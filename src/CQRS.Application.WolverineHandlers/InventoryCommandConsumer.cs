@@ -101,7 +101,7 @@ public sealed class InventoryCommandConsumer(
                     commandProcessingStatusRecorder.RecordCommandProcessingFailed(
                         request.CommandId,
                         timeProvider.GetUtcNow(),
-                        failed.GetType().Name
+                        failed.Error.ToString() ?? failed.Error.GetType().Name
                     ),
                 deserializationFailed =>
                     commandProcessingStatusRecorder.RecordCommandProcessingFailed(

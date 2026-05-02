@@ -4,6 +4,7 @@
   </PropertyGroup>
   <!-- App Packages -->
   <ItemGroup>
+    <PackageVersion Include="CliFx" Version="3.0.0" />
     <PackageVersion Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />
     <PackageVersion Include="AspNetCore.HealthChecks.Rabbitmq" Version="9.0.0" />
     <PackageVersion Include="Flurl" Version="4.0.0" />
