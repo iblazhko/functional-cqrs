@@ -2,6 +2,7 @@ using CQRS.API.Inventory;
 using CQRS.Domain.Failures;
 using CQRS.Mapping;
 using LanguageExt;
+using static LanguageExt.Prelude;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Shouldly;
 
@@ -23,7 +24,7 @@ public sealed class InventoriesApiHttpExtensionsTests
     [Fact]
     public void ToHttpResult_OptionSome_ReturnsOk()
     {
-        Option<InventoryResponse> option = LanguageExt.Prelude.Some(SomeResponse());
+        Option<InventoryResponse> option = Some(SomeResponse());
 
         var result = option.ToHttpResult();
 
@@ -34,7 +35,7 @@ public sealed class InventoriesApiHttpExtensionsTests
     public void ToHttpResult_OptionSome_OkContainsValue()
     {
         var response = SomeResponse();
-        Option<InventoryResponse> option = LanguageExt.Prelude.Some(response);
+        Option<InventoryResponse> option = Some(response);
 
         var result = (Ok<InventoryResponse>)option.ToHttpResult();
 
@@ -44,7 +45,7 @@ public sealed class InventoriesApiHttpExtensionsTests
     [Fact]
     public void ToHttpResult_OptionNone_ReturnsNotFound()
     {
-        Option<InventoryResponse> option = LanguageExt.Prelude.None;
+        Option<InventoryResponse> option = None;
 
         var result = option.ToHttpResult();
 

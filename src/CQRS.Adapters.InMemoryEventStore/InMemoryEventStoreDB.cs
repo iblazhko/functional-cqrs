@@ -21,7 +21,7 @@ public sealed class InMemoryEventStoreDB
             );
 
         var newStream = new SerializedEventStream(
-            currentStream.Events.Concat(events).ToArray(),
+            [.. currentStream.Events, .. events],
             currentStream.Version + events.Length
         );
 

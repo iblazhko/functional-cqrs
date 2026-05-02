@@ -1,7 +1,7 @@
-namespace CQRS.Infrastructure;
-
 using System.Reflection;
 using LanguageExt;
+
+namespace CQRS.Infrastructure;
 
 public sealed record EndpointsRegistration(Seq<Assembly> Assemblies, string QueuePrefix = "cqrs");
 

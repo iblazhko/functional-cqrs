@@ -6,7 +6,7 @@ public interface ITimeProvider
     Domain.TimeZone TimeZone { get; }
 }
 
-public class ApplicationTimeProvider : ITimeProvider
+public sealed class ApplicationTimeProvider : ITimeProvider
 {
     public DateTimeOffset GetUtcNow() => TimeProvider.System.GetUtcNow();
 

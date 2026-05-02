@@ -7,7 +7,7 @@ public interface IMoonPhaseService
     Task<MoonPhase> GetMoonPhase(Domain.TimeZone timeZone, DateTimeOffset time);
 }
 
-public class MoonPhaseService(Random random) : IMoonPhaseService
+public sealed class MoonPhaseService(Random random) : IMoonPhaseService
 {
     public Task<MoonPhase> GetMoonPhase(Domain.TimeZone timeZone, DateTimeOffset time) =>
         Task.FromResult(MoonPhaseValues[random.Next(0, MoonPhaseValues.Length)]);

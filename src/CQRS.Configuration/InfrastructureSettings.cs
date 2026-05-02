@@ -1,6 +1,6 @@
-namespace CQRS.Configuration;
-
 using System.Text;
+
+namespace CQRS.Configuration;
 
 public sealed record EndpointSettings
 {

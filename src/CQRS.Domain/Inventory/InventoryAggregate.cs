@@ -157,7 +157,7 @@ public static class InventoryAggregate
 
         public sealed record CommandNotSupported(InventoryId Id, string Command)
             : IInventoryCommandError;
-        // ReSharper enable NotAccessedPositionalProperty.Global
+        // ReSharper restore NotAccessedPositionalProperty.Global
     }
 }
 

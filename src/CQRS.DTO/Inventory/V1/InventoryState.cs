@@ -1,6 +1,6 @@
 namespace CQRS.DTO.Inventory.V1;
 
-public sealed class InventoryStateDto : ICqrsStateDto
+public sealed record InventoryStateDto : ICqrsStateDto
 {
     public string InventoryId { get; init; } = string.Empty;
     public string Name { get; init; } = string.Empty;

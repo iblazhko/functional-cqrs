@@ -9,7 +9,7 @@ using Serilog;
 
 namespace CQRS.Projections.WolverineHandlers;
 
-public class InventoryEventConsumer(IProjectionStore<InventoryViewModel> projectionStore)
+public sealed class InventoryEventConsumer(IProjectionStore<InventoryViewModel> projectionStore)
 {
     public Task Consume(InventoryCreatedEvent message) => HandleEventDto(message);
 
