@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="LanguageExt.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CQRS.Domain.Failures\CQRS.Domain.Failures.csproj" />
+    <ProjectReference Include="..\CQRS.EntityIds\CQRS.EntityIds.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="LanguageExt" />
+    <Using Include="LanguageExt.Prelude" Static="true" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="$(AssemblyName).Tests" />
+    <InternalsVisibleTo Include="CQRS.Adapters.InMemoryEventStore.Tests" />
+    <InternalsVisibleTo Include="CQRS.Adapters.MartenDbEventStore.Tests" />
+    <InternalsVisibleTo Include="CQRS.Application.Tests" />
+    <InternalsVisibleTo Include="CQRS.Application.WolverineHandlers.Tests" />
+    <InternalsVisibleTo Include="CQRS.Mapping.Tests" />
+    <InternalsVisibleTo Include="CQRS.Projections.Tests" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,5 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\CQRS.Projections.ViewModels\CQRS.Projections.ViewModels.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Shouldly" />
+    <PackageReference Include="WolverineFx" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CQRS.Adapters.InMemoryEventStore\CQRS.Adapters.InMemoryEventStore.csproj" />
+    <ProjectReference Include="..\CQRS.Application\CQRS.Application.csproj" />
+    <ProjectReference Include="..\CQRS.Application.CommandProcessingStatusRecording\CQRS.Application.CommandProcessingStatusRecording.csproj" />
+    <ProjectReference Include="..\CQRS.Application.WolverineHandlers\CQRS.Application.WolverineHandlers.csproj" />
+    <ProjectReference Include="..\CQRS.Domain\CQRS.Domain.csproj" />
+    <ProjectReference Include="..\CQRS.DTO\CQRS.DTO.csproj" />
+    <ProjectReference Include="..\CQRS.EntityIds\CQRS.EntityIds.csproj" />
+    <ProjectReference Include="..\CQRS.Ports.EventStore\CQRS.Ports.EventStore.csproj" />
+  </ItemGroup>
+</Project>

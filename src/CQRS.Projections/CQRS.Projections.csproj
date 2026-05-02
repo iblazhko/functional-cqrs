@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\CQRS.Domain\CQRS.Domain.csproj" />
+    <ProjectReference Include="..\CQRS.DTO\CQRS.DTO.csproj" />
+    <ProjectReference Include="..\CQRS.Mapping\CQRS.Mapping.csproj" />
+    <ProjectReference Include="..\CQRS.Ports.ProjectionStore\CQRS.Ports.ProjectionStore.csproj" />
+    <ProjectReference Include="..\CQRS.Projections.ViewModels\CQRS.Projections.ViewModels.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="WolverineFx" />
+    <PackageReference Include="Serilog" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CQRS.Application\CQRS.Application.csproj" />
+    <ProjectReference Include="..\CQRS.Application.CommandProcessingStatusRecording\CQRS.Application.CommandProcessingStatusRecording.csproj" />
+    <ProjectReference Include="..\CQRS.DTO\CQRS.DTO.csproj" />
+    <ProjectReference Include="..\CQRS.Ports.EventStore\CQRS.Ports.EventStore.csproj" />
+    <ProjectReference Include="..\CQRS.Ports.MessageBus\CQRS.Ports.MessageBus.csproj" />
+  </ItemGroup>
+</Project>

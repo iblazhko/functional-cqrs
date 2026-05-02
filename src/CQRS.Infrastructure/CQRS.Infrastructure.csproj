@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\CQRS.Adapters.InMemoryEventStore\CQRS.Adapters.InMemoryEventStore.csproj" />
+    <ProjectReference Include="..\CQRS.Adapters.MartenDbEventStore\CQRS.Adapters.MartenDbEventStore.csproj" />
+    <ProjectReference Include="..\CQRS.Adapters.MartenDbProjectionStore\CQRS.Adapters.MartenDbProjectionStore.csproj" />
+    <ProjectReference Include="..\CQRS.Adapters.WolverineMessageBus\CQRS.Adapters.WolverineMessageBus.csproj" />
+    <ProjectReference Include="..\CQRS.Application\CQRS.Application.csproj" />
+    <ProjectReference Include="..\CQRS.Configuration\CQRS.Configuration.csproj" />
+    <ProjectReference Include="..\CQRS.DTO\CQRS.DTO.csproj" />
+    <ProjectReference Include="..\CQRS.Ports.MessageBus\CQRS.Ports.MessageBus.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
+    <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" />
+    <PackageReference Include="LanguageExt.Core" />
+    <PackageReference Include="Marten" />
+    <PackageReference Include="WolverineFx" />
+    <PackageReference Include="WolverineFx.RabbitMQ" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Polly" />
+    <PackageReference Include="Polly.Contrib.WaitAndRetry" />
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Sinks.Console" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,69 @@
+@startuml Inventory System - Containers
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+skinparam defaultFontName "D-DIN"
+skinparam backgroundColor #EEEEEE
+scale 1600 width
+
+LAYOUT_TOP_DOWN()
+HIDE_STEREOTYPE()
+
+title Container diagram for Inventory Management System
+right footer Version 0.1
+
+AddElementTag("microservice-component", $shape=EightSidedShape(), $legendText="microservice-component")
+
+Person(admin, "Inventory Administrator", "Creates new inventories, disables inventories, views inventory status.")
+Container(client, "Client", "ui/cli", "Front-end interface end-user interacts with")
+System_Ext(ext_client, "<&cog> Component that uses inventory", "Adds items to or removes items from an inventory.", $sprite="robot")
+
+System_Boundary(boundary_system, "Inventory Management") {
+    frame "API Host" as api_host {
+        Container(api, "API", ".net/f#", "Command and Query API that the client system interacts with")
+        Container(query, "<&cog> Projections Query", ".net/f#", "Retrieves view models", $tags="microservice-component")
+    }
+
+    frame "Application Host" as app_host {
+        Container(domain, "Domain", ".net/f#", "Domain model and services")
+        Container(app, "<&cog> Application", ".net/f#", "Processes commands, adds events to event streams", $tags="microservice-component")
+        Container(projections, "<&cog> Projections", ".net/f#", "Subscribed to events, updates view model projectsions", $tags="microservice-component")
+    }
+
+    ContainerQueue(messagebus, "Message Bus", "RabbitMQ", "Inventory message queues")
+    ContainerDb(eventstore, "Event Store", "MartenDB", "Inventory event streams")
+    ContainerDb(projectionstore, "Projection Store", "MartenDB", "Inventory view models documents")
+
+    Rel(client, api, "Uses")
+    Rel(query, api, "Retreive view model DTO")
+    Rel(api, messagebus, "Send inventory command DTO")
+    Rel(messagebus, app, "Consume inventory command DTO")
+    Rel(app, eventstore, "Inventory event DTOs")
+    Rel(eventstore, messagebus, "Publish inventory event DTOs")
+    Rel(messagebus, projections, "Inventory event DTOs")
+    Rel(projections, projectionstore, "Updated view model DTOs")
+    Rel(projectionstore, query, "Retreive view model DTOs")
+
+    Rel(app, domain, "Uses")
+    Rel(projections, domain, "Uses")
+
+    Lay_D(client, api_host)
+    Lay_D(ext_client, api_host)
+
+    Lay_D(api_host, app_host)
+
+    Lay_D(api, query)
+
+    Lay_L(app, projections)
+    Lay_D(app, domain)
+    Lay_D(projections, domain)
+    Lay_D(app, eventstore)
+    Lay_D(projections, projectionstore)
+    Lay_D(query, projections)
+
+    Lay_D(messagebus, eventstore)
+}
+
+Rel(admin, client, "Uses")
+Rel(ext_client, api, "Uses")
+
+@enduml

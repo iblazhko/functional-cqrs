@@ -1,0 +1,142 @@
+<Solution>
+    <Folder Name="/0_Core/">
+        <Project Path="CQRS.Domain.Failures\CQRS.Domain.Failures.csproj" Type="Classic C#" />
+        <Project Path="CQRS.Domain.Tests\CQRS.Domain.Tests.csproj" Type="Classic C#" />
+        <Project Path="CQRS.Domain\CQRS.Domain.csproj" Type="Classic C#" />
+        <Project Path="CQRS.DTO\CQRS.DTO.csproj" Type="Classic C#" />
+        <Project Path="CQRS.EntityIds\CQRS.EntityIds.csproj" Type="Classic C#" />
+        <Project Path="CQRS.EntityIds.Tests\CQRS.EntityIds.Tests.csproj" Type="Classic C#" />
+        <Project Path="CQRS.Mapping\CQRS.Mapping.csproj" Type="Classic C#" />
+        <Project Path="CQRS.Mapping.Tests\CQRS.Mapping.Tests.csproj" Type="Classic C#" />
+    </Folder>
+    <Folder Name="/1_Server/" />
+    <Folder Name="/1_Server/1.1_Application/">
+        <Project
+            Path="CQRS.Application.CommandProcessingStatusRecording\CQRS.Application.CommandProcessingStatusRecording.csproj"
+            Type="Classic C#"
+        />
+        <Project
+            Path="CQRS.Application.WolverineHandlers\CQRS.Application.WolverineHandlers.csproj"
+            Type="Classic C#"
+        />
+        <Project
+            Path="CQRS.Application.WolverineHandlers.Tests\CQRS.Application.WolverineHandlers.Tests.csproj"
+            Type="Classic C#"
+        />
+        <Project Path="CQRS.Application.Tests\CQRS.Application.Tests.csproj" Type="Classic C#" />
+        <Project Path="CQRS.Application\CQRS.Application.csproj" Type="Classic C#" />
+    </Folder>
+    <Folder Name="/1_Server/1.2_Projections/">
+        <Project
+            Path="CQRS.Projections.WolverineHandlers\CQRS.Projections.WolverineHandlers.csproj"
+            Type="Classic C#"
+        />
+        <Project
+            Path="CQRS.Projections.WolverineHandlers.Tests\CQRS.Projections.WolverineHandlers.Tests.csproj"
+            Type="Classic C#"
+        />
+        <Project
+            Path="CQRS.Projections.Repositories\CQRS.Projections.Repositories.csproj"
+            Type="Classic C#"
+        />
+        <Project
+            Path="CQRS.Projections.Repositories.Tests\CQRS.Projections.Repositories.Tests.csproj"
+            Type="Classic C#"
+        />
+        <Project Path="CQRS.Projections.Tests\CQRS.Projections.Tests.csproj" Type="Classic C#" />
+        <Project
+            Path="CQRS.Projections.ViewModels\CQRS.Projections.ViewModels.csproj"
+            Type="Classic C#"
+        />
+        <Project Path="CQRS.Projections\CQRS.Projections.csproj" Type="Classic C#" />
+    </Folder>
+    <Folder Name="/1_Server/1.3_API/">
+        <Project Path="CQRS.API.Tests\CQRS.API.Tests.csproj" Type="Classic C#" />
+        <Project Path="CQRS.API\CQRS.API.csproj" Type="Classic C#" />
+    </Folder>
+    <Folder Name="/1_Server/1.4_Ports/">
+        <Project Path="CQRS.Ports.EventStore\CQRS.Ports.EventStore.csproj" Type="Classic C#" />
+        <Project Path="CQRS.Ports.EventStore.Tests\CQRS.Ports.EventStore.Tests.csproj" Type="Classic C#" />
+        <Project Path="CQRS.Ports.MessageBus\CQRS.Ports.MessageBus.csproj" Type="Classic C#" />
+        <Project Path="CQRS.Ports.MessageBus.Tests\CQRS.Ports.MessageBus.Tests.csproj" Type="Classic C#" />
+        <Project
+            Path="CQRS.Ports.ProjectionStore\CQRS.Ports.ProjectionStore.csproj"
+            Type="Classic C#"
+        />
+    </Folder>
+    <Folder Name="/1_Server/1.5_Adapters/">
+        <Project
+            Path="CQRS.Adapters.InMemoryEventStore.Tests\CQRS.Adapters.InMemoryEventStore.Tests.csproj"
+            Type="Classic C#"
+        />
+        <Project
+            Path="CQRS.Adapters.MartenDbEventStore.Tests\CQRS.Adapters.MartenDbEventStore.Tests.csproj"
+            Type="Classic C#"
+        />
+        <Project
+            Path="CQRS.Adapters.MartenDbProjectionStore.Tests\CQRS.Adapters.MartenDbProjectionStore.Tests.csproj"
+            Type="Classic C#"
+        />
+        <Project
+            Path="CQRS.Adapters.InMemoryEventStore\CQRS.Adapters.InMemoryEventStore.csproj"
+            Type="Classic C#"
+        />
+        <Project
+            Path="CQRS.Adapters.InMemoryProjectionStore.Tests\CQRS.Adapters.InMemoryProjectionStore.Tests.csproj"
+            Type="Classic C#"
+        />
+        <Project
+            Path="CQRS.Adapters.InMemoryProjectionStore\CQRS.Adapters.InMemoryProjectionStore.csproj"
+            Type="Classic C#"
+        />
+        <Project
+            Path="CQRS.Adapters.MartenDbEventStore\CQRS.Adapters.MartenDbEventStore.csproj"
+            Type="Classic C#"
+        />
+        <Project
+            Path="CQRS.Adapters.MartenDbProjectionStore\CQRS.Adapters.MartenDbProjectionStore.csproj"
+            Type="Classic C#"
+        />
+        <Project
+            Path="CQRS.Adapters.WolverineMessageBus\CQRS.Adapters.WolverineMessageBus.csproj"
+            Type="Classic C#"
+        />
+        <Project
+            Path="CQRS.Adapters.WolverineMessageBus.Tests\CQRS.Adapters.WolverineMessageBus.Tests.csproj"
+            Type="Classic C#"
+        />
+    </Folder>
+    <Folder Name="/1_Server/1.6_Hosts/">
+        <Project Path="CQRS.API.Host\CQRS.API.Host.csproj" Type="Classic C#" />
+        <Project Path="CQRS.Application.Host\CQRS.Application.Host.csproj" Type="Classic C#" />
+    </Folder>
+    <Folder Name="/1_Server/1.6_Hosts/1.6.0_Infrastructure/">
+        <Project Path="CQRS.Configuration\CQRS.Configuration.csproj" Type="Classic C#" />
+        <Project Path="CQRS.Infrastructure\CQRS.Infrastructure.csproj" Type="Classic C#" />
+    </Folder>
+    <Folder Name="/2_Client/">
+        <Project Path="CQRS.CLI\CQRS.CLI.csproj" Type="Classic C#" />
+    </Folder>
+    <Folder Name="/3_SystemTests/">
+        <Project Path="CQRS.System.Architecture.Tests\CQRS.System.Architecture.Tests.csproj" Type="Classic C#" />
+        <Project Path="CQRS.System.Integration.Tests\CQRS.System.Integration.Tests.csproj" Type="Classic C#" />
+    </Folder>
+    <Folder Name="/_devops_/">
+        <File Path="..\build.ps1" />
+        <File Path="..\docker-compose.yaml" />
+        <File Path="Directory.Build.props" />
+        <File Path="Directory.Packages.props" />
+        <File Path="CQRS.API.Host\cqrs-api.Dockerfile" />
+        <File Path="CQRS.Application.Host\cqrs-app.Dockerfile" />
+    </Folder>
+    <Folder Name="/_doc_/">
+        <File Path="..\README.md" />
+        <File Path="..\doc\architecture.md" />
+        <File Path="..\doc\build-and-run.md" />
+        <File Path="..\doc\cli-api.md" />
+        <File Path="..\doc\dependencies.md" />
+        <File Path="..\doc\dto.md" />
+        <File Path="..\doc\functional-core-imperative-shell.md" />
+        <File Path="..\doc\solution-structure.md" />
+    </Folder>
+</Solution>

@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\CQRS.Domain\CQRS.Domain.csproj" />
+    <ProjectReference Include="..\CQRS.DTO\CQRS.DTO.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LanguageExt.Core" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="$(AssemblyName).Tests" />
+  </ItemGroup>
+</Project>

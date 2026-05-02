@@ -1,0 +1,11 @@
+{
+    "cSpell.words": [
+        "CQRS",
+        "dockerize",
+        "dto",
+        "eventstore",
+        "Postgres",
+        "rabbitmq",
+        "Serilog"
+    ]
+}

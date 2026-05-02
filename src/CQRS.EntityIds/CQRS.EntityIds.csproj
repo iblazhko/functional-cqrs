@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="LanguageExt.Core" />
+    <PackageReference Include="Nanoid" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CQRS.Domain.Failures\CQRS.Domain.Failures.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="$(AssemblyName).Tests" />
+    <InternalsVisibleTo Include="CQRS.Application.Tests" />
+    <InternalsVisibleTo Include="CQRS.Mapping.Tests" />
+  </ItemGroup>
+</Project>
