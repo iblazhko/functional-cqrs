@@ -115,6 +115,7 @@
         <Project Path="CQRS.Infrastructure\CQRS.Infrastructure.csproj" Type="Classic C#" />
     </Folder>
     <Folder Name="/2_Client/">
+        <Project Path="CQRS.Benchmarks\CQRS.Benchmarks.csproj" Type="Classic C#" />
         <Project Path="CQRS.CLI\CQRS.CLI.csproj" Type="Classic C#" />
     </Folder>
     <Folder Name="/3_SystemTests/">
