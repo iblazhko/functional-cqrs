@@ -13,13 +13,13 @@ public static class InventoryApiEndpoints
 
         app.MapGet(
             prefix + "/{id}",
-            async ([FromRoute] string id, IInventoriesApiService apiService) =>
+            async ([FromRoute] string id, [FromServices] IInventoriesApiService apiService) =>
                 (await apiService.GetInventory(id)).ToHttpResult()
         );
 
         app.MapPost(
             prefix + "/",
-            async ([FromBody] CreateInventoryRequest request, IInventoriesApiService apiService) =>
+            async ([FromBody] CreateInventoryRequest request, [FromServices] IInventoriesApiService apiService) =>
                 (await apiService.CreateInventory(request)).ToHttpResult()
         );
 
@@ -28,7 +28,7 @@ public static class InventoryApiEndpoints
             async (
                 [FromRoute] string id,
                 [FromBody] RenameInventoryRequest request,
-                IInventoriesApiService apiService
+                [FromServices] IInventoriesApiService apiService
             ) => (await apiService.RenameInventory(id, request)).ToHttpResult()
         );
 
@@ -37,7 +37,7 @@ public static class InventoryApiEndpoints
             async (
                 [FromRoute] string id,
                 [FromBody] AddItemsToInventoryRequest request,
-                IInventoriesApiService apiService
+                [FromServices] IInventoriesApiService apiService
             ) => (await apiService.AddItemsToInventory(id, request)).ToHttpResult()
         );
 
@@ -46,7 +46,7 @@ public static class InventoryApiEndpoints
             async (
                 [FromRoute] string id,
                 [FromBody] RemoveItemsFromInventoryRequest request,
-                IInventoriesApiService apiService
+                [FromServices] IInventoriesApiService apiService
             ) => (await apiService.RemoveItemsFromInventory(id, request)).ToHttpResult()
         );
 
@@ -55,7 +55,7 @@ public static class InventoryApiEndpoints
             async (
                 [FromRoute] string id,
                 [FromBody] DeactivateInventoryRequest request,
-                IInventoriesApiService apiService
+                [FromServices] IInventoriesApiService apiService
             ) => (await apiService.DeactivateInventory(id, request)).ToHttpResult()
         );
     }

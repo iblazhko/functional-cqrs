@@ -1,5 +1,4 @@
 using CQRS.API.Inventory;
-using CQRS.Domain.Failures;
 using CQRS.Mapping;
 using LanguageExt;
 using static LanguageExt.Prelude;
@@ -78,11 +77,12 @@ public sealed class InventoriesApiHttpExtensionsTests
     [Fact]
     public void ToHttpResult_EitherLeft_ReturnsBadRequest()
     {
-        Either<MappingFault, AcceptedResponse> either = SomeFault();
+        var fault = SomeFault();
+        Either<MappingFault, AcceptedResponse> either = fault;
 
-        var result = either.ToHttpResult();
+        var result = (ProblemHttpResult)either.ToHttpResult();
 
-        result.ShouldBeOfType<BadRequest<MappingFault>>();
+        result.ShouldBeOfType<ProblemHttpResult>();
     }
 
     [Fact]
@@ -91,8 +91,11 @@ public sealed class InventoriesApiHttpExtensionsTests
         var fault = SomeFault();
         Either<MappingFault, AcceptedResponse> either = fault;
 
-        var result = (BadRequest<MappingFault>)either.ToHttpResult();
+        var result = (ProblemHttpResult)either.ToHttpResult();
 
-        result.Value.ShouldBe(fault);
+        result.ProblemDetails.Detail.ShouldBe(fault.Message);
+        result.ProblemDetails.Extensions.ShouldNotBeNull();
+        result.ProblemDetails.Extensions.ContainsKey("errors").ShouldBeTrue();
+        result.ProblemDetails.Extensions["errors"].ShouldBe(fault.Errors.Select(e => e.Message).ToArray());
     }
 }

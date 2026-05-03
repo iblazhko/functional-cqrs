@@ -28,6 +28,15 @@ services:
     networks:
       - cqrs-net
 
+  jaeger:
+    image: jaegertracing/jaeger:2.17.0
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "4317:4317"    # OTLP gRPC
+      - "4318:4318"    # OTLP HTTP
+    networks:
+      - cqrs-net
+
   ## Server
 
   server-application:
@@ -47,11 +56,13 @@ services:
       CQRS_CqrsApp__MessageBus__RabbitMq__Password: "${RABBITMQ_PASSWORD}"
       CQRS_CqrsApp__MessageBus__RabbitMq__VHost: "${RABBITMQ_VHOST}"
       CQRS_CqrsApp__Logging__Level: "Information"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://jaeger:4317"
     ports:
       - "17321:17321"
     depends_on:
       - rabbitmq
       - postgres
+      - jaeger
     networks:
       - cqrs-net
 
@@ -72,11 +83,13 @@ services:
       CQRS_CqrsApi__MessageBus__RabbitMq__Password: "${RABBITMQ_PASSWORD}"
       CQRS_CqrsApi__MessageBus__RabbitMq__VHost: "${RABBITMQ_VHOST}"
       CQRS_CqrsApi__Logging__Level: "Information"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://jaeger:4317"
     ports:
       - "17322:17322"
     depends_on:
       - rabbitmq
       - postgres
+      - jaeger
       - server-application
     networks:
       - cqrs-net

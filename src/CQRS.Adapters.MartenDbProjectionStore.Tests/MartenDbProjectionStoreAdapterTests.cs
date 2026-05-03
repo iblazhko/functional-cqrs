@@ -1,4 +1,5 @@
 using CQRS.Ports.ProjectionStore;
+using Microsoft.Extensions.Logging.Abstractions;
 using Shouldly;
 
 namespace CQRS.Adapters.MartenDbProjectionStore.Tests;
@@ -7,7 +8,7 @@ namespace CQRS.Adapters.MartenDbProjectionStore.Tests;
 public sealed class MartenDbProjectionStoreAdapterTests(PostgreSqlContainerFixture fixture)
 {
     private MartenDbProjectionStoreAdapter<TestViewModel> CreateStore() =>
-        new(fixture.DocumentStore);
+        new(fixture.DocumentStore, NullLoggerFactory.Instance);
 
     [Fact]
     public async Task OpenDocumentCollection_ReturnsNonNullCollection()

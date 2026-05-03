@@ -8,14 +8,18 @@ public interface ITimeProvider
 
 public sealed class ApplicationTimeProvider : ITimeProvider
 {
-    public DateTimeOffset GetUtcNow() => TimeProvider.System.GetUtcNow();
+    private readonly Domain.TimeZone _timeZone;
 
-    public Domain.TimeZone TimeZone => LondonTimeZone;
-
-    private static readonly Domain.TimeZone LondonTimeZone =
-        Domain.TimeZone.Create("Europe/London")
+    public ApplicationTimeProvider()
+    {
+        _timeZone = Domain.TimeZone.Create("Europe/London")
             .Match(
                 Right: tz => tz,
-                Left: _ => throw new InvalidOperationException("Invalid hardcoded timezone identifier")
+                Left: _ => throw new InvalidOperationException("Invalid hardcoded timezone identifier: 'Europe/London'")
             );
+    }
+
+    public DateTimeOffset GetUtcNow() => TimeProvider.System.GetUtcNow();
+
+    public Domain.TimeZone TimeZone => _timeZone;
 }

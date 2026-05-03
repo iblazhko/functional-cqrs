@@ -5,11 +5,14 @@ using CQRS.Mapping;
 using CQRS.Ports.ProjectionStore;
 using CQRS.Projections.Inventory.V1;
 using CQRS.Projections.ViewModels.Inventory.V1;
-using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace CQRS.Projections.WolverineHandlers;
 
-public sealed class InventoryEventConsumer(IProjectionStore<InventoryViewModel> projectionStore)
+public sealed class InventoryEventConsumer(
+    IProjectionStore<InventoryViewModel> projectionStore,
+    ILogger<InventoryEventConsumer> logger
+)
 {
     public Task Consume(InventoryCreatedEvent message) => HandleEventDto(message);
 
@@ -28,17 +31,14 @@ public sealed class InventoryEventConsumer(IProjectionStore<InventoryViewModel> 
     private async Task HandleEventDto<TEventDto>(TEventDto eventDto)
         where TEventDto : class, IInventoryEventDto
     {
-        Log.Logger.Information(
+        logger.LogInformation(
             "[MESSAGE-BUS] {MessageType} {@Message}",
             eventDto.GetType().FullName,
             eventDto
         );
 
         var result = await InventoryEventDtoHandler.Handle(eventDto, GetHandlerContext());
-        _ = result.Match(
-            Left: fault => throw new MappingException(fault.FromType, fault.ToType, fault.Message),
-            Right: _ => Unit.Default
-        );
+        result.IfLeft(fault => throw new MappingException(fault.FromType, fault.ToType, fault.Message));
     }
 
     private IInventoryDomainEventDtoHandlerContext<InventoryViewModel> GetHandlerContext() =>

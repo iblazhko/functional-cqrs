@@ -4,8 +4,9 @@ using CQRS.Application.Inventory;
 using CQRS.Domain;
 using CQRS.DTO;
 using CQRS.DTO.Inventory.V1;
+using CQRS.Ports.EventStore;
 using CQRS.Ports.MessageBus;
-using Serilog;
+using Microsoft.Extensions.Logging;
 using Wolverine;
 
 namespace CQRS.Application.WolverineHandlers;
@@ -14,7 +15,8 @@ public sealed class InventoryCommandConsumer(
     ITimeProvider timeProvider,
     IMoonPhaseService moonPhaseService,
     ICommandProcessingStatusRecordingService commandProcessingStatusRecorder,
-    InventoryCommandDtoHandler handler
+    InventoryCommandDtoHandler handler,
+    ILogger<InventoryCommandConsumer> logger
 )
 {
     public Task Consume(CreateInventoryCommand message, Envelope envelope) =>
@@ -46,6 +48,7 @@ public sealed class InventoryCommandConsumer(
             CausationId = (TryParseHeader(envelope, "cqrs-causation-id") ?? TryParseGuid(envelope.ParentId)) is { } g ? (MessagingId)g : null,
             Timestamp = timeProvider.GetUtcNow(),
         };
+        using var scope = logger.BeginScope(new Dictionary<string, object?> { ["CorrelationId"] = context.CorrelationId.Id });
         await InvokeWithProcessingStatusRecording(message, context, moonPhase);
     }
 
@@ -59,7 +62,7 @@ public sealed class InventoryCommandConsumer(
     )
         where T : class, IInventoryCommandDto
     {
-        Log.Information(
+        logger.LogInformation(
             "[MESSAGE-BUS<-] {MessageType} {@Message}",
             message.GetType().FullName,
             message
@@ -111,6 +114,12 @@ public sealed class InventoryCommandConsumer(
                     )
             );
         }
+        catch (ConcurrencyException)
+        {
+            // Transient: Wolverine retries per its configured cooldown policy.
+            // Status stays in Processing — do not record a terminal outcome.
+            throw;
+        }
         catch (Exception ex)
         {
             await commandProcessingStatusRecorder.RecordCommandProcessingFailed(
@@ -118,8 +127,7 @@ public sealed class InventoryCommandConsumer(
                 timeProvider.GetUtcNow(),
                 ex.Message
             );
-
-            throw;
+            throw new PermanentProcessingFailureException(ex.Message, ex);
         }
     }
 

@@ -77,8 +77,11 @@ public static class InfrastructureWaitPolicy
 
             return success;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Console.WriteLine(
+                $"[{TimeProvider.System.GetUtcNow():O}] Port check {host}:{port} failed — {ex.GetType().Name}: {ex.Message}"
+            );
             return false;
         }
     }

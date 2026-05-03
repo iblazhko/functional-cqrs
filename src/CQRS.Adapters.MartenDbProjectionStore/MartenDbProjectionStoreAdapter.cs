@@ -1,10 +1,13 @@
 using CQRS.Ports.ProjectionStore;
 using Marten;
+using Microsoft.Extensions.Logging;
 
 namespace CQRS.Adapters.MartenDbProjectionStore;
 
-public sealed class MartenDbProjectionStoreAdapter<TViewModel>(IDocumentStore documentStore)
-    : IProjectionStore<TViewModel>
+public sealed class MartenDbProjectionStoreAdapter<TViewModel>(
+    IDocumentStore documentStore,
+    ILoggerFactory loggerFactory
+) : IProjectionStore<TViewModel>
     where TViewModel : class
 {
     // in the case of MartenDb, there are no explicit documents collections (like e.g. in MongoDb)
@@ -14,7 +17,10 @@ public sealed class MartenDbProjectionStoreAdapter<TViewModel>(IDocumentStore do
         DocumentCollectionId collectionId
     ) =>
         Task.FromResult<IProjectionDocumentCollection<TViewModel>>(
-            new MartenDbDocumentCollection<TViewModel>(documentStore)
+            new MartenDbDocumentCollection<TViewModel>(
+                documentStore,
+                loggerFactory.CreateLogger<MartenDbDocumentCollection<TViewModel>>()
+            )
         );
 
     // MartenDb IDocumentStore instance lifecycle is managed by the application host

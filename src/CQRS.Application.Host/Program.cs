@@ -1,6 +1,7 @@
 using System.Reflection;
 using CQRS.Application;
 using CQRS.Application.CommandProcessingStatusRecording;
+using Microsoft.AspNetCore.Mvc;
 using CQRS.Application.WolverineHandlers;
 using CQRS.Configuration;
 using CQRS.DTO;
@@ -31,8 +32,10 @@ builder.Services
          settings.MessageBus)
     .AddCqrsEventStore(settings.MartenDb)
     .AddCqrsProjectionStore(settings.MartenDb)
+    .AddMartenDbCommandProcessingStatus(settings.MartenDb)
     .AddApplicationSerilog(settings.Logging)
-    .AddApplicationHealthChecks(settings);
+    .AddApplicationHealthChecks(settings)
+    .AddApplicationOpenTelemetry("cqrs-application");
 
 var app = builder.Build();
 
@@ -40,7 +43,7 @@ app.UseHealthChecks("/health");
 
 app.MapGet(
     "/commands/{commandId:guid}/status",
-    async (Guid commandId, ICommandProcessingStatusQueryService queryService) =>
+    async (Guid commandId, [FromServices] ICommandProcessingStatusQueryService queryService) =>
         (await queryService.GetCommandProcessingStatus(commandId))
             .Match<IResult>(vm => Results.Ok(vm), () => Results.NotFound())
 );

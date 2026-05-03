@@ -1,12 +1,14 @@
 using CQRS.Ports.EventStore;
 using Marten;
+using Microsoft.Extensions.Logging;
 
 namespace CQRS.Adapters.MartenDbEventStore;
 
 public sealed class MartenDbEventStoreAdapter<TDomainState, TDomainEvent, TEventDto>(
     IDocumentStore documentStore,
     IEventPublisher<TDomainEvent> eventPublisher,
-    TimeProvider timeProvider
+    TimeProvider timeProvider,
+    ILoggerFactory loggerFactory
 ) : IEventStore<TDomainState, TDomainEvent, TEventDto>
     where TEventDto : class
 {
@@ -24,7 +26,8 @@ public sealed class MartenDbEventStoreAdapter<TDomainState, TDomainEvent, TEvent
             DocumentStore,
             eventMapper,
             EventPublisher,
-            EventTimeProvider
+            EventTimeProvider,
+            loggerFactory.CreateLogger<MartenDbEventStreamSession<TDomainState, TDomainEvent, TEventDto>>()
         );
 
     public Task Delete(EventStreamId streamId)

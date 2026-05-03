@@ -5,6 +5,7 @@ using CQRS.Mapping;
 using CQRS.Ports.ProjectionStore;
 using CQRS.Projections.ViewModels.Inventory.V1;
 using CQRS.Projections.WolverineHandlers;
+using Microsoft.Extensions.Logging.Abstractions;
 using Shouldly;
 
 namespace CQRS.Projections.WolverineHandlers.Tests;
@@ -16,7 +17,7 @@ public sealed class InventoryEventConsumerTests
 
     public InventoryEventConsumerTests()
     {
-        _consumer = new InventoryEventConsumer(_store);
+        _consumer = new InventoryEventConsumer(_store, NullLogger<InventoryEventConsumer>.Instance);
     }
 
     private static string ValidId() => (string)EntityId.NewId();

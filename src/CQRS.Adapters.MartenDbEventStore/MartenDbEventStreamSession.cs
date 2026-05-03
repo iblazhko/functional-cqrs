@@ -2,7 +2,7 @@ using CQRS.Ports.EventStore;
 using LanguageExt;
 using static LanguageExt.Prelude;
 using Marten;
-using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace CQRS.Adapters.MartenDbEventStore;
 
@@ -11,7 +11,8 @@ internal sealed class MartenDbEventStreamSession<TDomainState, TDomainEvent, TEv
     IDocumentStore documentStore,
     IEventMapper<TDomainEvent, TEventDto> eventMapper,
     IEventPublisher<TDomainEvent> eventPublisher,
-    TimeProvider timeProvider
+    TimeProvider timeProvider,
+    ILogger<MartenDbEventStreamSession<TDomainState, TDomainEvent, TEventDto>> logger
 ) : IEventStreamSession<TDomainState, TDomainEvent>
     where TEventDto : class
 {
@@ -65,7 +66,7 @@ internal sealed class MartenDbEventStreamSession<TDomainState, TDomainEvent, TEv
 
     private async Task ReadStoredEvents(CancellationToken cancellationToken)
     {
-        Log.Debug("[EVENTSTORE] Open event stream {EventStreamId}", StreamId);
+        logger.LogDebug("[EVENTSTORE] Open event stream {EventStreamId}", StreamId);
 
         var mtEvents = await Session.Events.FetchStreamAsync(StreamId, token: cancellationToken);
 
@@ -145,7 +146,7 @@ internal sealed class MartenDbEventStreamSession<TDomainState, TDomainEvent, TEv
         CancellationToken cancellationToken = default
     )
     {
-        Log.Debug("[EVENTSTORE] Save event stream {EventStreamId}", StreamId);
+        logger.LogDebug("[EVENTSTORE] Save event stream {EventStreamId}", StreamId);
         if (_newEvents.Count == 0)
             return;
 

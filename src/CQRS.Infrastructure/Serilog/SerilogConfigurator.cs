@@ -4,6 +4,7 @@ namespace CQRS.Infrastructure;
 
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Serilog.Enrichers.OpenTelemetry;
 using Serilog.Events;
 
 public static class SerilogConfigurator
@@ -15,6 +16,8 @@ public static class SerilogConfigurator
 
         Log.Logger = configuration
             .Enrich.FromLogContext()
+            .Enrich.WithOpenTelemetryTraceId()
+            .Enrich.WithOpenTelemetrySpanId()
             .WriteTo.Console()
             .CreateLogger();
 

@@ -5,6 +5,7 @@
     <ProjectReference Include="..\CQRS.Adapters.MartenDbProjectionStore\CQRS.Adapters.MartenDbProjectionStore.csproj" />
     <ProjectReference Include="..\CQRS.Adapters.WolverineMessageBus\CQRS.Adapters.WolverineMessageBus.csproj" />
     <ProjectReference Include="..\CQRS.Application\CQRS.Application.csproj" />
+    <ProjectReference Include="..\CQRS.Application.CommandProcessingStatusRecording\CQRS.Application.CommandProcessingStatusRecording.csproj" />
     <ProjectReference Include="..\CQRS.Configuration\CQRS.Configuration.csproj" />
     <ProjectReference Include="..\CQRS.DTO\CQRS.DTO.csproj" />
     <ProjectReference Include="..\CQRS.Ports.MessageBus\CQRS.Ports.MessageBus.csproj" />
@@ -19,8 +20,13 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Polly" />
     <PackageReference Include="Polly.Contrib.WaitAndRetry" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" />
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Enrichers.OpenTelemetry" />
     <PackageReference Include="Serilog.Sinks.Console" />
   </ItemGroup>
 </Project>

@@ -23,7 +23,8 @@ builder.Services
          settings.MessageBus)
     .AddCqrsProjectionStore(settings.MartenDb)
     .AddApplicationSerilog(settings.Logging)
-    .AddApplicationHealthChecks(settings);
+    .AddApplicationHealthChecks(settings)
+    .AddApplicationOpenTelemetry("cqrs-api");
 
 var app = builder.Build();
 app.AddApiEndpoints();

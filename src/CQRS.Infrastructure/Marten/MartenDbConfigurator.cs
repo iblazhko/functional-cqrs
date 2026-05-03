@@ -1,5 +1,6 @@
 namespace CQRS.Infrastructure;
 
+using CQRS.Application.CommandProcessingStatusRecording;
 using CQRS.Configuration;
 using JasperFx.Events;
 using Marten;
@@ -22,6 +23,10 @@ public static class MartenDbConfigurator
                 options.Events.MetadataConfig.HeadersEnabled = true;
                 options.Events.MetadataConfig.CausationIdEnabled = true;
                 options.Events.MetadataConfig.CorrelationIdEnabled = true;
+
+                options.Schema.For<CommandProcessingStatusViewModel>()
+                    .Identity(x => x.CommandId)
+                    .Index(x => x.CorrelationId);
 
                 // AutoCreateSchemaObjects most likely should be turned off in a real deployment
                 options.AutoCreateSchemaObjects = JasperFx.AutoCreate.All;

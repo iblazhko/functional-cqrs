@@ -3,6 +3,6 @@
     <ProjectReference Include="..\CQRS.Ports.ProjectionStore\CQRS.Ports.ProjectionStore.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Serilog" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
   </ItemGroup>
 </Project>

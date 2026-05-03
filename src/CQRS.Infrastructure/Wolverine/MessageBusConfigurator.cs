@@ -40,11 +40,14 @@ public static class MessageBusConfigurator
             opts.OnException<Ports.EventStore.ConcurrencyException>()
                 .RetryWithCooldown(
                     [
-                        TimeSpan.FromMilliseconds(5),
-                        TimeSpan.FromMilliseconds(25),
-                        TimeSpan.FromMilliseconds(100),
+                        TimeSpan.FromMilliseconds(50),
+                        TimeSpan.FromMilliseconds(150),
+                        TimeSpan.FromMilliseconds(500),
                     ]
                 );
+
+            opts.OnException<Ports.MessageBus.PermanentProcessingFailureException>()
+                .MoveToErrorQueue();
         });
 
         return services;

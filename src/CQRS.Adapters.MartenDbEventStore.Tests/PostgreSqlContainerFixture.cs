@@ -5,6 +5,7 @@ using CQRS.Ports.EventStore;
 using DotNet.Testcontainers.Configurations;
 using JasperFx.Events;
 using Marten;
+using Microsoft.Extensions.Logging.Abstractions;
 using Testcontainers.PostgreSql;
 
 namespace CQRS.Adapters.MartenDbEventStore.Tests;
@@ -47,7 +48,7 @@ public sealed class PostgreSqlContainerFixture : IAsyncLifetime
     }
 
     public MartenDbEventStoreAdapter<InventoryState, IInventoryEvent, IInventoryEventDto> CreateAdapter() =>
-        new(DocumentStore, new NoOpEventPublisher<IInventoryEvent>(), TimeProvider.System);
+        new(DocumentStore, new NoOpEventPublisher<IInventoryEvent>(), TimeProvider.System, NullLoggerFactory.Instance);
 
     public async Task DisposeAsync()
     {

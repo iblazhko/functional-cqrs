@@ -37,7 +37,7 @@ public class InventoryCommandDtoHandler(
     )
     {
         var streamId = InventoryEventStreamId.GetStreamId(command.Id);
-        var session = eventStore.Open(streamId, eventMapper);
+        await using var session = eventStore.Open(streamId, eventMapper);
         var stateResult = await session.GetState(stateProjection);
 
         return await stateResult.Match(

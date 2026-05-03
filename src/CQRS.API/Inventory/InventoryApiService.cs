@@ -169,5 +169,13 @@ public static class InventoriesApiHttpExtensions
         outcome.Match(Results.Ok, Results.NotFound());
 
     public static IResult ToHttpResult(this Either<MappingFault, AcceptedResponse> outcome) =>
-        outcome.Match(f => Results.BadRequest(f), r => Results.Accepted(value: r));
+        outcome.Match(
+            fault => Results.Problem(
+                title: "Validation failed",
+                detail: fault.Message,
+                statusCode: 400,
+                extensions: new Dictionary<string, object?> { ["errors"] = fault.Errors.Select(e => e.Message).ToArray() }
+            ),
+            r => Results.Accepted(value: r)
+        );
 }

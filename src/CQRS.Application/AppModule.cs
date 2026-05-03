@@ -18,6 +18,13 @@ public static class Module
         services.AddSingleton<EventStoreInventoryEventMapper>();
         services.AddScoped<InventoryCommandDtoHandler>();
 
+        return services;
+    }
+
+    public static IServiceCollection AddInMemoryCommandProcessingStatus(
+        this IServiceCollection services
+    )
+    {
         services.AddSingleton<CommandProcessingStatusRecordingService>();
         services.AddSingleton<ICommandProcessingStatusRecordingService>(sp =>
             sp.GetRequiredService<CommandProcessingStatusRecordingService>()

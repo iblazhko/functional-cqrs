@@ -9,6 +9,8 @@ using CQRS.DTO.Inventory.V1;
 using CQRS.EntityIds;
 using CQRS.Mapping.Inventory.V1;
 using CQRS.Ports.EventStore;
+using CQRS.Ports.MessageBus;
+using Microsoft.Extensions.Logging.Abstractions;
 using Shouldly;
 using Wolverine;
 
@@ -76,7 +78,8 @@ public sealed class InventoryCommandConsumerTests
             new InventoryCommandV1Mapper(),
             new InventoryEventStreamStateProjection(),
             new EventStoreInventoryEventMapper()
-        )
+        ),
+        NullLogger<InventoryCommandConsumer>.Instance
     );
 
     private static string ValidId() => (string)EntityId.NewId();
@@ -212,12 +215,12 @@ public sealed class InventoryCommandConsumerTests
     // --- Exception path ---
 
     [Fact]
-    public async Task Consume_WhenEventStoreThrows_RecordsFailedAndRethrows()
+    public async Task Consume_WhenEventStoreThrows_RecordsFailedAndThrowsPermanentFailure()
     {
         var consumer = MakeConsumer(new ThrowingEventStore());
         var envelopeId = Guid.NewGuid();
 
-        await Should.ThrowAsync<InvalidOperationException>(
+        await Should.ThrowAsync<PermanentProcessingFailureException>(
             () => consumer.Consume(
                 new CreateInventoryCommand { InventoryId = ValidId(), Name = "Widget" },
                 MakeEnvelope(id: envelopeId)

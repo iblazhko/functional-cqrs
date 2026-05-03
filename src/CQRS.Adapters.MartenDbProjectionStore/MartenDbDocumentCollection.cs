@@ -1,11 +1,13 @@
 using CQRS.Ports.ProjectionStore;
 using Marten;
-using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace CQRS.Adapters.MartenDbProjectionStore;
 
-public sealed class MartenDbDocumentCollection<TViewModel>(IDocumentStore documentStore)
-    : IProjectionDocumentCollection<TViewModel>
+public sealed class MartenDbDocumentCollection<TViewModel>(
+    IDocumentStore documentStore,
+    ILogger<MartenDbDocumentCollection<TViewModel>> logger
+) : IProjectionDocumentCollection<TViewModel>
     where TViewModel : class
 {
     private readonly IDocumentSession _session = documentStore.LightweightSession();
@@ -23,7 +25,7 @@ public sealed class MartenDbDocumentCollection<TViewModel>(IDocumentStore docume
 
     public async Task<TViewModel?> GetById(DocumentId documentId)
     {
-        Log.Logger.Information("[PROJECTION] Retrieving {DocumentId}", documentId);
+        logger.LogInformation("[PROJECTION] Retrieving {DocumentId}", documentId);
         var envelope = await TryGetEnvelopeByDocumentId(documentId);
 
         return envelope?.VM;
@@ -31,7 +33,7 @@ public sealed class MartenDbDocumentCollection<TViewModel>(IDocumentStore docume
 
     public async Task Update(DocumentId documentId, TViewModel vm)
     {
-        Log.Logger.Information("[PROJECTION] Storing {DocumentId}", documentId);
+        logger.LogInformation("[PROJECTION] Storing {DocumentId}", documentId);
 
         var envelope = await TryGetEnvelopeByDocumentId(documentId);
 
