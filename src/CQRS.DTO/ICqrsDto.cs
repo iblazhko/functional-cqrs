@@ -6,8 +6,6 @@ public interface ICqrsCommandDto : ICqrsDto;
 
 public interface ICqrsEventDto : ICqrsDto;
 
-public interface ICqrsStateDto : ICqrsDto;
-
 public interface IInventoryEventDto : ICqrsEventDto;
 
 public interface IInventoryCommandDto : ICqrsCommandDto;
