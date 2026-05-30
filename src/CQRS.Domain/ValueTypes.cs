@@ -24,6 +24,7 @@ public sealed record PositiveInteger : IComparable<int>, IComparable<PositiveInt
 
     internal static PositiveInteger CreateUnsafe(int value) =>
         value <= 0
+            // This "throw" is a defencive mechanism added for the sake of completeness. This branch is not reached in practice.
             ? throw new ArgumentOutOfRangeException(
                 nameof(value),
                 "Value must be a positive integer"

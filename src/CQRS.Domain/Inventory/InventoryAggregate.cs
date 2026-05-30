@@ -2,6 +2,8 @@ namespace CQRS.Domain.Inventory;
 
 public static class InventoryAggregate
 {
+    private static readonly Seq<IInventoryEvent> NoEvents = Empty;
+
     public static Either<Errors.IInventoryCommandError, Seq<IInventoryEvent>> CreateInventory(
         InventoryState state,
         CreateInventory command
@@ -16,7 +18,7 @@ public static class InventoryAggregate
             () =>
                 state.Name != command.NewName
                     ? new InventoryRenamed(state.Id, state.Name, command.NewName).ToSeq()
-                    : Empty
+                    : NoEvents
         );
 
     public static Either<Errors.IInventoryCommandError, Seq<IInventoryEvent>> AddItemsToInventory(
@@ -27,7 +29,7 @@ public static class InventoryAggregate
             state,
             () =>
             {
-                return new Seq<IInventoryEvent>(ProduceEvents());
+                return ProduceEvents().ToSeq();
 
                 IEnumerable<IInventoryEvent> ProduceEvents()
                 {
@@ -64,7 +66,7 @@ public static class InventoryAggregate
                 if (quantityRequested > quantityInStock)
                     return new Errors.CannotRemoveMoreThanHaveInStock(state.Id);
 
-                return new Seq<IInventoryEvent>(ProduceEvents());
+                return ProduceEvents().ToSeq();
 
                 IEnumerable<IInventoryEvent> ProduceEvents()
                 {
@@ -102,7 +104,7 @@ public static class InventoryAggregate
             () =>
             {
                 if (!state.IsActive)
-                    return LanguageExt.Seq.empty<IInventoryEvent>();
+                    return NoEvents;
 
                 if (!state.Quantity.IsNone)
                     return new Errors.CannotDeactivateNonEmpty(state.Id);
@@ -164,4 +166,7 @@ public static class InventoryAggregate
 public static class InventoryEventExtensions
 {
     public static Seq<IInventoryEvent> ToSeq(this IInventoryEvent evt) => new([evt]);
+
+    public static Seq<IInventoryEvent> ToSeq(this IEnumerable<IInventoryEvent> events) =>
+        toSeq(events);
 }

@@ -12,6 +12,7 @@ All automation uses the PowerShell build script:
 ./build.ps1 -Target Dotnet.Test          # Run all tests
 ./build.ps1 -Target Dotnet.Restore       # Restore NuGet packages
 
+./build.ps1 -Target DockerCompose.Start          # Start full stack
 ./build.ps1 -Target DockerCompose.StartDetached  # Start full stack (background)
 ./build.ps1 -Target DockerCompose.Stop           # Stop stack
 ./build.ps1 -Target Docker.Build                 # Build Docker images (requires Dotnet.Publish first)
@@ -66,12 +67,14 @@ This is a C# implementation of **CQRS + Event Sourcing + DDD** using functional 
 
 ### Domain Pattern
 
-Aggregates use pure static functions: `(State, Command) → Either<IError, Seq<IEvent>>`
+Aggregates handle commands using pure static functions: `(State, Command) → Either<IError, Seq<IEvent>>`
 
 ```csharp
 // src/CQRS.Domain/Inventory/InventoryAggregate.cs — example shape
 public static Either<IError, Seq<IEvent>> Handle(InventoryState state, CreateInventory cmd) { ... }
 ```
+
+Events produced by the aggregate are stored in the corresponding event stream.
 
 State is reconstructed from events via `InventoryStateProjection`. No mutable state in domain.
 
@@ -79,10 +82,12 @@ State is reconstructed from events via `InventoryStateProjection`. No mutable st
 
 - **.NET 10 / C# 13**, `global.json` pins SDK version
 - **LanguageExt 5.x** — `Either<L,R>`, `Option<T>`, `Seq<T>`, discriminated unions
-- **MartenDB 8.x** — PostgreSQL-backed event store and document projection store
-- **MassTransit 8.x** + **RabbitMQ** — message bus for inter-process commands/events
+- **MartenDB 9.x** — PostgreSQL-backed event store and document projection store
+- **Wolverine 6.x** + **RabbitMQ** — message bus for inter-process commands/events
 - **ASP.NET Core Minimal APIs** — no controllers
-- **xUnit** + **ArchUnitNET** + **Bogus** + **FluentDocker** — test stack
+- **xUnit v3** + **Shouldly** + **Bogus**  — test stack
+  - Architectural dependencies rules verified with **ArchUnitNET**
+  - System level end-to-end tests implemented with **TestContainers**
 - **Serilog** — structured logging
 
 ### NuGet Package Management
@@ -91,8 +96,8 @@ Versions are centrally managed in `src/Directory.Packages.props`. Do not specify
 
 ### Infrastructure (Docker)
 
-- **PostgreSQL 17.6** on port 5432
-- **RabbitMQ 4.1** on port 5672 (management UI on 15672)
+- **PostgreSQL 18.x** on port 5432
+- **RabbitMQ 4.2** on port 5672 (management UI on 15672)
 - Default credentials in `.env` (dev only — `POSTGRES_PASSWORD=changeit`, `RABBITMQ_PASSWORD=changeit`)
 
 Use `docker-compose.yaml` for the full stack, or split compose files for app vs infrastructure separately.

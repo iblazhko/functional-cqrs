@@ -15,6 +15,7 @@ public static class InventoryStateProjection
             InventoryDeactivated => state with { IsActive = false },
             ItemWentInStock => state,
             ItemWentOutOfStock => state,
+            // Default branch is a defensive assertion rather than genuine control flow. Not reachable in practice.
             _ => throw new NotSupportedException($"Inventory event is not supported: {inventoryEvent.GetType().FullName}"),
         };
 }
