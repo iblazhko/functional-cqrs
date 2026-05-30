@@ -31,7 +31,7 @@ public sealed class MartenDbEventStreamSessionTests(PostgreSqlContainerFixture f
         var streamId = InventoryEventStreamId.GetStreamId(InventoryId.NewId());
         await using var session = CreateAdapter().Open(streamId, _mapper);
 
-        var result = await session.GetAllEvents();
+        var result = await session.GetAllEvents(cancellationToken: TestContext.Current.CancellationToken);
 
         result.Events.ShouldBeEmpty();
         result.StreamVersion.ShouldBe(EventStreamVersion.InitialVersion);
@@ -72,7 +72,7 @@ public sealed class MartenDbEventStreamSessionTests(PostgreSqlContainerFixture f
         newEvents.Events.Count.ShouldBe(1);
 
         await using var checkSession = CreateAdapter().Open(streamId, _mapper);
-        var persisted = await checkSession.GetAllEvents();
+        var persisted = await checkSession.GetAllEvents(cancellationToken: TestContext.Current.CancellationToken);
         persisted.Events.ShouldBeEmpty();
     }
 
@@ -85,7 +85,7 @@ public sealed class MartenDbEventStreamSessionTests(PostgreSqlContainerFixture f
 
         await using var session = CreateAdapter().Open(streamId, _mapper);
         session.AppendEvents([new InventoryCreated(entityId, entityName, true)], null, null);
-        await session.Save();
+        await session.Save(cancellationToken: TestContext.Current.CancellationToken);
 
         Should.Throw<SessionIsLockedException>(() =>
             session.AppendEvents([new InventoryCreated(entityId, entityName, true)], null, null)
@@ -105,10 +105,10 @@ public sealed class MartenDbEventStreamSessionTests(PostgreSqlContainerFixture f
 
         await using var session = CreateAdapter().Open(streamId, _mapper);
         session.AppendEvents([new InventoryCreated(entityId, entityName, true)], null, null);
-        await session.Save();
+        await session.Save(cancellationToken: TestContext.Current.CancellationToken);
 
         await using var reload = CreateAdapter().Open(streamId, _mapper);
-        var result = await reload.GetAllEvents();
+        var result = await reload.GetAllEvents(cancellationToken: TestContext.Current.CancellationToken);
 
         result.Events.Count.ShouldBe(1);
         result.Events.Single().Event.ShouldBeOfType<InventoryCreated>();
@@ -123,12 +123,12 @@ public sealed class MartenDbEventStreamSessionTests(PostgreSqlContainerFixture f
 
         await using var session1 = CreateAdapter().Open(streamId, _mapper);
         session1.AppendEvents([new InventoryCreated(entityId, entityName, true)], null, null);
-        await session1.Save();
+        await session1.Save(cancellationToken: TestContext.Current.CancellationToken);
 
         // State must be loaded before appending to an existing stream so the session
         // sets _storedRevision and uses Append (not StartStream) when saving.
         await using var session2 = CreateAdapter().Open(streamId, _mapper);
-        await session2.GetState(_projection);
+        await session2.GetState(_projection, cancellationToken: TestContext.Current.CancellationToken);
         session2.AppendEvents(
             [
                 new ItemsAddedToInventory(
@@ -142,10 +142,10 @@ public sealed class MartenDbEventStreamSessionTests(PostgreSqlContainerFixture f
             null,
             null
         );
-        await session2.Save();
+        await session2.Save(cancellationToken: TestContext.Current.CancellationToken);
 
         await using var reload = CreateAdapter().Open(streamId, _mapper);
-        var result = await reload.GetAllEvents();
+        var result = await reload.GetAllEvents(cancellationToken: TestContext.Current.CancellationToken);
         result.Events.Count.ShouldBe(2);
     }
 
@@ -160,7 +160,7 @@ public sealed class MartenDbEventStreamSessionTests(PostgreSqlContainerFixture f
         var streamId = InventoryEventStreamId.GetStreamId(entityId);
 
         await using var session = CreateAdapter().Open(streamId, _mapper);
-        var result = await session.GetState(_projection);
+        var result = await session.GetState(_projection, cancellationToken: TestContext.Current.CancellationToken);
 
         result.IsRight.ShouldBeTrue();
         var state = result.Match(Left: _ => null!, Right: s => s);
@@ -177,10 +177,10 @@ public sealed class MartenDbEventStreamSessionTests(PostgreSqlContainerFixture f
 
         await using var session1 = CreateAdapter().Open(streamId, _mapper);
         session1.AppendEvents([new InventoryCreated(entityId, entityName, true)], null, null);
-        await session1.Save();
+        await session1.Save(cancellationToken: TestContext.Current.CancellationToken);
 
         await using var session2 = CreateAdapter().Open(streamId, _mapper);
-        var result = await session2.GetState(_projection);
+        var result = await session2.GetState(_projection, cancellationToken: TestContext.Current.CancellationToken);
 
         result.IsRight.ShouldBeTrue();
         var state = result.Match(Left: _ => null!, Right: s => s);
@@ -199,16 +199,15 @@ public sealed class MartenDbEventStreamSessionTests(PostgreSqlContainerFixture f
 
         await using var session1 = CreateAdapter().Open(streamId, _mapper);
         session1.AppendEvents([new InventoryCreated(entityId, entityName, true)], null, null);
-        await session1.Save();
+        await session1.Save(cancellationToken: TestContext.Current.CancellationToken);
 
         await using var session2 = CreateAdapter().Open(streamId, _mapper);
         session2.AppendEvents(
             [new InventoryRenamed(entityId, entityName, updatedName)],
             null,
-            null
-        );
+            null);
 
-        var result = await session2.GetState(_projection);
+        var result = await session2.GetState(_projection, cancellationToken: TestContext.Current.CancellationToken);
 
         result.IsRight.ShouldBeTrue();
         result.Match(Left: _ => null!, Right: s => s).Name.ToString().ShouldBe(updatedName);

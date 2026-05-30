@@ -17,7 +17,7 @@ public sealed class PostgreSqlContainerFixture : IAsyncLifetime
 
     public IDocumentStore DocumentStore { get; private set; } = null!;
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await _container.StartAsync();
 
@@ -31,7 +31,7 @@ public sealed class PostgreSqlContainerFixture : IAsyncLifetime
         await DocumentStore.Storage.ApplyAllConfiguredChangesToDatabaseAsync();
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         if (DocumentStore is not null)
         {

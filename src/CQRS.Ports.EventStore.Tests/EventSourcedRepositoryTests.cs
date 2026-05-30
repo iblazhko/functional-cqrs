@@ -102,7 +102,8 @@ public sealed class EventSourcedRepositoryTests
         var expected = new TestState("loaded");
         var session = new SpySession { ReturnState = expected };
 
-        var result = await MakeRepository(session).GetState(AnyStreamId(), new IdentityMapper(), new ConstantProjection(expected));
+        var result = await MakeRepository(session)
+            .GetState(AnyStreamId(), new IdentityMapper(), new ConstantProjection(expected), cancellationToken: TestContext.Current.CancellationToken);
 
         result.IsRight.ShouldBeTrue();
         result.Match(Left: _ => TestState.Empty, Right: s => s).ShouldBe(expected);
@@ -113,7 +114,7 @@ public sealed class EventSourcedRepositoryTests
     {
         var session = new SpySession();
 
-        await MakeRepository(session).GetState(AnyStreamId(), new IdentityMapper(), new ConstantProjection(TestState.Empty));
+        await MakeRepository(session).GetState(AnyStreamId(), new IdentityMapper(), new ConstantProjection(TestState.Empty), cancellationToken: TestContext.Current.CancellationToken);
 
         session.Disposed.ShouldBeTrue();
     }
@@ -128,7 +129,8 @@ public sealed class EventSourcedRepositoryTests
 
         await MakeRepository(session).AddEvents(
             AnyStreamId(), new IdentityMapper(), new ConstantProjection(TestState.Empty),
-            _ => newEvents
+            _ => newEvents,
+            cancellationToken: TestContext.Current.CancellationToken
         );
 
         session.AppendedEvents.ShouldBe(newEvents);
@@ -141,7 +143,8 @@ public sealed class EventSourcedRepositoryTests
 
         await MakeRepository(session).AddEvents(
             AnyStreamId(), new IdentityMapper(), new ConstantProjection(TestState.Empty),
-            _ => [new TestEvent("A")]
+            _ => [new TestEvent("A")],
+            cancellationToken: TestContext.Current.CancellationToken
         );
 
         session.SaveCalled.ShouldBeTrue();
@@ -156,7 +159,8 @@ public sealed class EventSourcedRepositoryTests
         await MakeRepository(session).AddEvents(
             AnyStreamId(), new IdentityMapper(), new ConstantProjection(TestState.Empty),
             _ => [new TestEvent("A")],
-            correlationId: corrId
+            correlationId: corrId,
+            cancellationToken: TestContext.Current.CancellationToken
         );
 
         session.AppendedCorrelationId.ShouldBe(corrId);
@@ -171,7 +175,8 @@ public sealed class EventSourcedRepositoryTests
         await MakeRepository(session).AddEvents(
             AnyStreamId(), new IdentityMapper(), new ConstantProjection(TestState.Empty),
             _ => [new TestEvent("A")],
-            causationId: causId
+            causationId: causId,
+            cancellationToken: TestContext.Current.CancellationToken
         );
 
         session.AppendedCausationId.ShouldBe(causId);
@@ -185,7 +190,8 @@ public sealed class EventSourcedRepositoryTests
 
         var result = await MakeRepository(session).AddEvents(
             AnyStreamId(), new IdentityMapper(), new ConstantProjection(TestState.Empty),
-            _ => newEvents
+            _ => newEvents,
+            cancellationToken: TestContext.Current.CancellationToken
         );
 
         result.IsRight.ShouldBeTrue();
@@ -201,7 +207,8 @@ public sealed class EventSourcedRepositoryTests
         TestState? receivedState = null;
         await MakeRepository(session).AddEvents(
             AnyStreamId(), new IdentityMapper(), new ConstantProjection(sessionState),
-            state => { receivedState = state; return []; }
+            state => { receivedState = state; return []; },
+            cancellationToken: TestContext.Current.CancellationToken
         );
 
         receivedState.ShouldBe(sessionState);
@@ -216,7 +223,8 @@ public sealed class EventSourcedRepositoryTests
 
         await MakeRepository(session).AddEvents(
             AnyStreamId(), new IdentityMapper(), new ConstantProjection(TestState.Empty),
-            _ => []
+            _ => [],
+            cancellationToken: TestContext.Current.CancellationToken
         );
 
         session.AppendedEvents.ShouldBeNull();
@@ -229,7 +237,8 @@ public sealed class EventSourcedRepositoryTests
 
         await MakeRepository(session).AddEvents(
             AnyStreamId(), new IdentityMapper(), new ConstantProjection(TestState.Empty),
-            _ => []
+            _ => [],
+            cancellationToken: TestContext.Current.CancellationToken
         );
 
         session.SaveCalled.ShouldBeFalse();
@@ -242,7 +251,8 @@ public sealed class EventSourcedRepositoryTests
 
         var result = await MakeRepository(session).AddEvents(
             AnyStreamId(), new IdentityMapper(), new ConstantProjection(TestState.Empty),
-            _ => []
+            _ => [],
+            cancellationToken: TestContext.Current.CancellationToken
         );
 
         result.IsRight.ShouldBeTrue();
@@ -256,7 +266,8 @@ public sealed class EventSourcedRepositoryTests
 
         await MakeRepository(session).AddEvents(
             AnyStreamId(), new IdentityMapper(), new ConstantProjection(TestState.Empty),
-            _ => []
+            _ => [],
+            cancellationToken: TestContext.Current.CancellationToken
         );
 
         session.Disposed.ShouldBeTrue();

@@ -74,7 +74,7 @@ public sealed class InventoryCommandDtoHandlerTests
         var streamId = InventoryEventStreamId.GetStreamId(
             InventoryId.Create(EntityId.CreateUnsafe(id))
         );
-        var streamExists = await _eventStore.Contains(streamId);
+        var streamExists = await _eventStore.Contains(streamId, cancellationToken: TestContext.Current.CancellationToken);
         streamExists.ShouldBeTrue();
     }
 

@@ -32,7 +32,7 @@ public sealed class WolverineMessageBusAdapterTests
     {
         ITestEvent message = new ConcreteTestEvent("x");
 
-        await _adapter.Publish(message, MakeContext());
+        await _adapter.Publish(message, MakeContext(), cancellationToken: TestContext.Current.CancellationToken);
 
         var (published, _) = _bus.Published.ShouldHaveSingleItem();
         published.GetType().ShouldBe(typeof(ConcreteTestEvent));
@@ -51,7 +51,7 @@ public sealed class WolverineMessageBusAdapterTests
     {
         var message = "test-message";
 
-        await _adapter.Publish(message, MakeContext());
+        await _adapter.Publish(message, MakeContext(), cancellationToken: TestContext.Current.CancellationToken);
 
         var (published, _) = _bus.Published.ShouldHaveSingleItem();
         published.ShouldBe(message);
@@ -62,7 +62,7 @@ public sealed class WolverineMessageBusAdapterTests
     {
         var context = MakeContext();
 
-        await _adapter.Publish("hello", context);
+        await _adapter.Publish("hello", context, cancellationToken: TestContext.Current.CancellationToken);
 
         var (_, options) = _bus.Published.ShouldHaveSingleItem();
         options!.Headers["cqrs-message-id"].ShouldBe(context.MessageId.Id.ToString());
@@ -73,7 +73,7 @@ public sealed class WolverineMessageBusAdapterTests
     {
         var context = MakeContext();
 
-        await _adapter.Publish("hello", context);
+        await _adapter.Publish("hello", context, cancellationToken: TestContext.Current.CancellationToken);
 
         var (_, options) = _bus.Published.ShouldHaveSingleItem();
         options!.Headers["cqrs-correlation-id"].ShouldBe(context.CorrelationId.Id.ToString());
@@ -84,7 +84,7 @@ public sealed class WolverineMessageBusAdapterTests
     {
         var context = MakeContext(withCausation: true);
 
-        await _adapter.Publish("hello", context);
+        await _adapter.Publish("hello", context, cancellationToken: TestContext.Current.CancellationToken);
 
         var (_, options) = _bus.Published.ShouldHaveSingleItem();
         options!.Headers["cqrs-causation-id"].ShouldBe(context.CausationId!.Value.Id.ToString());
@@ -95,7 +95,7 @@ public sealed class WolverineMessageBusAdapterTests
     {
         var context = MakeContext(withCausation: false);
 
-        await _adapter.Publish("hello", context);
+        await _adapter.Publish("hello", context, cancellationToken: TestContext.Current.CancellationToken);
 
         var (_, options) = _bus.Published.ShouldHaveSingleItem();
         options!.Headers.ContainsKey("cqrs-causation-id").ShouldBeFalse();
@@ -116,7 +116,7 @@ public sealed class WolverineMessageBusAdapterTests
     {
         var message = "cmd-payload";
 
-        await _adapter.Send(message, MakeContext());
+        await _adapter.Send(message, MakeContext(), cancellationToken: TestContext.Current.CancellationToken);
 
         var (sent, _) = _bus.Sent.ShouldHaveSingleItem();
         sent.ShouldBe(message);
@@ -127,7 +127,7 @@ public sealed class WolverineMessageBusAdapterTests
     {
         var context = MakeContext();
 
-        await _adapter.Send("cmd", context);
+        await _adapter.Send("cmd", context, cancellationToken: TestContext.Current.CancellationToken);
 
         var (_, options) = _bus.Sent.ShouldHaveSingleItem();
         options!.Headers["cqrs-message-id"].ShouldBe(context.MessageId.Id.ToString());
@@ -138,7 +138,7 @@ public sealed class WolverineMessageBusAdapterTests
     {
         var context = MakeContext();
 
-        await _adapter.Send("cmd", context);
+        await _adapter.Send("cmd", context, cancellationToken: TestContext.Current.CancellationToken);
 
         var (_, options) = _bus.Sent.ShouldHaveSingleItem();
         options!.Headers["cqrs-correlation-id"].ShouldBe(context.CorrelationId.Id.ToString());
@@ -149,7 +149,7 @@ public sealed class WolverineMessageBusAdapterTests
     {
         var context = MakeContext(withCausation: true);
 
-        await _adapter.Send("cmd", context);
+        await _adapter.Send("cmd", context, cancellationToken: TestContext.Current.CancellationToken);
 
         var (_, options) = _bus.Sent.ShouldHaveSingleItem();
         options!.Headers["cqrs-causation-id"].ShouldBe(context.CausationId!.Value.Id.ToString());
@@ -160,7 +160,7 @@ public sealed class WolverineMessageBusAdapterTests
     {
         var context = MakeContext(withCausation: false);
 
-        await _adapter.Send("cmd", context);
+        await _adapter.Send("cmd", context, cancellationToken: TestContext.Current.CancellationToken);
 
         var (_, options) = _bus.Sent.ShouldHaveSingleItem();
         options!.Headers.ContainsKey("cqrs-causation-id").ShouldBeFalse();

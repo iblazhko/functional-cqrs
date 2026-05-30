@@ -63,7 +63,7 @@ public class CqrsTestContainersFixture : IAsyncLifetime
     // ReSharper disable once InconsistentNaming
     public CqrsSystem SUT { get; private set; } = null!;
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         _postgres = BuildPostgresContainer(MartenDbSettingsTemplate);
         _rabbitmq = BuildRabbitMqContainer(RabbitMqSettingsTemplate);
@@ -90,7 +90,7 @@ public class CqrsTestContainersFixture : IAsyncLifetime
             throw new InvalidOperationException("CQRS system did not become ready in time.");
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         if (_apiHost is not null)
         {

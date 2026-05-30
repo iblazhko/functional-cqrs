@@ -1,7 +1,8 @@
 using ArchUnitNET.Domain;
 using ArchUnitNET.Fluent;
 using ArchUnitNET.Loader;
-using ArchUnitNET.xUnit;
+using ArchUnitNET.xUnitV3;
+
 using static ArchUnitNET.Fluent.ArchRuleDefinition;
 
 namespace CQRS.System.Architecture.Tests;

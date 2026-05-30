@@ -109,7 +109,7 @@ public sealed class MartenDbDocumentCollectionTests(PostgreSqlContainerFixture f
         await collection.Update(id, new TestViewModel { Name = "v2" });
 
         using var session = fixture.DocumentStore.LightweightSession();
-        var envelope = await session.LoadAsync<DocumentEnvelope<TestViewModel>>(id);
+        var envelope = await session.LoadAsync<DocumentEnvelope<TestViewModel>>(id, token: TestContext.Current.CancellationToken);
         envelope.ShouldNotBeNull();
         ((long)envelope.Version).ShouldBe(2);
     }
@@ -123,7 +123,7 @@ public sealed class MartenDbDocumentCollectionTests(PostgreSqlContainerFixture f
         await collection.Update(id, new TestViewModel { Name = "first" });
 
         using var session = fixture.DocumentStore.LightweightSession();
-        var envelope = await session.LoadAsync<DocumentEnvelope<TestViewModel>>(id);
+        var envelope = await session.LoadAsync<DocumentEnvelope<TestViewModel>>(id, token: TestContext.Current.CancellationToken);
         envelope.ShouldNotBeNull();
         ((long)envelope.Version).ShouldBe(1);
     }
