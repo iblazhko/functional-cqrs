@@ -5,48 +5,49 @@ public static class InventoryAggregate
     private static readonly Seq<IInventoryEvent> NoEvents = Empty;
 
     public static Either<Errors.IInventoryCommandError, Seq<IInventoryEvent>> CreateInventory(
-        InventoryState state,
+        Option<InventoryState> state,
         CreateInventory command
     ) => InvokeIfNew(state, () => new InventoryCreated(command.Id, command.Name, true).ToSeq());
 
     public static Either<Errors.IInventoryCommandError, Seq<IInventoryEvent>> RenameInventory(
-        InventoryState state,
+        Option<InventoryState> state,
         RenameInventory command
     ) =>
         InvokeIfActive(
             state,
-            () =>
-                state.Name != command.NewName
-                    ? new InventoryRenamed(state.Id, state.Name, command.NewName).ToSeq()
+            command.Id,
+            existing =>
+                existing.Name != command.NewName
+                    ? new InventoryRenamed(existing.Id, existing.Name, command.NewName).ToSeq()
                     : NoEvents
         );
 
     public static Either<Errors.IInventoryCommandError, Seq<IInventoryEvent>> AddItemsToInventory(
-        InventoryState state,
+        Option<InventoryState> state,
         AddItemsToInventory command
     ) =>
         InvokeIfActive(
             state,
-            () =>
+            command.Id,
+            existing =>
             {
                 return ProduceEvents().ToSeq();
 
                 IEnumerable<IInventoryEvent> ProduceEvents()
                 {
-                    var newQuantity = state.Quantity + command.Count;
+                    var newQuantity = existing.Quantity + command.Count;
 
-                    yield return
-                        new ItemsAddedToInventory(
-                            state.Id,
-                            state.Name,
-                            command.Count,
-                            state.Quantity,
-                            newQuantity
-                        );
+                    yield return new ItemsAddedToInventory(
+                        existing.Id,
+                        existing.Name,
+                        command.Count,
+                        existing.Quantity,
+                        newQuantity
+                    );
 
-                    if (state.Quantity.IsNone)
+                    if (existing.Quantity.IsNone)
                     {
-                        yield return new ItemWentInStock(state.Id, state.Name, newQuantity);
+                        yield return new ItemWentInStock(existing.Id, existing.Name, newQuantity);
                     }
                 }
             }
@@ -55,16 +56,17 @@ public static class InventoryAggregate
     public static Either<
         Errors.IInventoryCommandError,
         Seq<IInventoryEvent>
-    > RemoveItemsFromInventory(InventoryState state, RemoveItemsFromInventory command) =>
+    > RemoveItemsFromInventory(Option<InventoryState> state, RemoveItemsFromInventory command) =>
         InvokeIfActive(
             state,
-            () =>
+            command.Id,
+            existing =>
             {
-                var quantityInStock = state.Quantity.Match(quantity => (int)quantity, () => 0);
+                var quantityInStock = existing.Quantity.Match(quantity => (int)quantity, () => 0);
                 var quantityRequested = (int)command.Count;
 
                 if (quantityRequested > quantityInStock)
-                    return new Errors.CannotRemoveMoreThanHaveInStock(state.Id);
+                    return new Errors.CannotRemoveMoreThanHaveInStock(existing.Id);
 
                 return ProduceEvents().ToSeq();
 
@@ -76,63 +78,66 @@ public static class InventoryAggregate
                         var n => Some(PositiveInteger.CreateUnsafe(n)),
                     };
 
-                    yield return
-                        new ItemsRemovedFromInventory(
-                            state.Id,
-                            state.Name,
-                            command.Count,
-                            PositiveInteger.CreateUnsafe(quantityInStock),
-                            newQuantity
-                        );
+                    yield return new ItemsRemovedFromInventory(
+                        existing.Id,
+                        existing.Name,
+                        command.Count,
+                        PositiveInteger.CreateUnsafe(quantityInStock),
+                        newQuantity
+                    );
 
                     if (newQuantity.IsNone)
-                    {
-                        yield return new ItemWentOutOfStock(state.Id, state.Name);
-                    }
+                        yield return new ItemWentOutOfStock(existing.Id, existing.Name);
                 }
             }
         );
 
     // Random business rule: cannot deactivate an inventory when the moon is in full phase
     public static Either<Errors.IInventoryCommandError, Seq<IInventoryEvent>> DeactivateInventory(
-        InventoryState state,
-        DeactivateInventory _,
+        Option<InventoryState> state,
+        DeactivateInventory command,
         MoonPhase moonPhase
     ) =>
         InvokeIfExists(
             state,
-            () =>
+            command.Id,
+            existing =>
             {
-                if (!state.IsActive)
+                if (!existing.IsActive)
                     return NoEvents;
 
-                if (!state.Quantity.IsNone)
-                    return new Errors.CannotDeactivateNonEmpty(state.Id);
+                if (!existing.Quantity.IsNone)
+                    return new Errors.CannotDeactivateNonEmpty(existing.Id);
 
                 if (moonPhase.IsFullMoon())
-                    return new Errors.CannotDeactivateWhenMoonIsFull(state.Id);
+                    return new Errors.CannotDeactivateWhenMoonIsFull(existing.Id);
 
-                return new InventoryDeactivated(state.Id, state.Name).ToSeq();
+                return new InventoryDeactivated(existing.Id, existing.Name).ToSeq();
             }
         );
 
     private static Either<Errors.IInventoryCommandError, Seq<IInventoryEvent>> InvokeIfNew(
-        InventoryState state,
+        Option<InventoryState> state,
         Func<Either<Errors.IInventoryCommandError, Seq<IInventoryEvent>>> action
-    ) => state.IsNew ? action() : new Errors.InventoryAlreadyExists(state.Id);
+    ) =>
+        state.Match(Some: existing => new Errors.InventoryAlreadyExists(existing.Id), None: action);
 
     private static Either<Errors.IInventoryCommandError, Seq<IInventoryEvent>> InvokeIfExists(
-        InventoryState state,
-        Func<Either<Errors.IInventoryCommandError, Seq<IInventoryEvent>>> action
-    ) => state.IsNew ? new Errors.InventoryDoesNotExist(state.Id) : action();
+        Option<InventoryState> state,
+        InventoryId id,
+        Func<InventoryState, Either<Errors.IInventoryCommandError, Seq<IInventoryEvent>>> action
+    ) => state.Match(Some: action, None: () => new Errors.InventoryDoesNotExist(id));
 
     private static Either<Errors.IInventoryCommandError, Seq<IInventoryEvent>> InvokeIfActive(
-        InventoryState state,
-        Func<Either<Errors.IInventoryCommandError, Seq<IInventoryEvent>>> action
+        Option<InventoryState> state,
+        InventoryId id,
+        Func<InventoryState, Either<Errors.IInventoryCommandError, Seq<IInventoryEvent>>> action
     ) =>
         InvokeIfExists(
             state,
-            () => state.IsActive ? action() : new Errors.CannotChangeInactive(state.Id)
+            id,
+            existing =>
+                existing.IsActive ? action(existing) : new Errors.CannotChangeInactive(existing.Id)
         );
 
     public static class Errors

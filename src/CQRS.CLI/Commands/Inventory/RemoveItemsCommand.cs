@@ -5,7 +5,10 @@ using CliFx.Infrastructure;
 namespace CQRS.CLI.Commands.Inventory;
 
 [Command("inventory remove-items", Description = "Remove items from an inventory")]
-public sealed partial class RemoveItemsCommand(InventoryApiClient client, CqrsCommandStatusApiClient commandStatusClient) : ICommand
+public sealed partial class RemoveItemsCommand(
+    InventoryApiClient client,
+    CqrsCommandStatusApiClient commandStatusClient
+) : ICommand
 {
     [CommandParameter(0, Name = "id", Description = "Inventory ID")]
     public string Id { get; set; } = string.Empty;

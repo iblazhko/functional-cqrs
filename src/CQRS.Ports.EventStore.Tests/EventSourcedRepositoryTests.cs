@@ -1,7 +1,7 @@
 using CQRS.Ports.EventStore;
 using LanguageExt;
-using static LanguageExt.Prelude;
 using Shouldly;
+using static LanguageExt.Prelude;
 
 namespace CQRS.Ports.EventStore.Tests;
 
@@ -15,18 +15,22 @@ public sealed class EventSourcedRepositoryTests
     }
 
     private sealed record TestEvent(string Name);
+
     private sealed record TestEventDto(string Name);
 
     private sealed class IdentityMapper : IEventMapper<TestEvent, TestEventDto>
     {
         public Either<EventDeserializationError, TestEvent> ToDomainEvent(TestEventDto dto) =>
             Right<EventDeserializationError, TestEvent>(new TestEvent(dto.Name));
+
         public TestEventDto ToEventDto(TestEvent domain) => new(domain.Name);
     }
 
-    private sealed class ConstantProjection(TestState state) : IEventStreamProjection<TestState, TestEvent>
+    private sealed class ConstantProjection(TestState state)
+        : IEventStreamProjection<TestState, TestEvent>
     {
         public TestState GetInitialState(EventStreamId streamId) => state;
+
         public TestState Apply(TestState s, TestEvent e) => s;
     }
 
@@ -46,7 +50,11 @@ public sealed class EventSourcedRepositoryTests
             CancellationToken cancellationToken = default
         ) => Task.FromResult(Right<EventDeserializationError, TestState>(ReturnState));
 
-        public void AppendEvents(IEnumerable<TestEvent> events, Guid? correlationId, Guid? causationId)
+        public void AppendEvents(
+            IEnumerable<TestEvent> events,
+            Guid? correlationId,
+            Guid? causationId
+        )
         {
             AppendedEvents = events.ToList();
             AppendedCorrelationId = correlationId;
@@ -62,17 +70,31 @@ public sealed class EventSourcedRepositoryTests
         public Task<EventStream<TestEvent>> GetAllEvents(
             TimeSpan deadline = default,
             CancellationToken cancellationToken = default
-        ) => Task.FromResult(new EventStream<TestEvent>((EventStreamId)"test", EventStreamVersion.InitialVersion, []));
+        ) =>
+            Task.FromResult(
+                new EventStream<TestEvent>(
+                    (EventStreamId)"test",
+                    EventStreamVersion.InitialVersion,
+                    []
+                )
+            );
 
         public EventStream<TestEvent> GetNewEvents() =>
             new((EventStreamId)"test", EventStreamVersion.InitialVersion, []);
 
         public void AppendEvents(IEnumerable<EventWithMetadata<TestEvent>> events) { }
+
         public void Dispose() { }
-        public ValueTask DisposeAsync() { Disposed = true; return ValueTask.CompletedTask; }
+
+        public ValueTask DisposeAsync()
+        {
+            Disposed = true;
+            return ValueTask.CompletedTask;
+        }
     }
 
-    private sealed class SpyStore(SpySession session) : IEventStore<TestState, TestEvent, TestEventDto>
+    private sealed class SpyStore(SpySession session)
+        : IEventStore<TestState, TestEvent, TestEventDto>
     {
         public IEventStreamSession<TestState, TestEvent> Open(
             EventStreamId streamId,
@@ -80,17 +102,21 @@ public sealed class EventSourcedRepositoryTests
             IEventSerializer? eventSerializer = null
         ) => session;
 
-        public Task<bool> Contains(EventStreamId streamId, CancellationToken cancellationToken = default) =>
-            Task.FromResult(false);
+        public Task<bool> Contains(
+            EventStreamId streamId,
+            CancellationToken cancellationToken = default
+        ) => Task.FromResult(false);
 
         public void Dispose() { }
+
         public ValueTask DisposeAsync() => ValueTask.CompletedTask;
     }
 
     // --- Helpers ---
 
-    private static EventSourcedRepository<TestState, TestEvent, TestEventDto> MakeRepository(SpySession session) =>
-        new(new SpyStore(session));
+    private static EventSourcedRepository<TestState, TestEvent, TestEventDto> MakeRepository(
+        SpySession session
+    ) => new(new SpyStore(session));
 
     private static EventStreamId AnyStreamId() => (EventStreamId)"test-stream";
 
@@ -103,7 +129,12 @@ public sealed class EventSourcedRepositoryTests
         var session = new SpySession { ReturnState = expected };
 
         var result = await MakeRepository(session)
-            .GetState(AnyStreamId(), new IdentityMapper(), new ConstantProjection(expected), cancellationToken: TestContext.Current.CancellationToken);
+            .GetState(
+                AnyStreamId(),
+                new IdentityMapper(),
+                new ConstantProjection(expected),
+                cancellationToken: TestContext.Current.CancellationToken
+            );
 
         result.IsRight.ShouldBeTrue();
         result.Match(Left: _ => TestState.Empty, Right: s => s).ShouldBe(expected);
@@ -114,7 +145,13 @@ public sealed class EventSourcedRepositoryTests
     {
         var session = new SpySession();
 
-        await MakeRepository(session).GetState(AnyStreamId(), new IdentityMapper(), new ConstantProjection(TestState.Empty), cancellationToken: TestContext.Current.CancellationToken);
+        await MakeRepository(session)
+            .GetState(
+                AnyStreamId(),
+                new IdentityMapper(),
+                new ConstantProjection(TestState.Empty),
+                cancellationToken: TestContext.Current.CancellationToken
+            );
 
         session.Disposed.ShouldBeTrue();
     }
@@ -127,11 +164,14 @@ public sealed class EventSourcedRepositoryTests
         var session = new SpySession();
         var newEvents = new[] { new TestEvent("A"), new TestEvent("B") };
 
-        await MakeRepository(session).AddEvents(
-            AnyStreamId(), new IdentityMapper(), new ConstantProjection(TestState.Empty),
-            _ => newEvents,
-            cancellationToken: TestContext.Current.CancellationToken
-        );
+        await MakeRepository(session)
+            .AddEvents(
+                AnyStreamId(),
+                new IdentityMapper(),
+                new ConstantProjection(TestState.Empty),
+                _ => newEvents,
+                cancellationToken: TestContext.Current.CancellationToken
+            );
 
         session.AppendedEvents.ShouldBe(newEvents);
     }
@@ -141,11 +181,14 @@ public sealed class EventSourcedRepositoryTests
     {
         var session = new SpySession();
 
-        await MakeRepository(session).AddEvents(
-            AnyStreamId(), new IdentityMapper(), new ConstantProjection(TestState.Empty),
-            _ => [new TestEvent("A")],
-            cancellationToken: TestContext.Current.CancellationToken
-        );
+        await MakeRepository(session)
+            .AddEvents(
+                AnyStreamId(),
+                new IdentityMapper(),
+                new ConstantProjection(TestState.Empty),
+                _ => [new TestEvent("A")],
+                cancellationToken: TestContext.Current.CancellationToken
+            );
 
         session.SaveCalled.ShouldBeTrue();
     }
@@ -156,12 +199,15 @@ public sealed class EventSourcedRepositoryTests
         var session = new SpySession();
         var corrId = Guid.NewGuid();
 
-        await MakeRepository(session).AddEvents(
-            AnyStreamId(), new IdentityMapper(), new ConstantProjection(TestState.Empty),
-            _ => [new TestEvent("A")],
-            correlationId: corrId,
-            cancellationToken: TestContext.Current.CancellationToken
-        );
+        await MakeRepository(session)
+            .AddEvents(
+                AnyStreamId(),
+                new IdentityMapper(),
+                new ConstantProjection(TestState.Empty),
+                _ => [new TestEvent("A")],
+                correlationId: corrId,
+                cancellationToken: TestContext.Current.CancellationToken
+            );
 
         session.AppendedCorrelationId.ShouldBe(corrId);
     }
@@ -172,12 +218,15 @@ public sealed class EventSourcedRepositoryTests
         var session = new SpySession();
         var causId = Guid.NewGuid();
 
-        await MakeRepository(session).AddEvents(
-            AnyStreamId(), new IdentityMapper(), new ConstantProjection(TestState.Empty),
-            _ => [new TestEvent("A")],
-            causationId: causId,
-            cancellationToken: TestContext.Current.CancellationToken
-        );
+        await MakeRepository(session)
+            .AddEvents(
+                AnyStreamId(),
+                new IdentityMapper(),
+                new ConstantProjection(TestState.Empty),
+                _ => [new TestEvent("A")],
+                causationId: causId,
+                cancellationToken: TestContext.Current.CancellationToken
+            );
 
         session.AppendedCausationId.ShouldBe(causId);
     }
@@ -188,11 +237,14 @@ public sealed class EventSourcedRepositoryTests
         var session = new SpySession();
         var newEvents = new[] { new TestEvent("X"), new TestEvent("Y") };
 
-        var result = await MakeRepository(session).AddEvents(
-            AnyStreamId(), new IdentityMapper(), new ConstantProjection(TestState.Empty),
-            _ => newEvents,
-            cancellationToken: TestContext.Current.CancellationToken
-        );
+        var result = await MakeRepository(session)
+            .AddEvents(
+                AnyStreamId(),
+                new IdentityMapper(),
+                new ConstantProjection(TestState.Empty),
+                _ => newEvents,
+                cancellationToken: TestContext.Current.CancellationToken
+            );
 
         result.IsRight.ShouldBeTrue();
         result.Match(Left: _ => [], Right: s => s).ShouldBe(newEvents);
@@ -205,11 +257,18 @@ public sealed class EventSourcedRepositoryTests
         var session = new SpySession { ReturnState = sessionState };
 
         TestState? receivedState = null;
-        await MakeRepository(session).AddEvents(
-            AnyStreamId(), new IdentityMapper(), new ConstantProjection(sessionState),
-            state => { receivedState = state; return []; },
-            cancellationToken: TestContext.Current.CancellationToken
-        );
+        await MakeRepository(session)
+            .AddEvents(
+                AnyStreamId(),
+                new IdentityMapper(),
+                new ConstantProjection(sessionState),
+                state =>
+                {
+                    receivedState = state;
+                    return [];
+                },
+                cancellationToken: TestContext.Current.CancellationToken
+            );
 
         receivedState.ShouldBe(sessionState);
     }
@@ -221,11 +280,14 @@ public sealed class EventSourcedRepositoryTests
     {
         var session = new SpySession();
 
-        await MakeRepository(session).AddEvents(
-            AnyStreamId(), new IdentityMapper(), new ConstantProjection(TestState.Empty),
-            _ => [],
-            cancellationToken: TestContext.Current.CancellationToken
-        );
+        await MakeRepository(session)
+            .AddEvents(
+                AnyStreamId(),
+                new IdentityMapper(),
+                new ConstantProjection(TestState.Empty),
+                _ => [],
+                cancellationToken: TestContext.Current.CancellationToken
+            );
 
         session.AppendedEvents.ShouldBeNull();
     }
@@ -235,11 +297,14 @@ public sealed class EventSourcedRepositoryTests
     {
         var session = new SpySession();
 
-        await MakeRepository(session).AddEvents(
-            AnyStreamId(), new IdentityMapper(), new ConstantProjection(TestState.Empty),
-            _ => [],
-            cancellationToken: TestContext.Current.CancellationToken
-        );
+        await MakeRepository(session)
+            .AddEvents(
+                AnyStreamId(),
+                new IdentityMapper(),
+                new ConstantProjection(TestState.Empty),
+                _ => [],
+                cancellationToken: TestContext.Current.CancellationToken
+            );
 
         session.SaveCalled.ShouldBeFalse();
     }
@@ -249,11 +314,14 @@ public sealed class EventSourcedRepositoryTests
     {
         var session = new SpySession();
 
-        var result = await MakeRepository(session).AddEvents(
-            AnyStreamId(), new IdentityMapper(), new ConstantProjection(TestState.Empty),
-            _ => [],
-            cancellationToken: TestContext.Current.CancellationToken
-        );
+        var result = await MakeRepository(session)
+            .AddEvents(
+                AnyStreamId(),
+                new IdentityMapper(),
+                new ConstantProjection(TestState.Empty),
+                _ => [],
+                cancellationToken: TestContext.Current.CancellationToken
+            );
 
         result.IsRight.ShouldBeTrue();
         result.Match(Left: _ => [], Right: s => s).ShouldBeEmpty();
@@ -264,11 +332,14 @@ public sealed class EventSourcedRepositoryTests
     {
         var session = new SpySession();
 
-        await MakeRepository(session).AddEvents(
-            AnyStreamId(), new IdentityMapper(), new ConstantProjection(TestState.Empty),
-            _ => [],
-            cancellationToken: TestContext.Current.CancellationToken
-        );
+        await MakeRepository(session)
+            .AddEvents(
+                AnyStreamId(),
+                new IdentityMapper(),
+                new ConstantProjection(TestState.Empty),
+                _ => [],
+                cancellationToken: TestContext.Current.CancellationToken
+            );
 
         session.Disposed.ShouldBeTrue();
     }

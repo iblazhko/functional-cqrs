@@ -3,6 +3,7 @@ using CQRS.Domain;
 using CQRS.Domain.Inventory;
 using CQRS.DTO;
 using CQRS.Ports.EventStore;
+using LanguageExt;
 using Shouldly;
 using static LanguageExt.Prelude;
 
@@ -11,9 +12,17 @@ namespace CQRS.Adapters.InMemoryEventStore.Tests;
 public sealed class EventStoreTests
 {
 #pragma warning disable CA1859
-    private readonly IEventStore<InventoryState, IInventoryEvent, IInventoryEventDto> _eventStore =
+    private readonly IEventStore<
+        Option<InventoryState>,
+        IInventoryEvent,
+        IInventoryEventDto
+    > _eventStore =
 #pragma warning restore CA1859
-        new InMemoryEventStoreAdapter<InventoryState, IInventoryEvent, IInventoryEventDto>();
+        new InMemoryEventStoreAdapter<
+            Option<InventoryState>,
+            IInventoryEvent,
+            IInventoryEventDto
+        >();
 
     private readonly IEventMapper<IInventoryEvent, IInventoryEventDto> _eventMapper =
         new EventStoreInventoryEventMapper();
@@ -26,7 +35,9 @@ public sealed class EventStoreTests
         var session = _eventStore.Open(streamId, _eventMapper);
         session.ShouldNotBeNull();
 
-        var eventStream = await session.GetAllEvents(cancellationToken: TestContext.Current.CancellationToken);
+        var eventStream = await session.GetAllEvents(
+            cancellationToken: TestContext.Current.CancellationToken
+        );
         eventStream.ShouldNotBeNull();
         eventStream.StreamId.ShouldBe(streamId);
         eventStream.StreamVersion.ShouldBe(EventStreamVersion.InitialVersion);
@@ -57,7 +68,9 @@ public sealed class EventStoreTests
 
         session.AppendEvents(eventsToAppend, Guid.NewGuid(), Guid.NewGuid());
 
-        var allEvents = await session.GetAllEvents(cancellationToken: TestContext.Current.CancellationToken);
+        var allEvents = await session.GetAllEvents(
+            cancellationToken: TestContext.Current.CancellationToken
+        );
         allEvents.ShouldNotBeNull();
         allEvents.StreamId.ShouldBe(streamId);
         allEvents.StreamVersion.ShouldBe((EventStreamVersion)2);
@@ -93,7 +106,9 @@ public sealed class EventStoreTests
         await session.Save(cancellationToken: TestContext.Current.CancellationToken);
 
         var session2 = _eventStore.Open(streamId, _eventMapper);
-        var allEvents = await session2.GetAllEvents(cancellationToken: TestContext.Current.CancellationToken);
+        var allEvents = await session2.GetAllEvents(
+            cancellationToken: TestContext.Current.CancellationToken
+        );
         allEvents.Events.Select(x => x.Event).ToList().ShouldBeEquivalentTo(eventsToAppend);
     }
 
@@ -103,7 +118,10 @@ public sealed class EventStoreTests
         var entityId = InventoryId.NewId();
         var streamId = InventoryEventStreamId.GetStreamId(entityId);
 
-        var result = await _eventStore.Contains(streamId, cancellationToken: TestContext.Current.CancellationToken);
+        var result = await _eventStore.Contains(
+            streamId,
+            cancellationToken: TestContext.Current.CancellationToken
+        );
 
         result.ShouldBeFalse();
     }
@@ -119,7 +137,10 @@ public sealed class EventStoreTests
         session.AppendEvents([new InventoryCreated(entityId, entityName, true)], null, null);
         await session.Save(cancellationToken: TestContext.Current.CancellationToken);
 
-        var result = await _eventStore.Contains(streamId, cancellationToken: TestContext.Current.CancellationToken);
+        var result = await _eventStore.Contains(
+            streamId,
+            cancellationToken: TestContext.Current.CancellationToken
+        );
         result.ShouldBeTrue();
     }
 
@@ -131,12 +152,14 @@ public sealed class EventStoreTests
         var projection = new InventoryEventStreamStateProjection();
 
         using var session = _eventStore.Open(streamId, _eventMapper);
-        var result = await session.GetState(projection, cancellationToken: TestContext.Current.CancellationToken);
+        var result = await session.GetState(
+            projection,
+            cancellationToken: TestContext.Current.CancellationToken
+        );
 
         result.IsRight.ShouldBeTrue();
-        var state = result.Match(Left: _ => null!, Right: s => s);
-        state.Id.ShouldBe(entityId);
-        state.IsNew.ShouldBeTrue();
+        var state = result.Match(Left: _ => Option<InventoryState>.None, Right: s => s);
+        state.IsNone.ShouldBeTrue();
     }
 
     [Fact]
@@ -152,12 +175,15 @@ public sealed class EventStoreTests
         await session1.Save(cancellationToken: TestContext.Current.CancellationToken);
 
         using var session2 = _eventStore.Open(streamId, _eventMapper);
-        var result = await session2.GetState(projection, cancellationToken: TestContext.Current.CancellationToken);
+        var result = await session2.GetState(
+            projection,
+            cancellationToken: TestContext.Current.CancellationToken
+        );
 
         result.IsRight.ShouldBeTrue();
-        var state = result.Match(Left: _ => null!, Right: s => s);
-        state.IsNew.ShouldBeFalse();
-        state.Name.ShouldBe(entityName);
+        var state = result.Match(Left: _ => Option<InventoryState>.None, Right: s => s);
+        state.IsSome.ShouldBeTrue();
+        state.Map(s => s.Name).ShouldBe(Some(entityName));
     }
 
     [Fact]
@@ -192,7 +218,9 @@ public sealed class EventStoreTests
 
         session.AppendEvents(new[] { eventWithMetadata });
 
-        var allEvents = await session.GetAllEvents(cancellationToken: TestContext.Current.CancellationToken);
+        var allEvents = await session.GetAllEvents(
+            cancellationToken: TestContext.Current.CancellationToken
+        );
         allEvents.Events.Count.ShouldBe(1);
         allEvents.Events.Single().Event.ShouldBe(domainEvent);
     }
@@ -258,7 +286,9 @@ public sealed class EventStoreTests
         );
         session2.AppendEvents([newEvent], null, null);
 
-        var allEvents = await session2.GetAllEvents(cancellationToken: TestContext.Current.CancellationToken);
+        var allEvents = await session2.GetAllEvents(
+            cancellationToken: TestContext.Current.CancellationToken
+        );
 
         var events = allEvents.Events.ToList();
         events.Count.ShouldBe(2);
@@ -286,10 +316,16 @@ public sealed class EventStoreTests
             null
         );
 
-        var result = await session2.GetState(projection, cancellationToken: TestContext.Current.CancellationToken);
+        var result = await session2.GetState(
+            projection,
+            cancellationToken: TestContext.Current.CancellationToken
+        );
 
         result.IsRight.ShouldBeTrue();
-        result.Match(Left: _ => null!, Right: s => s).Name.ShouldBe(updatedName);
+        result
+            .Match(Left: _ => Option<InventoryState>.None, Right: s => s)
+            .Map(s => s.Name)
+            .ShouldBe(Some(updatedName));
     }
 
     [Fact]

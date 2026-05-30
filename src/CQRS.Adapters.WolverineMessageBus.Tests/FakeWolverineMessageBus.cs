@@ -8,7 +8,11 @@ public sealed class FakeWolverineMessageBus : WolverineIMessageBus
     public List<(object Message, DeliveryOptions? Options)> Published { get; } = [];
     public List<(object Message, DeliveryOptions? Options)> Sent { get; } = [];
 
-    public ValueTask BroadcastToTopicAsync(string topicName, object message, DeliveryOptions? options = null)
+    public ValueTask BroadcastToTopicAsync(
+        string topicName,
+        object message,
+        DeliveryOptions? options = null
+    )
     {
         throw new NotImplementedException();
     }
@@ -22,14 +26,22 @@ public sealed class FakeWolverineMessageBus : WolverineIMessageBus
         return ValueTask.CompletedTask;
     }
 
-    public Task InvokeForTenantAsync(string tenantId, object message, CancellationToken cancellation = new CancellationToken(),
-        TimeSpan? timeout = null)
+    public Task InvokeForTenantAsync(
+        string tenantId,
+        object message,
+        CancellationToken cancellation = new CancellationToken(),
+        TimeSpan? timeout = null
+    )
     {
         throw new NotImplementedException();
     }
 
-    public Task<T> InvokeForTenantAsync<T>(string tenantId, object message, CancellationToken cancellation = new CancellationToken(),
-        TimeSpan? timeout = null)
+    public Task<T> InvokeForTenantAsync<T>(
+        string tenantId,
+        object message,
+        CancellationToken cancellation = new CancellationToken(),
+        TimeSpan? timeout = null
+    )
     {
         throw new NotImplementedException();
     }
@@ -61,35 +73,57 @@ public sealed class FakeWolverineMessageBus : WolverineIMessageBus
         return ValueTask.CompletedTask;
     }
 
-    public Task InvokeAsync(object message, CancellationToken cancellation = new CancellationToken(), TimeSpan? timeout = null)
+    public Task InvokeAsync(
+        object message,
+        CancellationToken cancellation = new CancellationToken(),
+        TimeSpan? timeout = null
+    )
     {
         throw new NotImplementedException();
     }
 
-    public Task InvokeAsync(object message, DeliveryOptions options, CancellationToken cancellation = new CancellationToken(),
-        TimeSpan? timeout = null)
+    public Task InvokeAsync(
+        object message,
+        DeliveryOptions options,
+        CancellationToken cancellation = new CancellationToken(),
+        TimeSpan? timeout = null
+    )
     {
         throw new NotImplementedException();
     }
 
-    public Task<T> InvokeAsync<T>(object message, CancellationToken cancellation = new CancellationToken(), TimeSpan? timeout = null)
+    public Task<T> InvokeAsync<T>(
+        object message,
+        CancellationToken cancellation = new CancellationToken(),
+        TimeSpan? timeout = null
+    )
     {
         throw new NotImplementedException();
     }
 
-    public Task<T> InvokeAsync<T>(object message, DeliveryOptions options, CancellationToken cancellation = new CancellationToken(),
-        TimeSpan? timeout = null)
+    public Task<T> InvokeAsync<T>(
+        object message,
+        DeliveryOptions options,
+        CancellationToken cancellation = new CancellationToken(),
+        TimeSpan? timeout = null
+    )
     {
         throw new NotImplementedException();
     }
 
-    public IAsyncEnumerable<TResponse> StreamAsync<TResponse>(object message, CancellationToken cancellation = new CancellationToken())
+    public IAsyncEnumerable<TResponse> StreamAsync<TResponse>(
+        object message,
+        CancellationToken cancellation = new CancellationToken()
+    )
     {
         throw new NotImplementedException();
     }
 
-    public IAsyncEnumerable<TResponse> StreamAsync<TResponse>(object message, DeliveryOptions options,
-        CancellationToken cancellation = new CancellationToken())
+    public IAsyncEnumerable<TResponse> StreamAsync<TResponse>(
+        object message,
+        DeliveryOptions options,
+        CancellationToken cancellation = new CancellationToken()
+    )
     {
         throw new NotImplementedException();
     }

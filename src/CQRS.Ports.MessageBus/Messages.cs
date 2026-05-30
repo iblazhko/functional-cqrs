@@ -42,10 +42,7 @@ public sealed record Context
 
 public static class MessageContextBuilderExtensions
 {
-    public static Context GetResponseMetadata(
-        this Context context,
-        DateTimeOffset timestamp
-    ) =>
+    public static Context GetResponseMetadata(this Context context, DateTimeOffset timestamp) =>
         new()
         {
             MessageId = MessagingId.NewId(),
@@ -54,4 +51,3 @@ public static class MessageContextBuilderExtensions
             Timestamp = timestamp,
         };
 }
-

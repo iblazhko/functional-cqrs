@@ -26,9 +26,7 @@ public sealed class InventoryBenchmarkClient(BenchmarkSettings settings)
         );
 
     public Task<CommandOutcome> RenameInventory(string id, string name) =>
-        ExecuteCommand(() =>
-            $"{InventoriesUrl}/{id}/rename".PutJsonAsync(new { Name = name })
-        );
+        ExecuteCommand(() => $"{InventoriesUrl}/{id}/rename".PutJsonAsync(new { Name = name }));
 
     public Task<CommandOutcome> AddItems(string id, int count) =>
         ExecuteCommand(() =>
@@ -41,9 +39,7 @@ public sealed class InventoryBenchmarkClient(BenchmarkSettings settings)
         );
 
     public Task<CommandOutcome> Deactivate(string id) =>
-        ExecuteCommand(() =>
-            $"{InventoriesUrl}/{id}/deactivate".PutJsonAsync(new { })
-        );
+        ExecuteCommand(() => $"{InventoriesUrl}/{id}/deactivate".PutJsonAsync(new { }));
 
     private async Task<CommandOutcome> ExecuteCommand(
         Func<Task<IFlurlResponse>> send,

@@ -24,13 +24,19 @@ public sealed class InventoryScenario(InventoryBenchmarkClient client, Benchmark
 
             if (settings.RenameEveryNIterations > 0 && i % settings.RenameEveryNIterations == 0)
             {
-                var renameResult = await client.RenameInventory(inventoryId, $"Bench-{Guid.NewGuid():N}");
+                var renameResult = await client.RenameInventory(
+                    inventoryId,
+                    $"Bench-{Guid.NewGuid():N}"
+                );
                 records.Add(ToRecord(concurrencyLevel, "RenameInventory", renameResult));
             }
 
             if (stock >= settings.ItemsToRemovePerIteration)
             {
-                var removeResult = await client.RemoveItems(inventoryId, settings.ItemsToRemovePerIteration);
+                var removeResult = await client.RemoveItems(
+                    inventoryId,
+                    settings.ItemsToRemovePerIteration
+                );
                 records.Add(ToRecord(concurrencyLevel, "RemoveItemsFromInventory", removeResult));
                 if (removeResult.Status == "Completed")
                     stock -= settings.ItemsToRemovePerIteration;
@@ -49,6 +55,9 @@ public sealed class InventoryScenario(InventoryBenchmarkClient client, Benchmark
         return records;
     }
 
-    private static BenchmarkRecord ToRecord(int concurrencyLevel, string commandType, CommandOutcome outcome) =>
-        new(concurrencyLevel, commandType, outcome.Status, outcome.ElapsedMs);
+    private static BenchmarkRecord ToRecord(
+        int concurrencyLevel,
+        string commandType,
+        CommandOutcome outcome
+    ) => new(concurrencyLevel, commandType, outcome.Status, outcome.ElapsedMs);
 }

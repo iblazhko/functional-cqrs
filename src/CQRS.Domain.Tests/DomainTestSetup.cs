@@ -1,4 +1,5 @@
 using CQRS.Domain.Inventory;
+using LanguageExt;
 using static LanguageExt.Prelude;
 
 namespace CQRS.Domain.Tests;
@@ -19,19 +20,13 @@ internal static class DomainTestSetup
         "INV-123-Updated"
     );
 
-    public static readonly InventoryState TestInventoryState_New = new(
-        TestInventoryId,
-        CreateTestInventoryName("N/A"),
-        None,
-        true,
-        false
-    );
+    // Non-existent inventory (write-side state before any InventoryCreated event)
+    public static readonly Option<InventoryState> TestInventoryState_None = None;
 
     public static readonly InventoryState TestInventoryState_Current = new(
         TestInventoryId,
         TestInventoryName,
         Some(CreateTestStockQuantity(5)),
-        false,
         true
     );
 
@@ -39,7 +34,6 @@ internal static class DomainTestSetup
         TestInventoryId,
         TestInventoryName,
         None,
-        false,
         true
     );
 
@@ -47,7 +41,6 @@ internal static class DomainTestSetup
         TestInventoryId,
         TestInventoryName,
         None,
-        false,
         false
     );
 }

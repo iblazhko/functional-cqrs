@@ -1,10 +1,10 @@
-using LanguageExt;
 using CQRS.DTO;
 using CQRS.DTO.Inventory.V1;
 using CQRS.Mapping;
 using CQRS.Ports.ProjectionStore;
 using CQRS.Projections.Inventory.V1;
 using CQRS.Projections.ViewModels.Inventory.V1;
+using LanguageExt;
 using Microsoft.Extensions.Logging;
 
 namespace CQRS.Projections.WolverineHandlers;
@@ -38,7 +38,9 @@ public sealed class InventoryEventConsumer(
         );
 
         var result = await InventoryEventDtoHandler.Handle(eventDto, GetHandlerContext());
-        result.IfLeft(fault => throw new MappingException(fault.FromType, fault.ToType, fault.Message));
+        result.IfLeft(fault =>
+            throw new MappingException(fault.FromType, fault.ToType, fault.Message)
+        );
     }
 
     private IInventoryDomainEventDtoHandlerContext<InventoryViewModel> GetHandlerContext() =>

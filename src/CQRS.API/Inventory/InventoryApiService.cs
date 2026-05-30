@@ -96,13 +96,15 @@ public class InventoryApiService(
     Task<Either<MappingFault, AcceptedResponse>> ValidateAndSend<TDto>(TDto commandDto)
         where TDto : IInventoryCommandDto
     {
-        var commandMetadata = ExtractRequestMetadata().GetResponseMetadata(timeProvider.GetUtcNow());
+        var commandMetadata = ExtractRequestMetadata()
+            .GetResponseMetadata(timeProvider.GetUtcNow());
         return commandMapper
             .ToDomainCommand(commandDto)
             .Match(
                 Left: fault => Task.FromResult<Either<MappingFault, AcceptedResponse>>(fault),
-                Right: async command => (Either<MappingFault, AcceptedResponse>)
-                    await SendCommandDto(commandDto, command.Id, commandMetadata)
+                Right: async command =>
+                    (Either<MappingFault, AcceptedResponse>)
+                        await SendCommandDto(commandDto, command.Id, commandMetadata)
             );
     }
 
@@ -133,12 +135,16 @@ public static class InventoriesApiHttpExtensions
 
     public static IResult ToHttpResult(this Either<MappingFault, AcceptedResponse> outcome) =>
         outcome.Match(
-            fault => Results.Problem(
-                title: "Validation failed",
-                detail: fault.Message,
-                statusCode: 400,
-                extensions: new Dictionary<string, object?> { ["errors"] = fault.Errors.Select(e => e.Message).ToArray() }
-            ),
+            fault =>
+                Results.Problem(
+                    title: "Validation failed",
+                    detail: fault.Message,
+                    statusCode: 400,
+                    extensions: new Dictionary<string, object?>
+                    {
+                        ["errors"] = fault.Errors.Select(e => e.Message).ToArray(),
+                    }
+                ),
             r => Results.Accepted(value: r)
         );
 }

@@ -4,6 +4,7 @@ using CQRS.DTO;
 using CQRS.Ports.EventStore;
 using DotNet.Testcontainers.Configurations;
 using JasperFx.Events;
+using LanguageExt;
 using Marten;
 using Microsoft.Extensions.Logging.Abstractions;
 using Testcontainers.PostgreSql;
@@ -17,9 +18,9 @@ public sealed class PostgreSqlContainerFixture : IAsyncLifetime
 {
     static PostgreSqlContainerFixture() => TestcontainersSettings.ResourceReaperEnabled = false;
 
-    private readonly PostgreSqlContainer _container =
-        new PostgreSqlBuilder("postgres:18.3")
-            .Build();
+    private readonly PostgreSqlContainer _container = new PostgreSqlBuilder(
+        "postgres:18.3"
+    ).Build();
 
     public IDocumentStore DocumentStore { get; private set; } = null!;
 
@@ -34,8 +35,8 @@ public sealed class PostgreSqlContainerFixture : IAsyncLifetime
             opts.Events.StreamIdentity = StreamIdentity.AsString;
             opts.AutoCreateSchemaObjects = JasperFx.AutoCreate.All;
             opts.Events.AddEventTypes(
-                typeof(IInventoryEventDto).Assembly
-                    .GetTypes()
+                typeof(IInventoryEventDto)
+                    .Assembly.GetTypes()
                     .Where(t =>
                         typeof(IInventoryEventDto).IsAssignableFrom(t)
                         && t is { IsClass: true, IsAbstract: false }
@@ -47,8 +48,17 @@ public sealed class PostgreSqlContainerFixture : IAsyncLifetime
         await DocumentStore.Storage.ApplyAllConfiguredChangesToDatabaseAsync();
     }
 
-    public MartenDbEventStoreAdapter<InventoryState, IInventoryEvent, IInventoryEventDto> CreateAdapter() =>
-        new(DocumentStore, new NoOpEventPublisher<IInventoryEvent>(), TimeProvider.System, NullLoggerFactory.Instance);
+    public MartenDbEventStoreAdapter<
+        Option<InventoryState>,
+        IInventoryEvent,
+        IInventoryEventDto
+    > CreateAdapter() =>
+        new(
+            DocumentStore,
+            new NoOpEventPublisher<IInventoryEvent>(),
+            TimeProvider.System,
+            NullLoggerFactory.Instance
+        );
 
     public async ValueTask DisposeAsync()
     {

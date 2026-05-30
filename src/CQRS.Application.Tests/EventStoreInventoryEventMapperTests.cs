@@ -13,6 +13,7 @@ public sealed class EventStoreInventoryEventMapperTests
     private readonly EventStoreInventoryEventMapper _mapper = new();
 
     private static InventoryId SomeId() => InventoryId.NewId();
+
     private static InventoryName SomeName() => InventoryName.CreateUnsafe("Widget");
 
     // --- ToEventDto ---
@@ -44,7 +45,11 @@ public sealed class EventStoreInventoryEventMapperTests
     [Fact]
     public void ToEventDto_InventoryRenamed_ReturnsInventoryRenamedEvent()
     {
-        var domain = new InventoryRenamed(SomeId(), SomeName(), InventoryName.CreateUnsafe("NewWidget"));
+        var domain = new InventoryRenamed(
+            SomeId(),
+            SomeName(),
+            InventoryName.CreateUnsafe("NewWidget")
+        );
 
         var dto = _mapper.ToEventDto(domain);
 
@@ -55,7 +60,8 @@ public sealed class EventStoreInventoryEventMapperTests
     public void ToEventDto_ItemsAddedToInventory_ReturnsItemsAddedToInventoryEvent()
     {
         var domain = new ItemsAddedToInventory(
-            SomeId(), SomeName(),
+            SomeId(),
+            SomeName(),
             PositiveInteger.CreateUnsafe(5),
             None,
             PositiveInteger.CreateUnsafe(5)
@@ -70,7 +76,8 @@ public sealed class EventStoreInventoryEventMapperTests
     public void ToEventDto_ItemsRemovedFromInventory_ReturnsItemsRemovedFromInventoryEvent()
     {
         var domain = new ItemsRemovedFromInventory(
-            SomeId(), SomeName(),
+            SomeId(),
+            SomeName(),
             PositiveInteger.CreateUnsafe(2),
             PositiveInteger.CreateUnsafe(5),
             Some(PositiveInteger.CreateUnsafe(3))
@@ -117,7 +124,12 @@ public sealed class EventStoreInventoryEventMapperTests
     public void ToDomainEvent_ValidInventoryCreatedEvent_ReturnsRight()
     {
         var id = SomeId();
-        var dto = new InventoryCreatedEvent { InventoryId = (string)id, Name = "Widget", IsActive = true };
+        var dto = new InventoryCreatedEvent
+        {
+            InventoryId = (string)id,
+            Name = "Widget",
+            IsActive = true,
+        };
 
         var result = _mapper.ToDomainEvent(dto);
 
@@ -129,9 +141,15 @@ public sealed class EventStoreInventoryEventMapperTests
     public void ToDomainEvent_ValidInventoryCreatedEvent_PreservesFields()
     {
         var id = SomeId();
-        var dto = new InventoryCreatedEvent { InventoryId = (string)id, Name = "Widget", IsActive = true };
+        var dto = new InventoryCreatedEvent
+        {
+            InventoryId = (string)id,
+            Name = "Widget",
+            IsActive = true,
+        };
 
-        var domain = (InventoryCreated)_mapper.ToDomainEvent(dto).Match(Left: _ => null!, Right: s => s);
+        var domain = (InventoryCreated)
+            _mapper.ToDomainEvent(dto).Match(Left: _ => null!, Right: s => s);
 
         ((string)domain.Id).ShouldBe((string)id);
         ((string)domain.Name).ShouldBe("Widget");
@@ -152,7 +170,12 @@ public sealed class EventStoreInventoryEventMapperTests
     public void ToDomainEvent_ValidInventoryRenamedEvent_ReturnsRight()
     {
         var id = SomeId();
-        var dto = new InventoryRenamedEvent { InventoryId = (string)id, OldName = "Old", NewName = "New" };
+        var dto = new InventoryRenamedEvent
+        {
+            InventoryId = (string)id,
+            OldName = "Old",
+            NewName = "New",
+        };
 
         var result = _mapper.ToDomainEvent(dto);
 

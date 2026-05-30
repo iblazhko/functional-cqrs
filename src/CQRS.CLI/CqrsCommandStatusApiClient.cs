@@ -56,10 +56,14 @@ public sealed class CqrsCommandStatusApiClient(CliSettings settings)
                     await console.Output.WriteLineAsync($"Completed. (CommandId: {commandId})");
                     return;
                 case "Rejected":
-                    await console.Output.WriteLineAsync($"Rejected: {status.Response}. (CommandId: {commandId})");
+                    await console.Output.WriteLineAsync(
+                        $"Rejected: {status.Response}. (CommandId: {commandId})"
+                    );
                     return;
                 case "Failed":
-                    await console.Output.WriteLineAsync($"Failed: {status.Response}. (CommandId: {commandId})");
+                    await console.Output.WriteLineAsync(
+                        $"Failed: {status.Response}. (CommandId: {commandId})"
+                    );
                     return;
             }
         }

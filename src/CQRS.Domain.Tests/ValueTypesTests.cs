@@ -139,19 +139,17 @@ public sealed class ShortStringTests
     [Fact]
     public void ImplicitStringConversion_ReturnsUnderlyingValue()
     {
-        ShortString.Create("Hello").Match(
-            _ => Assert.Fail("Expected Right"),
-            s => ((string)s).ShouldBe("Hello")
-        );
+        ShortString
+            .Create("Hello")
+            .Match(_ => Assert.Fail("Expected Right"), s => ((string)s).ShouldBe("Hello"));
     }
 
     [Fact]
     public void ToString_ReturnsUnderlyingValue()
     {
-        ShortString.Create("Hello").Match(
-            _ => Assert.Fail("Expected Right"),
-            s => s.ToString().ShouldBe("Hello")
-        );
+        ShortString
+            .Create("Hello")
+            .Match(_ => Assert.Fail("Expected Right"), s => s.ToString().ShouldBe("Hello"));
     }
 }
 
@@ -235,10 +233,9 @@ public sealed class LongStringTests
     [Fact]
     public void ImplicitStringConversion_ReturnsUnderlyingValue()
     {
-        LongString.Create("Hello").Match(
-            _ => Assert.Fail("Expected Right"),
-            s => ((string)s).ShouldBe("Hello")
-        );
+        LongString
+            .Create("Hello")
+            .Match(_ => Assert.Fail("Expected Right"), s => ((string)s).ShouldBe("Hello"));
     }
 }
 
@@ -261,7 +258,9 @@ public sealed class TimeZoneTests
     [Fact]
     public void CreateUnsafe_WithValidValue_ReturnsInstance()
     {
-        ((string)CQRS.Domain.TimeZone.CreateUnsafe("America/New_York")).ShouldBe("America/New_York");
+        ((string)CQRS.Domain.TimeZone.CreateUnsafe("America/New_York")).ShouldBe(
+            "America/New_York"
+        );
     }
 
     [Theory]
@@ -275,18 +274,14 @@ public sealed class TimeZoneTests
     [Fact]
     public void ImplicitStringConversion_ReturnsUnderlyingValue()
     {
-        CQRS.Domain.TimeZone.Create("Asia/Tokyo").Match(
-            _ => Assert.Fail("Expected Right"),
-            tz => ((string)tz).ShouldBe("Asia/Tokyo")
-        );
+        CQRS.Domain.TimeZone.Create("Asia/Tokyo")
+            .Match(_ => Assert.Fail("Expected Right"), tz => ((string)tz).ShouldBe("Asia/Tokyo"));
     }
 
     [Fact]
     public void ToString_ReturnsUnderlyingValue()
     {
-        CQRS.Domain.TimeZone.Create("Asia/Tokyo").Match(
-            _ => Assert.Fail("Expected Right"),
-            tz => tz.ToString().ShouldBe("Asia/Tokyo")
-        );
+        CQRS.Domain.TimeZone.Create("Asia/Tokyo")
+            .Match(_ => Assert.Fail("Expected Right"), tz => tz.ToString().ShouldBe("Asia/Tokyo"));
     }
 }

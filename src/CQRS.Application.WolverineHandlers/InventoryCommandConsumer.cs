@@ -44,11 +44,22 @@ public sealed class InventoryCommandConsumer(
         var context = new Context
         {
             MessageId = (MessagingId)(TryParseHeader(envelope, "cqrs-message-id") ?? envelope.Id),
-            CorrelationId = (MessagingId)(TryParseHeader(envelope, "cqrs-correlation-id") ?? TryParseGuid(envelope.CorrelationId) ?? envelope.Id),
-            CausationId = (TryParseHeader(envelope, "cqrs-causation-id") ?? TryParseGuid(envelope.ParentId)) is { } g ? (MessagingId)g : null,
+            CorrelationId = (MessagingId)(
+                TryParseHeader(envelope, "cqrs-correlation-id")
+                ?? TryParseGuid(envelope.CorrelationId)
+                ?? envelope.Id
+            ),
+            CausationId = (
+                TryParseHeader(envelope, "cqrs-causation-id") ?? TryParseGuid(envelope.ParentId)
+            )
+                is { } g
+                ? (MessagingId)g
+                : null,
             Timestamp = timeProvider.GetUtcNow(),
         };
-        using var scope = logger.BeginScope(new Dictionary<string, object?> { ["CorrelationId"] = context.CorrelationId.Id });
+        using var scope = logger.BeginScope(
+            new Dictionary<string, object?> { ["CorrelationId"] = context.CorrelationId.Id }
+        );
         await InvokeWithProcessingStatusRecording(message, context, moonPhase);
     }
 
@@ -131,8 +142,7 @@ public sealed class InventoryCommandConsumer(
         }
     }
 
-    private static Guid? TryParseGuid(string? value) =>
-        Guid.TryParse(value, out var g) ? g : null;
+    private static Guid? TryParseGuid(string? value) => Guid.TryParse(value, out var g) ? g : null;
 
     private static readonly JsonSerializerOptions SerializeOptions = new()
     {

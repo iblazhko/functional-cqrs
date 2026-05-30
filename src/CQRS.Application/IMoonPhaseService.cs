@@ -13,10 +13,10 @@ public sealed class MoonPhaseService(Random random) : IMoonPhaseService
         Task.FromResult(MoonPhaseValues[random.Next(0, MoonPhaseValues.Length)]);
 
     private static readonly MoonPhase[] MoonPhaseValues =
-        [
-            MoonPhase.NewMoon,
-            MoonPhase.FirstQuarter,
-            MoonPhase.FullMoon,
-            MoonPhase.LastQuarter
-        ];
+    [
+        MoonPhase.NewMoon,
+        MoonPhase.FirstQuarter,
+        MoonPhase.FullMoon,
+        MoonPhase.LastQuarter,
+    ];
 }

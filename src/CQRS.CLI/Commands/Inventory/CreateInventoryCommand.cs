@@ -5,7 +5,10 @@ using CliFx.Infrastructure;
 namespace CQRS.CLI.Commands.Inventory;
 
 [Command("inventory create", Description = "Create a new inventory item")]
-public sealed partial class CreateInventoryCommand(InventoryApiClient client, CqrsCommandStatusApiClient commandStatusClient) : ICommand
+public sealed partial class CreateInventoryCommand(
+    InventoryApiClient client,
+    CqrsCommandStatusApiClient commandStatusClient
+) : ICommand
 {
     [CommandOption("id", Description = "Inventory ID (auto-generated if omitted)")]
     public string? Id { get; set; }

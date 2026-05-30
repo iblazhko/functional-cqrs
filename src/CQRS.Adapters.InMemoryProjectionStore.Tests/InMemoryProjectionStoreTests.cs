@@ -53,7 +53,15 @@ public sealed class InMemoryDocumentCollectionTests
     {
         var id = (DocumentId)"doc-func-new";
 
-        await _collection.Update(id, vm => { vm.Name = "FromFunc"; vm.Count = 10; return vm; });
+        await _collection.Update(
+            id,
+            vm =>
+            {
+                vm.Name = "FromFunc";
+                vm.Count = 10;
+                return vm;
+            }
+        );
 
         var result = await _collection.GetById(id);
         result.ShouldNotBeNull();
@@ -67,7 +75,14 @@ public sealed class InMemoryDocumentCollectionTests
         var id = (DocumentId)"doc-func-existing";
         await _collection.Update(id, new TestViewModel { Name = "Original", Count = 5 });
 
-        await _collection.Update(id, vm => { vm.Count += 3; return vm; });
+        await _collection.Update(
+            id,
+            vm =>
+            {
+                vm.Count += 3;
+                return vm;
+            }
+        );
 
         var result = await _collection.GetById(id);
         result.ShouldNotBeNull();
@@ -80,9 +95,30 @@ public sealed class InMemoryDocumentCollectionTests
     {
         var id = (DocumentId)"doc-accumulate";
 
-        await _collection.Update(id, vm => { vm.Count = 1; return vm; });
-        await _collection.Update(id, vm => { vm.Count += 2; return vm; });
-        await _collection.Update(id, vm => { vm.Count += 3; return vm; });
+        await _collection.Update(
+            id,
+            vm =>
+            {
+                vm.Count = 1;
+                return vm;
+            }
+        );
+        await _collection.Update(
+            id,
+            vm =>
+            {
+                vm.Count += 2;
+                return vm;
+            }
+        );
+        await _collection.Update(
+            id,
+            vm =>
+            {
+                vm.Count += 3;
+                return vm;
+            }
+        );
 
         var result = await _collection.GetById(id);
         result.ShouldNotBeNull();

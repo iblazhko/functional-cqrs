@@ -12,7 +12,9 @@ public sealed class InMemoryDocumentCollection<TViewModel>
     private readonly ILogger _logger;
     private readonly ConcurrentDictionary<DocumentId, TViewModel> _documents = new();
 
-    public InMemoryDocumentCollection(ILogger<InMemoryDocumentCollection<TViewModel>>? logger = null)
+    public InMemoryDocumentCollection(
+        ILogger<InMemoryDocumentCollection<TViewModel>>? logger = null
+    )
     {
         _logger = logger ?? NullLogger<InMemoryDocumentCollection<TViewModel>>.Instance;
     }

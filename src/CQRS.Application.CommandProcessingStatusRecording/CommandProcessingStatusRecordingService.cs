@@ -135,10 +135,7 @@ public class CommandProcessingStatusRecordingService
 
     public Task<Option<CommandProcessingStatusViewModel>> GetCommandProcessingStatus(
         Guid commandId
-    ) =>
-        Task.FromResult(
-            _byCommandId.TryGetValue(commandId, out var vm) ? Some(vm) : None
-        );
+    ) => Task.FromResult(_byCommandId.TryGetValue(commandId, out var vm) ? Some(vm) : None);
 
     public Task<Option<CommandProcessingStatusViewModel>> GetByCorrelationId(Guid correlationId) =>
         Task.FromResult(

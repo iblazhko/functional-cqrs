@@ -14,7 +14,7 @@ public sealed partial class InventoryCommand : ICommand, ICommandWithHelpOption
     {
         await console.Output.WriteLineAsync(
             "Usage: inventory <command> [options]"
-            + "\nRun 'inventory --help' to list available commands."
+                + "\nRun 'inventory --help' to list available commands."
         );
     }
 }

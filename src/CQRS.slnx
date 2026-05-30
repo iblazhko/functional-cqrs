@@ -11,43 +11,19 @@
     </Folder>
     <Folder Name="/1_Server/" />
     <Folder Name="/1_Server/1.1_Application/">
-        <Project
-            Path="CQRS.Application.CommandProcessingStatusRecording\CQRS.Application.CommandProcessingStatusRecording.csproj"
-            Type="Classic C#"
-        />
-        <Project
-            Path="CQRS.Application.WolverineHandlers\CQRS.Application.WolverineHandlers.csproj"
-            Type="Classic C#"
-        />
-        <Project
-            Path="CQRS.Application.WolverineHandlers.Tests\CQRS.Application.WolverineHandlers.Tests.csproj"
-            Type="Classic C#"
-        />
+        <Project Path="CQRS.Application.CommandProcessingStatusRecording\CQRS.Application.CommandProcessingStatusRecording.csproj" Type="Classic C#"  />
+        <Project Path="CQRS.Application.WolverineHandlers\CQRS.Application.WolverineHandlers.csproj" Type="Classic C#"  />
+        <Project Path="CQRS.Application.WolverineHandlers.Tests\CQRS.Application.WolverineHandlers.Tests.csproj" Type="Classic C#"  />
         <Project Path="CQRS.Application.Tests\CQRS.Application.Tests.csproj" Type="Classic C#" />
         <Project Path="CQRS.Application\CQRS.Application.csproj" Type="Classic C#" />
     </Folder>
     <Folder Name="/1_Server/1.2_Projections/">
-        <Project
-            Path="CQRS.Projections.WolverineHandlers\CQRS.Projections.WolverineHandlers.csproj"
-            Type="Classic C#"
-        />
-        <Project
-            Path="CQRS.Projections.WolverineHandlers.Tests\CQRS.Projections.WolverineHandlers.Tests.csproj"
-            Type="Classic C#"
-        />
-        <Project
-            Path="CQRS.Projections.Repositories\CQRS.Projections.Repositories.csproj"
-            Type="Classic C#"
-        />
-        <Project
-            Path="CQRS.Projections.Repositories.Tests\CQRS.Projections.Repositories.Tests.csproj"
-            Type="Classic C#"
-        />
+        <Project Path="CQRS.Projections.WolverineHandlers\CQRS.Projections.WolverineHandlers.csproj" Type="Classic C#"  />
+        <Project Path="CQRS.Projections.WolverineHandlers.Tests\CQRS.Projections.WolverineHandlers.Tests.csproj" Type="Classic C#"  />
+        <Project Path="CQRS.Projections.Repositories\CQRS.Projections.Repositories.csproj" Type="Classic C#"  />
+        <Project Path="CQRS.Projections.Repositories.Tests\CQRS.Projections.Repositories.Tests.csproj" Type="Classic C#"  />
         <Project Path="CQRS.Projections.Tests\CQRS.Projections.Tests.csproj" Type="Classic C#" />
-        <Project
-            Path="CQRS.Projections.ViewModels\CQRS.Projections.ViewModels.csproj"
-            Type="Classic C#"
-        />
+        <Project Path="CQRS.Projections.ViewModels\CQRS.Projections.ViewModels.csproj" Type="Classic C#"  />
         <Project Path="CQRS.Projections\CQRS.Projections.csproj" Type="Classic C#" />
     </Folder>
     <Folder Name="/1_Server/1.3_API/">
@@ -56,55 +32,22 @@
     </Folder>
     <Folder Name="/1_Server/1.4_Ports/">
         <Project Path="CQRS.Ports.EventStore\CQRS.Ports.EventStore.csproj" Type="Classic C#" />
-        <Project Path="CQRS.Ports.EventStore.Tests\CQRS.Ports.EventStore.Tests.csproj" Type="Classic C#" />
+        <Project Path="CQRS.Ports.EventStore.Tests\CQRS.Ports.EventStore.Tests.csproj" Type="Classic C#"  />
         <Project Path="CQRS.Ports.MessageBus\CQRS.Ports.MessageBus.csproj" Type="Classic C#" />
-        <Project Path="CQRS.Ports.MessageBus.Tests\CQRS.Ports.MessageBus.Tests.csproj" Type="Classic C#" />
-        <Project
-            Path="CQRS.Ports.ProjectionStore\CQRS.Ports.ProjectionStore.csproj"
-            Type="Classic C#"
-        />
+        <Project Path="CQRS.Ports.MessageBus.Tests\CQRS.Ports.MessageBus.Tests.csproj" Type="Classic C#"  />
+        <Project Path="CQRS.Ports.ProjectionStore\CQRS.Ports.ProjectionStore.csproj" Type="Classic C#"  />
     </Folder>
     <Folder Name="/1_Server/1.5_Adapters/">
-        <Project
-            Path="CQRS.Adapters.InMemoryEventStore.Tests\CQRS.Adapters.InMemoryEventStore.Tests.csproj"
-            Type="Classic C#"
-        />
-        <Project
-            Path="CQRS.Adapters.MartenDbEventStore.Tests\CQRS.Adapters.MartenDbEventStore.Tests.csproj"
-            Type="Classic C#"
-        />
-        <Project
-            Path="CQRS.Adapters.MartenDbProjectionStore.Tests\CQRS.Adapters.MartenDbProjectionStore.Tests.csproj"
-            Type="Classic C#"
-        />
-        <Project
-            Path="CQRS.Adapters.InMemoryEventStore\CQRS.Adapters.InMemoryEventStore.csproj"
-            Type="Classic C#"
-        />
-        <Project
-            Path="CQRS.Adapters.InMemoryProjectionStore.Tests\CQRS.Adapters.InMemoryProjectionStore.Tests.csproj"
-            Type="Classic C#"
-        />
-        <Project
-            Path="CQRS.Adapters.InMemoryProjectionStore\CQRS.Adapters.InMemoryProjectionStore.csproj"
-            Type="Classic C#"
-        />
-        <Project
-            Path="CQRS.Adapters.MartenDbEventStore\CQRS.Adapters.MartenDbEventStore.csproj"
-            Type="Classic C#"
-        />
-        <Project
-            Path="CQRS.Adapters.MartenDbProjectionStore\CQRS.Adapters.MartenDbProjectionStore.csproj"
-            Type="Classic C#"
-        />
-        <Project
-            Path="CQRS.Adapters.WolverineMessageBus\CQRS.Adapters.WolverineMessageBus.csproj"
-            Type="Classic C#"
-        />
-        <Project
-            Path="CQRS.Adapters.WolverineMessageBus.Tests\CQRS.Adapters.WolverineMessageBus.Tests.csproj"
-            Type="Classic C#"
-        />
+        <Project Path="CQRS.Adapters.InMemoryEventStore.Tests\CQRS.Adapters.InMemoryEventStore.Tests.csproj" Type="Classic C#"  />
+        <Project Path="CQRS.Adapters.MartenDbEventStore.Tests\CQRS.Adapters.MartenDbEventStore.Tests.csproj" Type="Classic C#"  />
+        <Project Path="CQRS.Adapters.MartenDbProjectionStore.Tests\CQRS.Adapters.MartenDbProjectionStore.Tests.csproj" Type="Classic C#"  />
+        <Project Path="CQRS.Adapters.InMemoryEventStore\CQRS.Adapters.InMemoryEventStore.csproj" Type="Classic C#"  />
+        <Project Path="CQRS.Adapters.InMemoryProjectionStore.Tests\CQRS.Adapters.InMemoryProjectionStore.Tests.csproj" Type="Classic C#"  />
+        <Project Path="CQRS.Adapters.InMemoryProjectionStore\CQRS.Adapters.InMemoryProjectionStore.csproj" Type="Classic C#"  />
+        <Project Path="CQRS.Adapters.MartenDbEventStore\CQRS.Adapters.MartenDbEventStore.csproj" Type="Classic C#"  />
+        <Project Path="CQRS.Adapters.MartenDbProjectionStore\CQRS.Adapters.MartenDbProjectionStore.csproj" Type="Classic C#"  />
+        <Project Path="CQRS.Adapters.WolverineMessageBus\CQRS.Adapters.WolverineMessageBus.csproj" Type="Classic C#"  />
+        <Project Path="CQRS.Adapters.WolverineMessageBus.Tests\CQRS.Adapters.WolverineMessageBus.Tests.csproj" Type="Classic C#"  />
     </Folder>
     <Folder Name="/1_Server/1.6_Hosts/">
         <Project Path="CQRS.API.Host\CQRS.API.Host.csproj" Type="Classic C#" />
@@ -119,8 +62,8 @@
         <Project Path="CQRS.CLI\CQRS.CLI.csproj" Type="Classic C#" />
     </Folder>
     <Folder Name="/3_SystemTests/">
-        <Project Path="CQRS.System.Architecture.Tests\CQRS.System.Architecture.Tests.csproj" Type="Classic C#" />
-        <Project Path="CQRS.System.Integration.Tests\CQRS.System.Integration.Tests.csproj" Type="Classic C#" />
+        <Project Path="CQRS.System.Architecture.Tests\CQRS.System.Architecture.Tests.csproj" Type="Classic C#"  />
+        <Project Path="CQRS.System.Integration.Tests\CQRS.System.Integration.Tests.csproj" Type="Classic C#"  />
     </Folder>
     <Folder Name="/_devops_/">
         <File Path="..\build.ps1" />

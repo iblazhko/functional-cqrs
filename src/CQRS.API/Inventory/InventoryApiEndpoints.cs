@@ -19,8 +19,10 @@ public static class InventoryApiEndpoints
 
         app.MapPost(
             prefix + "/",
-            async ([FromBody] CreateInventoryRequest request, [FromServices] IInventoriesApiService apiService) =>
-                (await apiService.CreateInventory(request)).ToHttpResult()
+            async (
+                [FromBody] CreateInventoryRequest request,
+                [FromServices] IInventoriesApiService apiService
+            ) => (await apiService.CreateInventory(request)).ToHttpResult()
         );
 
         app.MapPut(

@@ -45,7 +45,8 @@ public sealed class InMemoryEventStreamSession<TDomainState, TDomainEvent, TEven
     ) =>
         Task.FromResult(
             _eventStream.Map(stream =>
-                stream.Events.Concat(_newEvents)
+                stream
+                    .Events.Concat(_newEvents)
                     .Aggregate(
                         projection.GetInitialState(_streamId),
                         (state, em) => projection.Apply(state, em.Event)
@@ -71,9 +72,10 @@ public sealed class InMemoryEventStreamSession<TDomainState, TDomainEvent, TEven
 
     private List<EventWithMetadata<TDomainEvent>> GetAllEventsWithMetadata() =>
         _eventStream.Match(
-            Left: err => throw new InvalidOperationException(
-                $"Event deserialization failed for '{err.EventType}': {err.Reason}"
-            ),
+            Left: err =>
+                throw new InvalidOperationException(
+                    $"Event deserialization failed for '{err.EventType}': {err.Reason}"
+                ),
             Right: stream => stream.Events.Concat(_newEvents).ToList()
         );
 
@@ -132,32 +134,34 @@ public sealed class InMemoryEventStreamSession<TDomainState, TDomainEvent, TEven
     private Either<EventDeserializationError, EventStream<TDomainEvent>> FromSerializedEventsStream(
         SerializedEventStream serializedEventStream
     ) =>
-        serializedEventStream.Events
-            .Aggregate(
+        serializedEventStream
+            .Events.Aggregate(
                 Right<EventDeserializationError, List<EventWithMetadata<TDomainEvent>>>(
                     new List<EventWithMetadata<TDomainEvent>>()
                 ),
-                (acc, x) => acc.Bind(list =>
-                    _eventMapper
-                        .ToDomainEvent(
-                            (TEventDto)_eventSerializer.Deserialize(
-                                x.Data,
-                                _eventTypeResolver.GetEventType(x.EventTypeFullName)
+                (acc, x) =>
+                    acc.Bind(list =>
+                        _eventMapper
+                            .ToDomainEvent(
+                                (TEventDto)
+                                    _eventSerializer.Deserialize(
+                                        x.Data,
+                                        _eventTypeResolver.GetEventType(x.EventTypeFullName)
+                                    )
                             )
-                        )
-                        .Map(evt =>
-                        {
-                            list.Add(
-                                EventWithMetadata<TDomainEvent>.FromEvent(
-                                    evt,
-                                    Guid.Empty,
-                                    Guid.Empty,
-                                    DateTime.UtcNow
-                                )
-                            );
-                            return list;
-                        })
-                )
+                            .Map(evt =>
+                            {
+                                list.Add(
+                                    EventWithMetadata<TDomainEvent>.FromEvent(
+                                        evt,
+                                        Guid.Empty,
+                                        Guid.Empty,
+                                        DateTime.UtcNow
+                                    )
+                                );
+                                return list;
+                            })
+                    )
             )
             .Map(events => new EventStream<TDomainEvent>(
                 _streamId,

@@ -1,22 +1,27 @@
 using CQRS.API.Inventory;
 using CQRS.Mapping;
 using LanguageExt;
-using static LanguageExt.Prelude;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Shouldly;
+using static LanguageExt.Prelude;
 
 namespace CQRS.API.Tests;
 
 public sealed class InventoriesApiHttpExtensionsTests
 {
-    private static MappingFault SomeFault() =>
-        new("SourceType", "DestType", "field is invalid");
+    private static MappingFault SomeFault() => new("SourceType", "DestType", "field is invalid");
 
     private static AcceptedResponse SomeAccepted() =>
         new() { InventoryId = "INV001", CorrelationId = Guid.NewGuid() };
 
     private static InventoryResponse SomeResponse() =>
-        new() { InventoryId = "INV001", Name = "Widget", StockQuantity = 5, IsActive = true };
+        new()
+        {
+            InventoryId = "INV001",
+            Name = "Widget",
+            StockQuantity = 5,
+            IsActive = true,
+        };
 
     // --- Option<T>.ToHttpResult() ---
 
@@ -96,6 +101,8 @@ public sealed class InventoriesApiHttpExtensionsTests
         result.ProblemDetails.Detail.ShouldBe(fault.Message);
         result.ProblemDetails.Extensions.ShouldNotBeNull();
         result.ProblemDetails.Extensions.ContainsKey("errors").ShouldBeTrue();
-        result.ProblemDetails.Extensions["errors"].ShouldBe(fault.Errors.Select(e => e.Message).ToArray());
+        result
+            .ProblemDetails.Extensions["errors"]
+            .ShouldBe(fault.Errors.Select(e => e.Message).ToArray());
     }
 }

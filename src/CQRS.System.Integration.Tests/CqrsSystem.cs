@@ -96,16 +96,16 @@ public class CqrsSystem(Uri apiBaseAddress, Uri applicationBaseAddress)
                 return status?.Status;
             });
 
-        var finalStatus = result.Outcome == OutcomeType.Successful
-            ? result.Result
-            : result.FinalHandledResult;
+        var finalStatus =
+            result.Outcome == OutcomeType.Successful ? result.Result : result.FinalHandledResult;
 
         var failure = finalStatus switch
         {
-            null => $"Command {commandId} was never recorded (may not have reached the application host)",
+            null =>
+                $"Command {commandId} was never recorded (may not have reached the application host)",
             "Rejected" or "Failed" => $"Command {commandId} ended with status: {finalStatus}",
             "Processing" => $"Command {commandId} did not complete within the timeout period",
-            _ => null
+            _ => null,
         };
 
         if (failure is not null)
@@ -221,9 +221,8 @@ public class CqrsSystem(Uri apiBaseAddress, Uri applicationBaseAddress)
             )
             .ExecuteAndCaptureAsync(() => GetInventory(inventoryId));
 
-        var inventory = result.Outcome == OutcomeType.Successful
-            ? result.Result
-            : result.FinalHandledResult;
+        var inventory =
+            result.Outcome == OutcomeType.Successful ? result.Result : result.FinalHandledResult;
 
         inventory.ShouldNotBeNull($"Inventory '{inventoryId}' did not reach expected state");
 

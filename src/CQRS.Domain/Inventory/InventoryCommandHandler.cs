@@ -5,7 +5,7 @@ public static class InventoryCommandHandler
     public static Either<
         InventoryAggregate.Errors.IInventoryCommandError,
         Seq<IInventoryEvent>
-    > Handle(InventoryState state, IInventoryCommand command, MoonPhase moonPhase) =>
+    > Handle(Option<InventoryState> state, IInventoryCommand command, MoonPhase moonPhase) =>
         command switch
         {
             CreateInventory cmd => InventoryAggregate.CreateInventory(state, cmd),

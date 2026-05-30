@@ -1,5 +1,4 @@
 using System.Text;
-
 using CliFx;
 using CliFx.Binding;
 using CliFx.Infrastructure;
@@ -34,6 +33,5 @@ public sealed partial class CommandStatusCommand(CqrsCommandStatusApiClient clie
         statusSummary.AppendLine($"UpdatedAt:   {status.UpdatedAt}");
 
         await console.Output.WriteLineAsync(statusSummary.ToString());
-
     }
 }

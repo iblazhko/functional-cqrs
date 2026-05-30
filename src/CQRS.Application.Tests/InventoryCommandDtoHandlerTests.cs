@@ -8,14 +8,23 @@ using CQRS.DTO.Inventory.V1;
 using CQRS.EntityIds;
 using CQRS.Mapping.Inventory.V1;
 using CQRS.Ports.EventStore;
+using LanguageExt;
 using Shouldly;
 
 namespace CQRS.Application.Tests;
 
 public sealed class InventoryCommandDtoHandlerTests
 {
-    private readonly IEventStore<InventoryState, IInventoryEvent, IInventoryEventDto> _eventStore =
-        new InMemoryEventStoreAdapter<InventoryState, IInventoryEvent, IInventoryEventDto>();
+    private readonly IEventStore<
+        Option<InventoryState>,
+        IInventoryEvent,
+        IInventoryEventDto
+    > _eventStore =
+        new InMemoryEventStoreAdapter<
+            Option<InventoryState>,
+            IInventoryEvent,
+            IInventoryEventDto
+        >();
 
     private readonly InventoryCommandDtoHandler _handler;
 
@@ -74,7 +83,10 @@ public sealed class InventoryCommandDtoHandlerTests
         var streamId = InventoryEventStreamId.GetStreamId(
             InventoryId.Create(EntityId.CreateUnsafe(id))
         );
-        var streamExists = await _eventStore.Contains(streamId, cancellationToken: TestContext.Current.CancellationToken);
+        var streamExists = await _eventStore.Contains(
+            streamId,
+            cancellationToken: TestContext.Current.CancellationToken
+        );
         streamExists.ShouldBeTrue();
     }
 
@@ -129,12 +141,16 @@ public sealed class InventoryCommandDtoHandlerTests
         var id = ValidId();
         await _handler.Handle(
             new CreateInventoryCommand { InventoryId = id, Name = "Widget" },
-            MoonPhase.NewMoon, Guid.NewGuid(), Guid.NewGuid()
+            MoonPhase.NewMoon,
+            Guid.NewGuid(),
+            Guid.NewGuid()
         );
 
         var result = await _handler.Handle(
             new RenameInventoryCommand { InventoryId = id, NewName = "Gadget" },
-            MoonPhase.NewMoon, Guid.NewGuid(), Guid.NewGuid()
+            MoonPhase.NewMoon,
+            Guid.NewGuid(),
+            Guid.NewGuid()
         );
 
         result.IsT0.ShouldBeTrue();
@@ -147,12 +163,16 @@ public sealed class InventoryCommandDtoHandlerTests
 
         await _handler.Handle(
             new CreateInventoryCommand { InventoryId = id, Name = "Widget" },
-            MoonPhase.NewMoon, Guid.NewGuid(), Guid.NewGuid()
+            MoonPhase.NewMoon,
+            Guid.NewGuid(),
+            Guid.NewGuid()
         );
 
         var result = await _handler.Handle(
             new DeactivateInventoryCommand { InventoryId = id },
-            MoonPhase.FullMoon, Guid.NewGuid(), Guid.NewGuid()
+            MoonPhase.FullMoon,
+            Guid.NewGuid(),
+            Guid.NewGuid()
         );
 
         result.IsT2.ShouldBeTrue();

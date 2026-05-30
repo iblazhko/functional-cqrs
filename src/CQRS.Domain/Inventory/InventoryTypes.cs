@@ -41,13 +41,13 @@ public sealed record InventoryName
     public static Either<ValidationFault, InventoryName> Create(string value) =>
         MediumString.Create(value).Map(Create);
 
-    internal static InventoryName CreateUnsafe(string value) => new(MediumString.CreateUnsafe(value));
+    internal static InventoryName CreateUnsafe(string value) =>
+        new(MediumString.CreateUnsafe(value));
 }
 
 public sealed record InventoryState(
     InventoryId Id,
     InventoryName Name,
     Option<PositiveInteger> Quantity,
-    bool IsNew,
     bool IsActive
 );

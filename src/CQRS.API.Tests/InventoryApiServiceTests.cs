@@ -33,12 +33,23 @@ public sealed class InventoryApiServiceTests
 
     private static string InvalidId() => "bad-id";
 
-    private async Task SeedInventory(string inventoryId, string name, int stock = 0, bool isActive = true)
+    private async Task SeedInventory(
+        string inventoryId,
+        string name,
+        int stock = 0,
+        bool isActive = true
+    )
     {
         var collection = await _store.OpenDocumentCollection(InventoryCollection.CollectionId);
         await collection.Update(
             (DocumentId)inventoryId,
-            new InventoryViewModel { Id = inventoryId, Name = name, StockQuantity = stock, IsActive = isActive }
+            new InventoryViewModel
+            {
+                Id = inventoryId,
+                Name = name,
+                StockQuantity = stock,
+                IsActive = isActive,
+            }
         );
     }
 
@@ -156,7 +167,10 @@ public sealed class InventoryApiServiceTests
     [Fact]
     public async Task RenameInventory_ValidRequest_ReturnsRight()
     {
-        var result = await _service.RenameInventory(ValidId(), new RenameInventoryRequest { Name = "New Name" });
+        var result = await _service.RenameInventory(
+            ValidId(),
+            new RenameInventoryRequest { Name = "New Name" }
+        );
 
         result.IsRight.ShouldBeTrue();
     }
@@ -172,7 +186,10 @@ public sealed class InventoryApiServiceTests
     [Fact]
     public async Task RenameInventory_EmptyName_ReturnsLeft()
     {
-        var result = await _service.RenameInventory(ValidId(), new RenameInventoryRequest { Name = string.Empty });
+        var result = await _service.RenameInventory(
+            ValidId(),
+            new RenameInventoryRequest { Name = string.Empty }
+        );
 
         result.IsLeft.ShouldBeTrue();
     }
@@ -180,7 +197,10 @@ public sealed class InventoryApiServiceTests
     [Fact]
     public async Task RenameInventory_InvalidId_ReturnsLeft()
     {
-        var result = await _service.RenameInventory(InvalidId(), new RenameInventoryRequest { Name = "Valid" });
+        var result = await _service.RenameInventory(
+            InvalidId(),
+            new RenameInventoryRequest { Name = "Valid" }
+        );
 
         result.IsLeft.ShouldBeTrue();
     }
@@ -190,7 +210,10 @@ public sealed class InventoryApiServiceTests
     [Fact]
     public async Task AddItemsToInventory_ValidRequest_ReturnsRight()
     {
-        var result = await _service.AddItemsToInventory(ValidId(), new AddItemsToInventoryRequest { Count = 5 });
+        var result = await _service.AddItemsToInventory(
+            ValidId(),
+            new AddItemsToInventoryRequest { Count = 5 }
+        );
 
         result.IsRight.ShouldBeTrue();
     }
@@ -206,7 +229,10 @@ public sealed class InventoryApiServiceTests
     [Fact]
     public async Task AddItemsToInventory_ZeroCount_ReturnsLeft()
     {
-        var result = await _service.AddItemsToInventory(ValidId(), new AddItemsToInventoryRequest { Count = 0 });
+        var result = await _service.AddItemsToInventory(
+            ValidId(),
+            new AddItemsToInventoryRequest { Count = 0 }
+        );
 
         result.IsLeft.ShouldBeTrue();
     }
@@ -214,7 +240,10 @@ public sealed class InventoryApiServiceTests
     [Fact]
     public async Task AddItemsToInventory_NegativeCount_ReturnsLeft()
     {
-        var result = await _service.AddItemsToInventory(ValidId(), new AddItemsToInventoryRequest { Count = -1 });
+        var result = await _service.AddItemsToInventory(
+            ValidId(),
+            new AddItemsToInventoryRequest { Count = -1 }
+        );
 
         result.IsLeft.ShouldBeTrue();
     }
@@ -224,7 +253,10 @@ public sealed class InventoryApiServiceTests
     [Fact]
     public async Task RemoveItemsFromInventory_ValidRequest_ReturnsRight()
     {
-        var result = await _service.RemoveItemsFromInventory(ValidId(), new RemoveItemsFromInventoryRequest { Count = 3 });
+        var result = await _service.RemoveItemsFromInventory(
+            ValidId(),
+            new RemoveItemsFromInventoryRequest { Count = 3 }
+        );
 
         result.IsRight.ShouldBeTrue();
     }
@@ -232,7 +264,10 @@ public sealed class InventoryApiServiceTests
     [Fact]
     public async Task RemoveItemsFromInventory_ValidRequest_SendsCommandToBus()
     {
-        await _service.RemoveItemsFromInventory(ValidId(), new RemoveItemsFromInventoryRequest { Count = 3 });
+        await _service.RemoveItemsFromInventory(
+            ValidId(),
+            new RemoveItemsFromInventoryRequest { Count = 3 }
+        );
 
         _bus.SentMessages.ShouldHaveSingleItem();
     }
@@ -240,7 +275,10 @@ public sealed class InventoryApiServiceTests
     [Fact]
     public async Task RemoveItemsFromInventory_ZeroCount_ReturnsLeft()
     {
-        var result = await _service.RemoveItemsFromInventory(ValidId(), new RemoveItemsFromInventoryRequest { Count = 0 });
+        var result = await _service.RemoveItemsFromInventory(
+            ValidId(),
+            new RemoveItemsFromInventoryRequest { Count = 0 }
+        );
 
         result.IsLeft.ShouldBeTrue();
     }
@@ -250,7 +288,10 @@ public sealed class InventoryApiServiceTests
     [Fact]
     public async Task DeactivateInventory_ValidRequest_ReturnsRight()
     {
-        var result = await _service.DeactivateInventory(ValidId(), new DeactivateInventoryRequest());
+        var result = await _service.DeactivateInventory(
+            ValidId(),
+            new DeactivateInventoryRequest()
+        );
 
         result.IsRight.ShouldBeTrue();
     }
@@ -266,7 +307,10 @@ public sealed class InventoryApiServiceTests
     [Fact]
     public async Task DeactivateInventory_InvalidId_ReturnsLeft()
     {
-        var result = await _service.DeactivateInventory(InvalidId(), new DeactivateInventoryRequest());
+        var result = await _service.DeactivateInventory(
+            InvalidId(),
+            new DeactivateInventoryRequest()
+        );
 
         result.IsLeft.ShouldBeTrue();
     }

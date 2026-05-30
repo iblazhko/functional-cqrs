@@ -15,8 +15,7 @@ public sealed class CommandProcessingResultTests
             true
         ).ToSeq();
 
-    private static MappingFault SomeFault() =>
-        new("SourceType", "DestType", "field is invalid");
+    private static MappingFault SomeFault() => new("SourceType", "DestType", "field is invalid");
 
     private static InventoryAggregate.Errors.IInventoryCommandError SomeError() =>
         new InventoryAggregate.Errors.InventoryAlreadyExists(InventoryId.NewId());

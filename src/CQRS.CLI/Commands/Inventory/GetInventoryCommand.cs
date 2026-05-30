@@ -19,10 +19,11 @@ public sealed partial class GetInventoryCommand(InventoryApiClient client) : ICo
 
         await console.Output.WriteLineAsync(
             $"""
-             Inventory:  {inventory.InventoryId}");
-               Name:     {inventory.Name}");
-               Stock:    {inventory.StockQuantity}");
-               Active:   {(inventory.IsActive ? "Yes" : "No")}");
-             """);
+            Inventory:  {inventory.InventoryId}");
+              Name:     {inventory.Name}");
+              Stock:    {inventory.StockQuantity}");
+              Active:   {(inventory.IsActive ? "Yes" : "No")}");
+            """
+        );
     }
 }

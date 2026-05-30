@@ -27,7 +27,9 @@ public sealed class MartenDbEventStoreAdapter<TDomainState, TDomainEvent, TEvent
             eventMapper,
             EventPublisher,
             EventTimeProvider,
-            loggerFactory.CreateLogger<MartenDbEventStreamSession<TDomainState, TDomainEvent, TEventDto>>()
+            loggerFactory.CreateLogger<
+                MartenDbEventStreamSession<TDomainState, TDomainEvent, TEventDto>
+            >()
         );
 
     public Task Delete(EventStreamId streamId)

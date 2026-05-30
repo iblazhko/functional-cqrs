@@ -36,7 +36,8 @@ public sealed class EventSourcedRepository<TDomainState, TDomainEvent, TEventDto
         var stateResult = await session.GetState(stateProjection, deadline, cancellationToken);
 
         return await stateResult.Match(
-            Left: err => Task.FromResult(Left<EventDeserializationError, IEnumerable<TDomainEvent>>(err)),
+            Left: err =>
+                Task.FromResult(Left<EventDeserializationError, IEnumerable<TDomainEvent>>(err)),
             Right: async state =>
             {
                 var newEvents = action(state).ToList();

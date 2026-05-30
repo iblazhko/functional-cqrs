@@ -39,17 +39,17 @@ public sealed class EntityIdTests
     public sealed class Create
     {
         [Theory]
-        [InlineData(ValidId)]           // 14 uppercase letters from valid alphabet
-        [InlineData("00000000000000")]  // 14 digits
-        [InlineData("ABCDEFGH000000")]  // letters and digits mixed
+        [InlineData(ValidId)] // 14 uppercase letters from valid alphabet
+        [InlineData("00000000000000")] // 14 digits
+        [InlineData("ABCDEFGH000000")] // letters and digits mixed
         public void WithValidId_ReturnsRight(string value)
         {
             EntityId.Create(value).IsRight.ShouldBeTrue();
         }
 
         [Theory]
-        [InlineData(ValidIdLowercase)]  // lowercase normalises to valid uppercase
-        [InlineData("Abcdefghjkmnpq")]  // mixed case
+        [InlineData(ValidIdLowercase)] // lowercase normalises to valid uppercase
+        [InlineData("Abcdefghjkmnpq")] // mixed case
         public void WithLowercaseValidId_ReturnsRight(string value)
         {
             EntityId.Create(value).IsRight.ShouldBeTrue();
@@ -58,15 +58,17 @@ public sealed class EntityIdTests
         [Fact]
         public void NormalisesInputToUppercase()
         {
-            EntityId.Create(ValidIdLowercase).Match(
-                Left: _ => Assert.Fail("Expected Right"),
-                Right: id => ((string)id).ShouldBe(ValidId)
-            );
+            EntityId
+                .Create(ValidIdLowercase)
+                .Match(
+                    Left: _ => Assert.Fail("Expected Right"),
+                    Right: id => ((string)id).ShouldBe(ValidId)
+                );
         }
 
         [Theory]
-        [InlineData("")]                 // empty
-        [InlineData("ABCDEFGHJKMNP")]   // 13 chars — too short
+        [InlineData("")] // empty
+        [InlineData("ABCDEFGHJKMNP")] // 13 chars — too short
         [InlineData("ABCDEFGHJKMNPQR")] // 15 chars — too long
         public void WithWrongLength_ReturnsLeft(string value)
         {
@@ -115,10 +117,10 @@ public sealed class EntityIdTests
         }
 
         [Theory]
-        [InlineData("ABCDEFGHJKMNP")]   // too short
+        [InlineData("ABCDEFGHJKMNP")] // too short
         [InlineData("ABCDEFGHJKMNPQR")] // too long
-        [InlineData("ABCDEFGHIJKMNP")]  // contains 'I'
-        [InlineData("ABCDEFGH!JKMNP")]  // invalid character
+        [InlineData("ABCDEFGHIJKMNP")] // contains 'I'
+        [InlineData("ABCDEFGH!JKMNP")] // invalid character
         public void WithInvalidId_ThrowsArgumentException(string value)
         {
             Should.Throw<ArgumentException>(() => EntityId.CreateUnsafe(value));

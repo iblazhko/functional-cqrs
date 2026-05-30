@@ -27,7 +27,12 @@ public sealed class InventoryEventDtoHandlerTests
     [Fact]
     public async Task Handle_ValidDto_ReturnsRight()
     {
-        var dto = new InventoryCreatedEvent { InventoryId = ValidId(), Name = "Widget", IsActive = true };
+        var dto = new InventoryCreatedEvent
+        {
+            InventoryId = ValidId(),
+            Name = "Widget",
+            IsActive = true,
+        };
 
         var result = await InventoryEventDtoHandler.Handle(dto, MakeContext());
 
@@ -38,7 +43,12 @@ public sealed class InventoryEventDtoHandlerTests
     public async Task Handle_ValidDto_ViewModelStoredInProjectionStore()
     {
         var id = ValidId();
-        var dto = new InventoryCreatedEvent { InventoryId = id, Name = "Widget", IsActive = true };
+        var dto = new InventoryCreatedEvent
+        {
+            InventoryId = id,
+            Name = "Widget",
+            IsActive = true,
+        };
 
         await InventoryEventDtoHandler.Handle(dto, MakeContext());
 
@@ -51,7 +61,12 @@ public sealed class InventoryEventDtoHandlerTests
     public async Task Handle_InventoryCreatedDto_ViewModelHasCorrectName()
     {
         var id = ValidId();
-        var dto = new InventoryCreatedEvent { InventoryId = id, Name = "Widget", IsActive = true };
+        var dto = new InventoryCreatedEvent
+        {
+            InventoryId = id,
+            Name = "Widget",
+            IsActive = true,
+        };
 
         await InventoryEventDtoHandler.Handle(dto, MakeContext());
 
@@ -64,7 +79,12 @@ public sealed class InventoryEventDtoHandlerTests
     public async Task Handle_InventoryCreatedDto_ViewModelIsActive()
     {
         var id = ValidId();
-        var dto = new InventoryCreatedEvent { InventoryId = id, Name = "Widget", IsActive = true };
+        var dto = new InventoryCreatedEvent
+        {
+            InventoryId = id,
+            Name = "Widget",
+            IsActive = true,
+        };
 
         await InventoryEventDtoHandler.Handle(dto, MakeContext());
 
@@ -80,11 +100,21 @@ public sealed class InventoryEventDtoHandlerTests
         var context = MakeContext();
 
         await InventoryEventDtoHandler.Handle(
-            new InventoryCreatedEvent { InventoryId = id, Name = "Widget", IsActive = true },
+            new InventoryCreatedEvent
+            {
+                InventoryId = id,
+                Name = "Widget",
+                IsActive = true,
+            },
             context
         );
         await InventoryEventDtoHandler.Handle(
-            new InventoryRenamedEvent { InventoryId = id, OldName = "Widget", NewName = "Gadget" },
+            new InventoryRenamedEvent
+            {
+                InventoryId = id,
+                OldName = "Widget",
+                NewName = "Gadget",
+            },
             context
         );
 
@@ -100,11 +130,23 @@ public sealed class InventoryEventDtoHandlerTests
         var context = MakeContext();
 
         await InventoryEventDtoHandler.Handle(
-            new InventoryCreatedEvent { InventoryId = id, Name = "Widget", IsActive = true },
+            new InventoryCreatedEvent
+            {
+                InventoryId = id,
+                Name = "Widget",
+                IsActive = true,
+            },
             context
         );
         await InventoryEventDtoHandler.Handle(
-            new ItemsAddedToInventoryEvent { InventoryId = id, Name = "Widget", AddedCount = 5, OldStockQuantity = 0, NewStockQuantity = 5 },
+            new ItemsAddedToInventoryEvent
+            {
+                InventoryId = id,
+                Name = "Widget",
+                AddedCount = 5,
+                OldStockQuantity = 0,
+                NewStockQuantity = 5,
+            },
             context
         );
 
@@ -120,7 +162,12 @@ public sealed class InventoryEventDtoHandlerTests
         var context = MakeContext();
 
         await InventoryEventDtoHandler.Handle(
-            new InventoryCreatedEvent { InventoryId = id, Name = "Widget", IsActive = true },
+            new InventoryCreatedEvent
+            {
+                InventoryId = id,
+                Name = "Widget",
+                IsActive = true,
+            },
             context
         );
         await InventoryEventDtoHandler.Handle(

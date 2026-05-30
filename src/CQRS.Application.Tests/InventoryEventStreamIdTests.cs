@@ -28,28 +28,6 @@ public sealed class InventoryEventStreamIdTests
     }
 
     [Fact]
-    public void GetInventoryId_ExtractsInventoryIdFromStreamId()
-    {
-        var inventoryId = InventoryId.NewId();
-        var streamId = InventoryEventStreamId.GetStreamId(inventoryId);
-
-        var roundTripped = InventoryEventStreamId.GetInventoryId(streamId);
-
-        ((string)roundTripped).ShouldBe((string)inventoryId);
-    }
-
-    [Fact]
-    public void GetStreamId_ThenGetInventoryId_RoundTrips()
-    {
-        var inventoryId = InventoryId.NewId();
-
-        var streamId = InventoryEventStreamId.GetStreamId(inventoryId);
-        var recovered = InventoryEventStreamId.GetInventoryId(streamId);
-
-        ((string)recovered).ShouldBe((string)inventoryId);
-    }
-
-    [Fact]
     public void GetStreamId_DifferentIds_ProduceDifferentStreamIds()
     {
         var id1 = InventoryId.NewId();

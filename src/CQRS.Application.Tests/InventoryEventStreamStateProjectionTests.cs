@@ -1,6 +1,8 @@
 using CQRS.Application.Inventory;
 using CQRS.Domain.Inventory;
+using LanguageExt;
 using Shouldly;
+using static LanguageExt.Prelude;
 
 namespace CQRS.Application.Tests;
 
@@ -9,29 +11,17 @@ public sealed class InventoryEventStreamStateProjectionTests
     private readonly InventoryEventStreamStateProjection _projection = new();
 
     [Fact]
-    public void GetInitialState_ReturnsNewState()
+    public void GetInitialState_ReturnsNone()
     {
-        var inventoryId = InventoryId.NewId();
-        var streamId = InventoryEventStreamId.GetStreamId(inventoryId);
+        var streamId = InventoryEventStreamId.GetStreamId(InventoryId.NewId());
 
         var state = _projection.GetInitialState(streamId);
 
-        state.IsNew.ShouldBeTrue();
+        state.IsNone.ShouldBeTrue();
     }
 
     [Fact]
-    public void GetInitialState_StateIdMatchesInventoryIdInStream()
-    {
-        var inventoryId = InventoryId.NewId();
-        var streamId = InventoryEventStreamId.GetStreamId(inventoryId);
-
-        var state = _projection.GetInitialState(streamId);
-
-        ((string)state.Id).ShouldBe((string)inventoryId);
-    }
-
-    [Fact]
-    public void Apply_InventoryCreated_ReturnsNonNewState()
+    public void Apply_InventoryCreated_ReturnsSomeState()
     {
         var inventoryId = InventoryId.NewId();
         var streamId = InventoryEventStreamId.GetStreamId(inventoryId);
@@ -40,7 +30,7 @@ public sealed class InventoryEventStreamStateProjectionTests
 
         var newState = _projection.Apply(initialState, evt);
 
-        newState.IsNew.ShouldBeFalse();
+        newState.IsSome.ShouldBeTrue();
     }
 
     [Fact]
@@ -53,7 +43,7 @@ public sealed class InventoryEventStreamStateProjectionTests
 
         var newState = _projection.Apply(initialState, evt);
 
-        ((string)newState.Name).ShouldBe("Widget");
+        newState.Map(s => (string)s.Name).ShouldBe(Some("Widget"));
     }
 
     [Fact]
@@ -69,6 +59,6 @@ public sealed class InventoryEventStreamStateProjectionTests
 
         var newState = _projection.Apply(createdState, evt);
 
-        newState.IsActive.ShouldBeFalse();
+        newState.Map(s => s.IsActive).ShouldBe(Some(false));
     }
 }

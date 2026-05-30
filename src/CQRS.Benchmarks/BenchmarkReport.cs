@@ -4,7 +4,14 @@ namespace CQRS.Benchmarks;
 
 public static class BenchmarkReport
 {
-    private static readonly string[] OutcomeOrder = ["Completed", "Rejected", "Failed", "Timeout", "Error"];
+    private static readonly string[] OutcomeOrder =
+    [
+        "Completed",
+        "Rejected",
+        "Failed",
+        "Timeout",
+        "Error",
+    ];
 
     public static void Print(IReadOnlyList<BenchmarkRecord> records, int[] concurrencyLevels)
     {
@@ -37,9 +44,7 @@ public static class BenchmarkReport
                     .ToList();
                 var total = subset.Count;
                 var succeeded = subset.Count(r => r.Outcome == "Completed");
-                row.Add(
-                    total > 0 ? $"{succeeded}/{total} ({100.0 * succeeded / total:F0}%)" : "-"
-                );
+                row.Add(total > 0 ? $"{succeeded}/{total} ({100.0 * succeeded / total:F0}%)" : "-");
             }
             table.AddRow(row.ToArray());
         }

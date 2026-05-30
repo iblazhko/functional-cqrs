@@ -43,14 +43,10 @@ public sealed class InventoryApiClient(CliSettings settings)
         );
 
     public Task<AcceptedResponse> RenameInventory(string id, string name) =>
-        ExecuteWrite(() =>
-            $"{InventoriesUrl}/{id}/rename".PutJsonAsync(new { Name = name })
-        );
+        ExecuteWrite(() => $"{InventoriesUrl}/{id}/rename".PutJsonAsync(new { Name = name }));
 
     public Task<AcceptedResponse> AddItems(string id, int count) =>
-        ExecuteWrite(() =>
-            $"{InventoriesUrl}/{id}/add-items".PutJsonAsync(new { Count = count })
-        );
+        ExecuteWrite(() => $"{InventoriesUrl}/{id}/add-items".PutJsonAsync(new { Count = count }));
 
     public Task<AcceptedResponse> RemoveItems(string id, int count) =>
         ExecuteWrite(() =>
@@ -58,9 +54,7 @@ public sealed class InventoryApiClient(CliSettings settings)
         );
 
     public Task<AcceptedResponse> Deactivate(string id) =>
-        ExecuteWrite(() =>
-            $"{InventoriesUrl}/{id}/deactivate".PutJsonAsync(new { })
-        );
+        ExecuteWrite(() => $"{InventoriesUrl}/{id}/deactivate".PutJsonAsync(new { }));
 
     private static async Task<AcceptedResponse> ExecuteWrite(Func<Task<IFlurlResponse>> call)
     {

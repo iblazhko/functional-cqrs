@@ -12,10 +12,14 @@ public sealed class ApplicationTimeProvider : ITimeProvider
 
     public ApplicationTimeProvider()
     {
-        _timeZone = Domain.TimeZone.Create("Europe/London")
+        _timeZone = Domain
+            .TimeZone.Create("Europe/London")
             .Match(
                 Right: tz => tz,
-                Left: _ => throw new InvalidOperationException("Invalid hardcoded timezone identifier: 'Europe/London'")
+                Left: _ =>
+                    throw new InvalidOperationException(
+                        "Invalid hardcoded timezone identifier: 'Europe/London'"
+                    )
             );
     }
 

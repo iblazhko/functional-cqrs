@@ -15,11 +15,14 @@ public sealed class MartenDbEventStreamSessionTests(PostgreSqlContainerFixture f
     private readonly IEventMapper<IInventoryEvent, IInventoryEventDto> _mapper =
         new EventStoreInventoryEventMapper();
 
-    private readonly IEventStreamProjection<InventoryState, IInventoryEvent> _projection =
+    private readonly IEventStreamProjection<Option<InventoryState>, IInventoryEvent> _projection =
         new InventoryEventStreamStateProjection();
 
-    private MartenDbEventStoreAdapter<InventoryState, IInventoryEvent, IInventoryEventDto> CreateAdapter() =>
-        fixture.CreateAdapter();
+    private MartenDbEventStoreAdapter<
+        Option<InventoryState>,
+        IInventoryEvent,
+        IInventoryEventDto
+    > CreateAdapter() => fixture.CreateAdapter();
 
     // -------------------------------------------------------------------------
     // GetAllEvents
@@ -31,7 +34,9 @@ public sealed class MartenDbEventStreamSessionTests(PostgreSqlContainerFixture f
         var streamId = InventoryEventStreamId.GetStreamId(InventoryId.NewId());
         await using var session = CreateAdapter().Open(streamId, _mapper);
 
-        var result = await session.GetAllEvents(cancellationToken: TestContext.Current.CancellationToken);
+        var result = await session.GetAllEvents(
+            cancellationToken: TestContext.Current.CancellationToken
+        );
 
         result.Events.ShouldBeEmpty();
         result.StreamVersion.ShouldBe(EventStreamVersion.InitialVersion);
@@ -72,7 +77,9 @@ public sealed class MartenDbEventStreamSessionTests(PostgreSqlContainerFixture f
         newEvents.Events.Count.ShouldBe(1);
 
         await using var checkSession = CreateAdapter().Open(streamId, _mapper);
-        var persisted = await checkSession.GetAllEvents(cancellationToken: TestContext.Current.CancellationToken);
+        var persisted = await checkSession.GetAllEvents(
+            cancellationToken: TestContext.Current.CancellationToken
+        );
         persisted.Events.ShouldBeEmpty();
     }
 
@@ -108,7 +115,9 @@ public sealed class MartenDbEventStreamSessionTests(PostgreSqlContainerFixture f
         await session.Save(cancellationToken: TestContext.Current.CancellationToken);
 
         await using var reload = CreateAdapter().Open(streamId, _mapper);
-        var result = await reload.GetAllEvents(cancellationToken: TestContext.Current.CancellationToken);
+        var result = await reload.GetAllEvents(
+            cancellationToken: TestContext.Current.CancellationToken
+        );
 
         result.Events.Count.ShouldBe(1);
         result.Events.Single().Event.ShouldBeOfType<InventoryCreated>();
@@ -128,7 +137,10 @@ public sealed class MartenDbEventStreamSessionTests(PostgreSqlContainerFixture f
         // State must be loaded before appending to an existing stream so the session
         // sets _storedRevision and uses Append (not StartStream) when saving.
         await using var session2 = CreateAdapter().Open(streamId, _mapper);
-        await session2.GetState(_projection, cancellationToken: TestContext.Current.CancellationToken);
+        await session2.GetState(
+            _projection,
+            cancellationToken: TestContext.Current.CancellationToken
+        );
         session2.AppendEvents(
             [
                 new ItemsAddedToInventory(
@@ -145,7 +157,9 @@ public sealed class MartenDbEventStreamSessionTests(PostgreSqlContainerFixture f
         await session2.Save(cancellationToken: TestContext.Current.CancellationToken);
 
         await using var reload = CreateAdapter().Open(streamId, _mapper);
-        var result = await reload.GetAllEvents(cancellationToken: TestContext.Current.CancellationToken);
+        var result = await reload.GetAllEvents(
+            cancellationToken: TestContext.Current.CancellationToken
+        );
         result.Events.Count.ShouldBe(2);
     }
 
@@ -160,12 +174,14 @@ public sealed class MartenDbEventStreamSessionTests(PostgreSqlContainerFixture f
         var streamId = InventoryEventStreamId.GetStreamId(entityId);
 
         await using var session = CreateAdapter().Open(streamId, _mapper);
-        var result = await session.GetState(_projection, cancellationToken: TestContext.Current.CancellationToken);
+        var result = await session.GetState(
+            _projection,
+            cancellationToken: TestContext.Current.CancellationToken
+        );
 
         result.IsRight.ShouldBeTrue();
-        var state = result.Match(Left: _ => null!, Right: s => s);
-        state.IsNew.ShouldBeTrue();
-        state.Id.ShouldBe(entityId);
+        var state = result.Match(Left: _ => Option<InventoryState>.None, Right: s => s);
+        state.IsNone.ShouldBeTrue();
     }
 
     [Fact]
@@ -180,13 +196,16 @@ public sealed class MartenDbEventStreamSessionTests(PostgreSqlContainerFixture f
         await session1.Save(cancellationToken: TestContext.Current.CancellationToken);
 
         await using var session2 = CreateAdapter().Open(streamId, _mapper);
-        var result = await session2.GetState(_projection, cancellationToken: TestContext.Current.CancellationToken);
+        var result = await session2.GetState(
+            _projection,
+            cancellationToken: TestContext.Current.CancellationToken
+        );
 
         result.IsRight.ShouldBeTrue();
-        var state = result.Match(Left: _ => null!, Right: s => s);
-        state.IsNew.ShouldBeFalse();
-        state.IsActive.ShouldBeTrue();
-        state.Name.ToString().ShouldBe(entityName);
+        var state = result.Match(Left: _ => Option<InventoryState>.None, Right: s => s);
+        state.IsSome.ShouldBeTrue();
+        state.Map(s => s.IsActive).ShouldBe(Some(true));
+        state.Map(s => s.Name.ToString()).ShouldBe(Some((string)entityName));
     }
 
     [Fact]
@@ -205,11 +224,18 @@ public sealed class MartenDbEventStreamSessionTests(PostgreSqlContainerFixture f
         session2.AppendEvents(
             [new InventoryRenamed(entityId, entityName, updatedName)],
             null,
-            null);
+            null
+        );
 
-        var result = await session2.GetState(_projection, cancellationToken: TestContext.Current.CancellationToken);
+        var result = await session2.GetState(
+            _projection,
+            cancellationToken: TestContext.Current.CancellationToken
+        );
 
         result.IsRight.ShouldBeTrue();
-        result.Match(Left: _ => null!, Right: s => s).Name.ToString().ShouldBe(updatedName);
+        result
+            .Match(Left: _ => Option<InventoryState>.None, Right: s => s)
+            .Map(s => s.Name.ToString())
+            .ShouldBe(Some((string)updatedName));
     }
 }

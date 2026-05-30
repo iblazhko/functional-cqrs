@@ -28,5 +28,4 @@ public static class InventoryCommandMapperExtensions
         this Either<MappingFault, TInventoryEvent> result
     )
         where TInventoryEvent : class, IInventoryEvent => result.Map(IInventoryEvent (evt) => evt);
-
 }

@@ -33,18 +33,21 @@ public static class MessageBusConfigurator
             );
 
             endpointsRegistration.SendConventions.Match(
-                some => WolverineConventions.RegisterSendConventions(opts, some.QueuePrefix, some.Assemblies),
+                some =>
+                    WolverineConventions.RegisterSendConventions(
+                        opts,
+                        some.QueuePrefix,
+                        some.Assemblies
+                    ),
                 () => { }
             );
 
             opts.OnException<Ports.EventStore.ConcurrencyException>()
-                .RetryWithCooldown(
-                    [
-                        TimeSpan.FromMilliseconds(50),
-                        TimeSpan.FromMilliseconds(150),
-                        TimeSpan.FromMilliseconds(500),
-                    ]
-                );
+                .RetryWithCooldown([
+                    TimeSpan.FromMilliseconds(50),
+                    TimeSpan.FromMilliseconds(150),
+                    TimeSpan.FromMilliseconds(500),
+                ]);
 
             opts.OnException<Ports.MessageBus.PermanentProcessingFailureException>()
                 .MoveToErrorQueue();

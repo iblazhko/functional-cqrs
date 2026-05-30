@@ -24,7 +24,8 @@ public static class MartenDbConfigurator
                 options.Events.MetadataConfig.CausationIdEnabled = true;
                 options.Events.MetadataConfig.CorrelationIdEnabled = true;
 
-                options.Schema.For<CommandProcessingStatusViewModel>()
+                options
+                    .Schema.For<CommandProcessingStatusViewModel>()
                     .Identity(x => x.CommandId)
                     .Index(x => x.CorrelationId);
 

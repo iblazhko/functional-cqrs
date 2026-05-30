@@ -83,7 +83,11 @@ public sealed class InventoryCommandV1Mapper_ToDomainCommand_Tests
     [Fact]
     public void CreateInventoryCommand_MappsToDomain()
     {
-        var dto = new CreateInventoryCommand { InventoryId = ValidInventoryIdString, Name = ValidInventoryName };
+        var dto = new CreateInventoryCommand
+        {
+            InventoryId = ValidInventoryIdString,
+            Name = ValidInventoryName,
+        };
 
         var result = _mapper.ToDomainCommand(dto);
 
@@ -96,7 +100,11 @@ public sealed class InventoryCommandV1Mapper_ToDomainCommand_Tests
     [Fact]
     public void RenameInventoryCommand_MappsToDomain()
     {
-        var dto = new RenameInventoryCommand { InventoryId = ValidInventoryIdString, NewName = ValidUpdatedName };
+        var dto = new RenameInventoryCommand
+        {
+            InventoryId = ValidInventoryIdString,
+            NewName = ValidUpdatedName,
+        };
 
         var result = _mapper.ToDomainCommand(dto);
 
@@ -109,7 +117,11 @@ public sealed class InventoryCommandV1Mapper_ToDomainCommand_Tests
     [Fact]
     public void AddItemsToInventoryCommand_MappsToDomain()
     {
-        var dto = new AddItemsToInventoryCommand { InventoryId = ValidInventoryIdString, Count = 7 };
+        var dto = new AddItemsToInventoryCommand
+        {
+            InventoryId = ValidInventoryIdString,
+            Count = 7,
+        };
 
         var result = _mapper.ToDomainCommand(dto);
 
@@ -122,7 +134,11 @@ public sealed class InventoryCommandV1Mapper_ToDomainCommand_Tests
     [Fact]
     public void RemoveItemsFromInventoryCommand_MappsToDomain()
     {
-        var dto = new RemoveItemsFromInventoryCommand { InventoryId = ValidInventoryIdString, Count = 4 };
+        var dto = new RemoveItemsFromInventoryCommand
+        {
+            InventoryId = ValidInventoryIdString,
+            Count = 4,
+        };
 
         var result = _mapper.ToDomainCommand(dto);
 
@@ -147,7 +163,11 @@ public sealed class InventoryCommandV1Mapper_ToDomainCommand_Tests
     [Fact]
     public void InvalidInventoryId_ReturnsLeft()
     {
-        var dto = new CreateInventoryCommand { InventoryId = "invalid-id", Name = ValidInventoryName };
+        var dto = new CreateInventoryCommand
+        {
+            InventoryId = "invalid-id",
+            Name = ValidInventoryName,
+        };
 
         var result = _mapper.ToDomainCommand(dto);
 
@@ -181,7 +201,11 @@ public sealed class InventoryCommandV1Mapper_ToDomainCommand_Tests
     [Fact]
     public void InvalidItemCount_ReturnsLeft()
     {
-        var dto = new AddItemsToInventoryCommand { InventoryId = ValidInventoryIdString, Count = 0 };
+        var dto = new AddItemsToInventoryCommand
+        {
+            InventoryId = ValidInventoryIdString,
+            Count = 0,
+        };
 
         var result = _mapper.ToDomainCommand(dto);
 

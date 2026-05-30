@@ -1,5 +1,5 @@
-using Shouldly;
 using CQRS.Domain.Inventory;
+using Shouldly;
 
 namespace CQRS.System.Integration.Tests;
 
@@ -34,7 +34,7 @@ public class InventoryApiTests(CqrsTestContainersFixture fixture)
     }
 
     [Fact]
-    public async Task  CreateInventory_WithValidRequestAndValidState_ShouldBeProcessed()
+    public async Task CreateInventory_WithValidRequestAndValidState_ShouldBeProcessed()
     {
         const string inventoryName = "TEST-GET-AFTER-CREATE";
         var inventoryId = InventoryId.NewId().ToString();
@@ -80,7 +80,10 @@ public class InventoryApiTests(CqrsTestContainersFixture fixture)
 
         var renameResponse = await fixture.SUT.RenameInventory(inventoryId, updatedName);
         await fixture.SUT.WaitForCommandProcessed(renameResponse.CommandId!.Value);
-        var inventory = await fixture.SUT.WaitForInventory(inventoryId, vm => vm.Name == updatedName);
+        var inventory = await fixture.SUT.WaitForInventory(
+            inventoryId,
+            vm => vm.Name == updatedName
+        );
 
         inventory.Name.ShouldBe(updatedName);
     }
@@ -108,13 +111,19 @@ public class InventoryApiTests(CqrsTestContainersFixture fixture)
         const int itemCount = 15;
         var inventoryId = InventoryId.NewId().ToString();
 
-        var createResponse = await fixture.SUT.CreateInventory("TEST-ADD-ITEMS-PROJECTION", inventoryId);
+        var createResponse = await fixture.SUT.CreateInventory(
+            "TEST-ADD-ITEMS-PROJECTION",
+            inventoryId
+        );
         await fixture.SUT.WaitForCommandProcessed(createResponse.CommandId!.Value);
         await fixture.SUT.WaitForInventory(inventoryId, vm => vm.StockQuantity == 0);
 
         var addResponse = await fixture.SUT.AddItemsToInventory(inventoryId, itemCount);
         await fixture.SUT.WaitForCommandProcessed(addResponse.CommandId!.Value);
-        var inventory = await fixture.SUT.WaitForInventory(inventoryId, vm => vm.StockQuantity == itemCount);
+        var inventory = await fixture.SUT.WaitForInventory(
+            inventoryId,
+            vm => vm.StockQuantity == itemCount
+        );
 
         inventory.StockQuantity.ShouldBe(itemCount);
     }
@@ -150,7 +159,10 @@ public class InventoryApiTests(CqrsTestContainersFixture fixture)
         const int removeCount = 7;
         var inventoryId = InventoryId.NewId().ToString();
 
-        var createResponse = await fixture.SUT.CreateInventory("TEST-REMOVE-ITEMS-PROJECTION", inventoryId);
+        var createResponse = await fixture.SUT.CreateInventory(
+            "TEST-REMOVE-ITEMS-PROJECTION",
+            inventoryId
+        );
         await fixture.SUT.WaitForCommandProcessed(createResponse.CommandId!.Value);
         await fixture.SUT.WaitForInventory(inventoryId, vm => vm.StockQuantity == 0);
 
@@ -194,17 +206,17 @@ public class InventoryApiTests(CqrsTestContainersFixture fixture)
     {
         var inventoryId = InventoryId.NewId().ToString();
 
-        var createResponse = await fixture.SUT.CreateInventory("TEST-DEACTIVATE-PROJECTION", inventoryId);
+        var createResponse = await fixture.SUT.CreateInventory(
+            "TEST-DEACTIVATE-PROJECTION",
+            inventoryId
+        );
         await fixture.SUT.WaitForCommandProcessed(createResponse.CommandId!.Value);
         await fixture.SUT.WaitForInventory(inventoryId, vm => vm.StockQuantity == 0);
 
         var deactivateResponse = await fixture.SUT.DeactivateInventory(inventoryId);
         await fixture.SUT.WaitForCommandProcessed(deactivateResponse.CommandId!.Value);
 
-        var inventory = await fixture.SUT.WaitForInventory(
-            inventoryId,
-            vm => !vm.IsActive
-        );
+        var inventory = await fixture.SUT.WaitForInventory(inventoryId, vm => !vm.IsActive);
 
         inventory.IsActive.ShouldBeFalse();
     }

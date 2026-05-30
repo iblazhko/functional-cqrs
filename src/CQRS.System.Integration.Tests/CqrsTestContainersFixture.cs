@@ -3,7 +3,6 @@ using CQRS.API;
 using CQRS.Application;
 using CQRS.Application.CommandProcessingStatusRecording;
 using CQRS.Application.WolverineHandlers;
-using Microsoft.AspNetCore.Mvc;
 using CQRS.Configuration;
 using CQRS.Domain;
 using CQRS.DTO;
@@ -17,6 +16,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.PostgreSql;
 using Testcontainers.RabbitMq;
@@ -29,31 +29,21 @@ public class CqrsTestContainersFixture : IAsyncLifetime
 {
     static CqrsTestContainersFixture() => TestcontainersSettings.ResourceReaperEnabled = false;
 
-    private readonly MartenDbSettings MartenDbSettingsTemplate =
-        new()
-        {
-            Endpoint = new EndpointSettings
-            {
-                Host = "localhost",
-                Port = 5432
-            },
-            Username = "pgadmin",
-            Password = "changeit",
-            Database = "cqrs"
-        };
+    private readonly MartenDbSettings MartenDbSettingsTemplate = new()
+    {
+        Endpoint = new EndpointSettings { Host = "localhost", Port = 5432 },
+        Username = "pgadmin",
+        Password = "changeit",
+        Database = "cqrs",
+    };
 
-    private readonly RabbitMqSettings RabbitMqSettingsTemplate =
-        new()
-        {
-            Endpoint = new EndpointSettings
-            {
-                Host = "localhost",
-                Port = 5672
-            },
-            Username = "rmqadmin",
-            Password = "changeit",
-            VirtualHost = "cqrs"
-        };
+    private readonly RabbitMqSettings RabbitMqSettingsTemplate = new()
+    {
+        Endpoint = new EndpointSettings { Host = "localhost", Port = 5672 },
+        Username = "rmqadmin",
+        Password = "changeit",
+        VirtualHost = "cqrs",
+    };
 
     private PostgreSqlContainer? _postgres;
     private RabbitMqContainer? _rabbitmq;
@@ -94,8 +84,8 @@ public class CqrsTestContainersFixture : IAsyncLifetime
     {
         if (_apiHost is not null)
         {
-             await _apiHost.StopAsync();
-             await _apiHost.DisposeAsync();
+            await _apiHost.StopAsync();
+            await _apiHost.DisposeAsync();
         }
 
         if (_appHost is not null)
@@ -117,30 +107,35 @@ public class CqrsTestContainersFixture : IAsyncLifetime
         }
     }
 
-    MartenDbSettings BuildMartenDbSettings(MartenDbSettings settings, PostgreSqlContainer container) =>
+    MartenDbSettings BuildMartenDbSettings(
+        MartenDbSettings settings,
+        PostgreSqlContainer container
+    ) =>
         settings with
         {
             Endpoint = new EndpointSettings
             {
                 Host = container.Hostname,
-                Port = container.GetMappedPublicPort(5432)
-            }
+                Port = container.GetMappedPublicPort(5432),
+            },
         };
 
-    MessageBusSettings BuildMessageBusSettings(RabbitMqSettings settings, RabbitMqContainer container) =>
-        new()
-        {
-            RabbitMq = BuildRabbitMqSettings(settings, container)
-        };
+    MessageBusSettings BuildMessageBusSettings(
+        RabbitMqSettings settings,
+        RabbitMqContainer container
+    ) => new() { RabbitMq = BuildRabbitMqSettings(settings, container) };
 
-    RabbitMqSettings BuildRabbitMqSettings(RabbitMqSettings settings, RabbitMqContainer container) =>
+    RabbitMqSettings BuildRabbitMqSettings(
+        RabbitMqSettings settings,
+        RabbitMqContainer container
+    ) =>
         settings with
         {
             Endpoint = new EndpointSettings
             {
                 Host = container.Hostname,
-                Port = container.GetMappedPublicPort(5672)
-            }
+                Port = container.GetMappedPublicPort(5672),
+            },
         };
 
     PostgreSqlContainer BuildPostgresContainer(MartenDbSettings martenDbSettings) =>
@@ -157,7 +152,10 @@ public class CqrsTestContainersFixture : IAsyncLifetime
             .WithEnvironment("RABBITMQ_DEFAULT_VHOST", rabbitMqSettings.VirtualHost)
             .Build();
 
-    private static WebApplication BuildApplicationHost(MartenDbSettings martenDb, MessageBusSettings messageBus)
+    private static WebApplication BuildApplicationHost(
+        MartenDbSettings martenDb,
+        MessageBusSettings messageBus
+    )
     {
         var builder = WebApplication.CreateBuilder();
         builder.WebHost.UseUrls("http://127.0.0.1:0");
@@ -165,7 +163,6 @@ public class CqrsTestContainersFixture : IAsyncLifetime
         var commandsAssembly = typeof(IInventoryCommandDto).Assembly;
         var commandConsumersAssembly = typeof(InventoryCommandConsumer).Assembly;
         var projectionConsumersAssembly = typeof(InventoryEventConsumer).Assembly;
-
         // csharpier-ignore
         builder.Services
             .AddApplicationServices()
@@ -186,18 +183,25 @@ public class CqrsTestContainersFixture : IAsyncLifetime
         app.UseHealthChecks("/health");
         app.MapGet(
             "/commands/{commandId:guid}/status",
-            async (Guid commandId, [FromServices] ICommandProcessingStatusQueryService queryService) =>
-                (await queryService.GetCommandProcessingStatus(commandId))
-                    .Match<IResult>(vm => Results.Ok(vm), () => Results.NotFound())
+            async (
+                Guid commandId,
+                [FromServices] ICommandProcessingStatusQueryService queryService
+            ) =>
+                (await queryService.GetCommandProcessingStatus(commandId)).Match<IResult>(
+                    vm => Results.Ok(vm),
+                    () => Results.NotFound()
+                )
         );
         return app;
     }
 
-    private static WebApplication BuildApiHost(MartenDbSettings martenDb, MessageBusSettings messageBus)
+    private static WebApplication BuildApiHost(
+        MartenDbSettings martenDb,
+        MessageBusSettings messageBus
+    )
     {
         var builder = WebApplication.CreateBuilder();
         builder.WebHost.UseUrls("http://127.0.0.1:0");
-
         // csharpier-ignore
         builder.Services
             .AddApiServices()
@@ -216,15 +220,16 @@ public class CqrsTestContainersFixture : IAsyncLifetime
         return app;
     }
 
-    private static CqrsSettings BuildSettings(MartenDbSettings martenDb, MessageBusSettings messageBus) =>
-        new() { MartenDb = martenDb, MessageBus = messageBus };
+    private static CqrsSettings BuildSettings(
+        MartenDbSettings martenDb,
+        MessageBusSettings messageBus
+    ) => new() { MartenDb = martenDb, MessageBus = messageBus };
 
     private static string GetBoundAddress(WebApplication app) =>
-        app.Services
-            .GetRequiredService<IServer>()
+        app
+            .Services.GetRequiredService<IServer>()
             .Features.Get<IServerAddressesFeature>()!
-            .Addresses
-            .First();
+            .Addresses.First();
 }
 
 file sealed class MoonPhaseServiceStub(MoonPhase phase) : IMoonPhaseService

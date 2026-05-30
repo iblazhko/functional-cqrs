@@ -6,7 +6,11 @@ public sealed class FakeMessageBus : IMessageBus
 {
     public List<(object Message, Context Context)> SentMessages { get; } = [];
 
-    public Task Publish<T>(T message, Context context, CancellationToken cancellationToken = default)
+    public Task Publish<T>(
+        T message,
+        Context context,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentNullException.ThrowIfNull(message);
         SentMessages.Add((message, context));

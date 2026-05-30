@@ -13,7 +13,7 @@ public sealed class InventoryCommandHandlerTests
     {
         InventoryCommandHandler
             .Handle(
-                TestInventoryState_New,
+                TestInventoryState_None,
                 new CreateInventory(TestInventoryId, TestInventoryName),
                 MoonPhase.NewMoon
             )
@@ -64,7 +64,10 @@ public sealed class InventoryCommandHandlerTests
         var remaining = CreateTestStockQuantity(3);
         InventoryCommandHandler
             .Handle(
-                TestInventoryState_Current with { Quantity = currentStock },
+                TestInventoryState_Current with
+                {
+                    Quantity = currentStock,
+                },
                 new RemoveItemsFromInventory(TestInventoryId, countToRemove),
                 MoonPhase.NewMoon
             )

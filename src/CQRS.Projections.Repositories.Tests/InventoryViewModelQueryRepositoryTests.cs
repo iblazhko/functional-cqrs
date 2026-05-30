@@ -12,8 +12,7 @@ public sealed class InventoryViewModelQueryRepositoryTests
 {
     private readonly InMemoryProjectionStoreAdapter<InventoryViewModel> _store = new();
 
-    private InventoryViewModelQueryRepository MakeRepository() =>
-        new(_store);
+    private InventoryViewModelQueryRepository MakeRepository() => new(_store);
 
     private async Task SeedViewModel(InventoryViewModel vm)
     {
@@ -28,7 +27,12 @@ public sealed class InventoryViewModelQueryRepositoryTests
     {
         var inventoryId = InventoryId.NewId();
         var documentId = InventoryProjectionDocumentId.FromInventoryId(inventoryId);
-        var vm = new InventoryViewModel { Id = (string)inventoryId, Name = "Widget", IsActive = true };
+        var vm = new InventoryViewModel
+        {
+            Id = (string)inventoryId,
+            Name = "Widget",
+            IsActive = true,
+        };
         await SeedViewModel(vm);
 
         var result = await MakeRepository().GetById(documentId);
@@ -41,7 +45,12 @@ public sealed class InventoryViewModelQueryRepositoryTests
     {
         var inventoryId = InventoryId.NewId();
         var documentId = InventoryProjectionDocumentId.FromInventoryId(inventoryId);
-        var vm = new InventoryViewModel { Id = (string)inventoryId, Name = "Widget", IsActive = true };
+        var vm = new InventoryViewModel
+        {
+            Id = (string)inventoryId,
+            Name = "Widget",
+            IsActive = true,
+        };
         await SeedViewModel(vm);
 
         var result = await MakeRepository().GetById(documentId);
@@ -54,7 +63,13 @@ public sealed class InventoryViewModelQueryRepositoryTests
     {
         var inventoryId = InventoryId.NewId();
         var documentId = InventoryProjectionDocumentId.FromInventoryId(inventoryId);
-        var vm = new InventoryViewModel { Id = (string)inventoryId, Name = "Gadget", StockQuantity = 42, IsActive = false };
+        var vm = new InventoryViewModel
+        {
+            Id = (string)inventoryId,
+            Name = "Gadget",
+            StockQuantity = 42,
+            IsActive = false,
+        };
         await SeedViewModel(vm);
 
         var result = await MakeRepository().GetById(documentId);
@@ -82,7 +97,8 @@ public sealed class InventoryViewModelQueryRepositoryTests
         await SeedViewModel(new InventoryViewModel { Id = (string)id1, Name = "First" });
         await SeedViewModel(new InventoryViewModel { Id = (string)id2, Name = "Second" });
 
-        var result = await MakeRepository().GetById(InventoryProjectionDocumentId.FromInventoryId(id2));
+        var result = await MakeRepository()
+            .GetById(InventoryProjectionDocumentId.FromInventoryId(id2));
 
         result!.Name.ShouldBe("Second");
     }

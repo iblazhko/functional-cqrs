@@ -12,7 +12,13 @@ internal static class WolverineConventions
 {
     private static readonly Type CommandDtoType = typeof(ICqrsCommandDto);
     private static readonly Type EnvelopeType = typeof(Envelope);
-    private static readonly string[] HandlerMethodNames = ["Handle", "HandleAsync", "Consume", "ConsumeAsync"];
+    private static readonly string[] HandlerMethodNames =
+    [
+        "Handle",
+        "HandleAsync",
+        "Consume",
+        "ConsumeAsync",
+    ];
 
     internal static string ToQueueName(string queuePrefix, string typeName)
     {
@@ -21,7 +27,11 @@ internal static class WolverineConventions
         return $"{queuePrefix}:{trimmed}";
     }
 
-    internal static void RegisterListeners(WolverineOptions opts, string queuePrefix, IEnumerable<Assembly> assemblies)
+    internal static void RegisterListeners(
+        WolverineOptions opts,
+        string queuePrefix,
+        IEnumerable<Assembly> assemblies
+    )
     {
         foreach (var asm in assemblies)
         foreach (var messageType in MessageTypesFromHandlerAssembly(asm))
@@ -31,7 +41,11 @@ internal static class WolverineConventions
         }
     }
 
-    internal static void RegisterSendConventions(WolverineOptions opts, string queuePrefix, IEnumerable<Assembly> assemblies)
+    internal static void RegisterSendConventions(
+        WolverineOptions opts,
+        string queuePrefix,
+        IEnumerable<Assembly> assemblies
+    )
     {
         foreach (var asm in assemblies)
         foreach (var commandType in CommandTypesFromAssembly(asm))
@@ -50,13 +64,13 @@ internal static class WolverineConventions
             .Where(p =>
                 !EnvelopeType.IsAssignableFrom(p.ParameterType)
                 && !p.ParameterType.IsValueType
-                && p.ParameterType != typeof(CancellationToken))
+                && p.ParameterType != typeof(CancellationToken)
+            )
             .Select(p => p.ParameterType)
             .Distinct();
 
     private static IEnumerable<Type> CommandTypesFromAssembly(Assembly asm) =>
-        asm.GetTypes()
-            .Where(t => !t.IsAbstract && CommandDtoType.IsAssignableFrom(t));
+        asm.GetTypes().Where(t => !t.IsAbstract && CommandDtoType.IsAssignableFrom(t));
 
     private static string ToSnakeCase(string typeName)
     {

@@ -2,7 +2,6 @@ using ArchUnitNET.Domain;
 using ArchUnitNET.Fluent;
 using ArchUnitNET.Loader;
 using ArchUnitNET.xUnitV3;
-
 using static ArchUnitNET.Fluent.ArchRuleDefinition;
 
 namespace CQRS.System.Architecture.Tests;
@@ -177,8 +176,7 @@ public sealed class DependenciesTest
     // Rule 1 — Core MUST NOT depend on any project from Server
     // -------------------------------------------------------------------------
 
-    private const string RuleCoreMustNotDependOnPorts =
-        "Core MUST NOT depend on Ports";
+    private const string RuleCoreMustNotDependOnPorts = "Core MUST NOT depend on Ports";
 
     [Fact(DisplayName = RuleCoreMustNotDependOnPorts)]
     public void TestRuleCoreMustNotDependOnPorts()
@@ -193,8 +191,7 @@ public sealed class DependenciesTest
         rule.Check(Architecture);
     }
 
-    private const string RuleCoreMustNotDependOnApplication =
-        "Core MUST NOT depend on Application";
+    private const string RuleCoreMustNotDependOnApplication = "Core MUST NOT depend on Application";
 
     [Fact(DisplayName = RuleCoreMustNotDependOnApplication)]
     public void TestRuleCoreMustNotDependOnApplication()
@@ -209,8 +206,7 @@ public sealed class DependenciesTest
         rule.Check(Architecture);
     }
 
-    private const string RuleCoreMustNotDependOnProjections =
-        "Core MUST NOT depend on Projections";
+    private const string RuleCoreMustNotDependOnProjections = "Core MUST NOT depend on Projections";
 
     [Fact(DisplayName = RuleCoreMustNotDependOnProjections)]
     public void TestRuleCoreMustNotDependOnProjections()
@@ -225,8 +221,7 @@ public sealed class DependenciesTest
         rule.Check(Architecture);
     }
 
-    private const string RuleCoreMustNotDependOnAdapters =
-        "Core MUST NOT depend on Adapters";
+    private const string RuleCoreMustNotDependOnAdapters = "Core MUST NOT depend on Adapters";
 
     [Fact(DisplayName = RuleCoreMustNotDependOnAdapters)]
     public void TestRuleCoreMustNotDependOnAdapters()
@@ -241,8 +236,7 @@ public sealed class DependenciesTest
         rule.Check(Architecture);
     }
 
-    private const string RuleCoreMustNotDependOnApi =
-        "Core MUST NOT depend on API";
+    private const string RuleCoreMustNotDependOnApi = "Core MUST NOT depend on API";
 
     [Fact(DisplayName = RuleCoreMustNotDependOnApi)]
     public void TestRuleCoreMustNotDependOnApi()
@@ -261,8 +255,7 @@ public sealed class DependenciesTest
     // Rule 2.1 — Application
     // -------------------------------------------------------------------------
 
-    private const string RuleApplicationMustNotDependOnApi =
-        "Application MUST NOT depend on API";
+    private const string RuleApplicationMustNotDependOnApi = "Application MUST NOT depend on API";
 
     [Fact(DisplayName = RuleApplicationMustNotDependOnApi)]
     public void TestRuleApplicationMustNotDependOnApi()
@@ -297,8 +290,7 @@ public sealed class DependenciesTest
         rule.Check(Architecture);
     }
 
-    private const string RuleProjectionsMustNotDependOnApi =
-        "Projections MUST NOT depend on API";
+    private const string RuleProjectionsMustNotDependOnApi = "Projections MUST NOT depend on API";
 
     [Fact(DisplayName = RuleProjectionsMustNotDependOnApi)]
     public void TestRuleProjectionsMustNotDependOnApi()
@@ -377,23 +369,50 @@ public sealed class DependenciesTest
     [Fact(DisplayName = RulePortsShouldNotDependOnEachOther)]
     public void TestRulePortsShouldNotDependOnEachOther()
     {
-        var eventStorePort = Types().That().ResideInAssembly("CQRS.Ports.EventStore").As("EventStore Port");
-        var messageBusPort = Types().That().ResideInAssembly("CQRS.Ports.MessageBus").As("MessageBus Port");
-        var projectionStorePort = Types().That().ResideInAssembly("CQRS.Ports.ProjectionStore").As("ProjectionStore Port");
+        var eventStorePort = Types()
+            .That()
+            .ResideInAssembly("CQRS.Ports.EventStore")
+            .As("EventStore Port");
+        var messageBusPort = Types()
+            .That()
+            .ResideInAssembly("CQRS.Ports.MessageBus")
+            .As("MessageBus Port");
+        var projectionStorePort = Types()
+            .That()
+            .ResideInAssembly("CQRS.Ports.ProjectionStore")
+            .As("ProjectionStore Port");
 
-        Types().That().Are(eventStorePort).Should()
-            .NotDependOnAny(messageBusPort).AndShould().NotDependOnAny(projectionStorePort)
-            .Because(RulePortsShouldNotDependOnEachOther).WithoutRequiringPositiveResults()
+        Types()
+            .That()
+            .Are(eventStorePort)
+            .Should()
+            .NotDependOnAny(messageBusPort)
+            .AndShould()
+            .NotDependOnAny(projectionStorePort)
+            .Because(RulePortsShouldNotDependOnEachOther)
+            .WithoutRequiringPositiveResults()
             .Check(Architecture);
 
-        Types().That().Are(messageBusPort).Should()
-            .NotDependOnAny(eventStorePort).AndShould().NotDependOnAny(projectionStorePort)
-            .Because(RulePortsShouldNotDependOnEachOther).WithoutRequiringPositiveResults()
+        Types()
+            .That()
+            .Are(messageBusPort)
+            .Should()
+            .NotDependOnAny(eventStorePort)
+            .AndShould()
+            .NotDependOnAny(projectionStorePort)
+            .Because(RulePortsShouldNotDependOnEachOther)
+            .WithoutRequiringPositiveResults()
             .Check(Architecture);
 
-        Types().That().Are(projectionStorePort).Should()
-            .NotDependOnAny(eventStorePort).AndShould().NotDependOnAny(messageBusPort)
-            .Because(RulePortsShouldNotDependOnEachOther).WithoutRequiringPositiveResults()
+        Types()
+            .That()
+            .Are(projectionStorePort)
+            .Should()
+            .NotDependOnAny(eventStorePort)
+            .AndShould()
+            .NotDependOnAny(messageBusPort)
+            .Because(RulePortsShouldNotDependOnEachOther)
+            .WithoutRequiringPositiveResults()
             .Check(Architecture);
     }
 
@@ -481,37 +500,55 @@ public sealed class DependenciesTest
     [Fact(DisplayName = RuleCliMustNotDependOnServer)]
     public void TestRuleCliMustNotDependOnServer()
     {
-        Types().That().Are(CliLayer).Should()
+        Types()
+            .That()
+            .Are(CliLayer)
+            .Should()
             .NotDependOnAny(DomainLayer)
             .Because(RuleCliMustNotDependOnServer)
             .WithoutRequiringPositiveResults()
             .Check(Architecture);
 
-        Types().That().Are(CliLayer).Should()
+        Types()
+            .That()
+            .Are(CliLayer)
+            .Should()
             .NotDependOnAny(ApplicationLayer)
             .Because(RuleCliMustNotDependOnServer)
             .WithoutRequiringPositiveResults()
             .Check(Architecture);
 
-        Types().That().Are(CliLayer).Should()
+        Types()
+            .That()
+            .Are(CliLayer)
+            .Should()
             .NotDependOnAny(ProjectionsLayer)
             .Because(RuleCliMustNotDependOnServer)
             .WithoutRequiringPositiveResults()
             .Check(Architecture);
 
-        Types().That().Are(CliLayer).Should()
+        Types()
+            .That()
+            .Are(CliLayer)
+            .Should()
             .NotDependOnAny(PortsLayer)
             .Because(RuleCliMustNotDependOnServer)
             .WithoutRequiringPositiveResults()
             .Check(Architecture);
 
-        Types().That().Are(CliLayer).Should()
+        Types()
+            .That()
+            .Are(CliLayer)
+            .Should()
             .NotDependOnAny(AdaptersLayer)
             .Because(RuleCliMustNotDependOnServer)
             .WithoutRequiringPositiveResults()
             .Check(Architecture);
 
-        Types().That().Are(CliLayer).Should()
+        Types()
+            .That()
+            .Are(CliLayer)
+            .Should()
             .NotDependOnAny(ApiLayer)
             .Because(RuleCliMustNotDependOnServer)
             .WithoutRequiringPositiveResults()

@@ -9,7 +9,10 @@ using Serilog.Events;
 
 public static class SerilogConfigurator
 {
-    public static IServiceCollection AddApplicationSerilog(this IServiceCollection services, LoggingSettings settings)
+    public static IServiceCollection AddApplicationSerilog(
+        this IServiceCollection services,
+        LoggingSettings settings
+    )
     {
         var configuration = new LoggerConfiguration();
         configuration = SetMinimumLevel(configuration, settings.Level);
@@ -29,39 +32,32 @@ public static class SerilogConfigurator
     static LoggerConfiguration SetMinimumLevel(LoggerConfiguration configuration, string level) =>
         level?.ToUpperInvariant() switch
         {
-            "VERBOSE" =>
-                configuration
-                    .MinimumLevel.Verbose()
-                    .MinimumLevel.Override("Microsoft", LogEventLevel.Verbose),
+            "VERBOSE" => configuration
+                .MinimumLevel.Verbose()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Verbose),
 
-            "DEBUG" =>
-                configuration
-                    .MinimumLevel.Debug()
-                    .MinimumLevel.Override("Microsoft", LogEventLevel.Debug),
+            "DEBUG" => configuration
+                .MinimumLevel.Debug()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Debug),
 
-            "INFO" or "INFORMATION" =>
-                configuration
-                    .MinimumLevel.Information()
-                    .MinimumLevel.Override("Microsoft", LogEventLevel.Information),
+            "INFO" or "INFORMATION" => configuration
+                .MinimumLevel.Information()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information),
 
-            "WARN" or "WARNING" =>
-                configuration
-                    .MinimumLevel.Warning()
-                    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning),
+            "WARN" or "WARNING" => configuration
+                .MinimumLevel.Warning()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning),
 
-            "ERR" or "ERROR" =>
-                configuration
-                    .MinimumLevel.Error()
-                    .MinimumLevel.Override("Microsoft", LogEventLevel.Error),
+            "ERR" or "ERROR" => configuration
+                .MinimumLevel.Error()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Error),
 
-            "FATAL" =>
-                configuration
-                    .MinimumLevel.Fatal()
-                    .MinimumLevel.Override("Microsoft", LogEventLevel.Fatal),
+            "FATAL" => configuration
+                .MinimumLevel.Fatal()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Fatal),
 
-            _ =>
-                configuration
-                    .MinimumLevel.Warning()
-                    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+            _ => configuration
+                .MinimumLevel.Warning()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning),
         };
 }

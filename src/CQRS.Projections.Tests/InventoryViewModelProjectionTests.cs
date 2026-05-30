@@ -77,7 +77,13 @@ public sealed class InventoryViewModelProjectionTests
     public void Apply_InventoryRenamed_PreservesOtherFields()
     {
         var id = SomeId();
-        var initial = EmptyVm() with { Id = (string)id, Name = "Old", StockQuantity = 10, IsActive = true };
+        var initial = EmptyVm() with
+        {
+            Id = (string)id,
+            Name = "Old",
+            StockQuantity = 10,
+            IsActive = true,
+        };
         var evt = new InventoryRenamed(id, SomeName("Old"), SomeName("New"));
 
         var vm = InventoryViewModelProjection.Apply(initial, evt);
@@ -94,7 +100,8 @@ public sealed class InventoryViewModelProjectionTests
         var id = SomeId();
         var initial = EmptyVm() with { Id = (string)id, StockQuantity = 5 };
         var evt = new ItemsAddedToInventory(
-            id, SomeName(),
+            id,
+            SomeName(),
             PositiveInteger.CreateUnsafe(3),
             Some(PositiveInteger.CreateUnsafe(5)),
             PositiveInteger.CreateUnsafe(8)
@@ -111,7 +118,8 @@ public sealed class InventoryViewModelProjectionTests
         var id = SomeId();
         var initial = EmptyVm() with { Id = (string)id, StockQuantity = 0 };
         var evt = new ItemsAddedToInventory(
-            id, SomeName(),
+            id,
+            SomeName(),
             PositiveInteger.CreateUnsafe(5),
             None,
             PositiveInteger.CreateUnsafe(5)
@@ -130,7 +138,8 @@ public sealed class InventoryViewModelProjectionTests
         var id = SomeId();
         var initial = EmptyVm() with { Id = (string)id, StockQuantity = 10 };
         var evt = new ItemsRemovedFromInventory(
-            id, SomeName(),
+            id,
+            SomeName(),
             PositiveInteger.CreateUnsafe(3),
             PositiveInteger.CreateUnsafe(10),
             Some(PositiveInteger.CreateUnsafe(7))
@@ -147,7 +156,8 @@ public sealed class InventoryViewModelProjectionTests
         var id = SomeId();
         var initial = EmptyVm() with { Id = (string)id, StockQuantity = 3 };
         var evt = new ItemsRemovedFromInventory(
-            id, SomeName(),
+            id,
+            SomeName(),
             PositiveInteger.CreateUnsafe(3),
             PositiveInteger.CreateUnsafe(3),
             None
@@ -176,7 +186,13 @@ public sealed class InventoryViewModelProjectionTests
     public void Apply_InventoryDeactivated_PreservesOtherFields()
     {
         var id = SomeId();
-        var initial = EmptyVm() with { Id = (string)id, Name = "Widget", StockQuantity = 0, IsActive = true };
+        var initial = EmptyVm() with
+        {
+            Id = (string)id,
+            Name = "Widget",
+            StockQuantity = 0,
+            IsActive = true,
+        };
         var evt = new InventoryDeactivated(id, SomeName("Widget"));
 
         var vm = InventoryViewModelProjection.Apply(initial, evt);
@@ -191,7 +207,13 @@ public sealed class InventoryViewModelProjectionTests
     public void Apply_ItemWentInStock_DoesNotModifyVm()
     {
         var id = SomeId();
-        var initial = EmptyVm() with { Id = (string)id, Name = "Widget", StockQuantity = 5, IsActive = true };
+        var initial = EmptyVm() with
+        {
+            Id = (string)id,
+            Name = "Widget",
+            StockQuantity = 5,
+            IsActive = true,
+        };
         var evt = new ItemWentInStock(id, SomeName(), PositiveInteger.CreateUnsafe(5));
 
         var vm = InventoryViewModelProjection.Apply(initial, evt);
@@ -203,7 +225,13 @@ public sealed class InventoryViewModelProjectionTests
     public void Apply_ItemWentOutOfStock_DoesNotModifyVm()
     {
         var id = SomeId();
-        var initial = EmptyVm() with { Id = (string)id, Name = "Widget", StockQuantity = 0, IsActive = true };
+        var initial = EmptyVm() with
+        {
+            Id = (string)id,
+            Name = "Widget",
+            StockQuantity = 0,
+            IsActive = true,
+        };
         var evt = new ItemWentOutOfStock(id, SomeName());
 
         var vm = InventoryViewModelProjection.Apply(initial, evt);

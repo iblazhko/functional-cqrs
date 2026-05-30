@@ -11,9 +11,9 @@ public sealed class PostgreSqlContainerFixture : IAsyncLifetime
 {
     static PostgreSqlContainerFixture() => TestcontainersSettings.ResourceReaperEnabled = false;
 
-    private readonly PostgreSqlContainer _container =
-        new PostgreSqlBuilder("postgres:18.3")
-            .Build();
+    private readonly PostgreSqlContainer _container = new PostgreSqlBuilder(
+        "postgres:18.3"
+    ).Build();
 
     public IDocumentStore DocumentStore { get; private set; } = null!;
 

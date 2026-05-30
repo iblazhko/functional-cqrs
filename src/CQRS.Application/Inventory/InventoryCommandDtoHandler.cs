@@ -3,14 +3,14 @@ using CQRS.Domain.Inventory;
 using CQRS.DTO;
 using CQRS.Mapping;
 using CQRS.Mapping.Inventory;
+using CQRS.Ports.EventStore;
 using LanguageExt;
 using OneOf;
-using CQRS.Ports.EventStore;
 
 namespace CQRS.Application.Inventory;
 
 public class InventoryCommandDtoHandler(
-    IEventStore<InventoryState, IInventoryEvent, IInventoryEventDto> eventStore,
+    IEventStore<Option<InventoryState>, IInventoryEvent, IInventoryEventDto> eventStore,
     IInventoryCommandMapper commandMapper,
     InventoryEventStreamStateProjection stateProjection,
     EventStoreInventoryEventMapper eventMapper
@@ -92,11 +92,11 @@ public sealed class CommandProcessingResult
         InventoryAggregate.Errors.IInventoryCommandError error
     ) => new(new FailedResult(error));
 
-    public static CommandProcessingResult DeserializationFailed(
-        EventDeserializationError error
-    ) => new(new DeserializationFailedResult(error));
+    public static CommandProcessingResult DeserializationFailed(EventDeserializationError error) =>
+        new(new DeserializationFailedResult(error));
 
     private CommandProcessingResult(
         OneOf<CompletedResult, RejectedResult, FailedResult, DeserializationFailedResult> input
-    ) : base(input) { }
+    )
+        : base(input) { }
 }

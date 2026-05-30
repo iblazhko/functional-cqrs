@@ -4,26 +4,15 @@ using static LanguageExt.Prelude;
 
 namespace CQRS.Domain.Tests;
 
-// "Inventory does not exist" wording that is used below may be slightly confusing -
-// we do have a state instance, so why do we say "does not exist"?
-// The answer to that is that a "new" state (state with `IsNew = true`) represents
-// a case when we have no events for a given entity. Typically, this means that
-// there is no event stream for a given entity.
+// The write-side state passed to the aggregate is an `Option<InventoryState>`:
+// `None` means there are no events for the entity (typically no event stream at all),
+// so the inventory "does not exist" yet, while `Some` carries the reconstructed state.
 //
-// Technically, we may have a persisted event stream that is empty,
-// (at least in the EventStoreDB this is possible) and as far as this
-// application is concerned, the end result will be the same - there
-// are no events to apply to the default state projection state, and
-// we will have a "new" state (state with `IsNew = true`) passed to
-// the aggregate when we read such stream,
-// but 1) this is semantically almost the same as having no stream at all,
-// and 2) this can only happen as a result of an internal error
-// in EventStream adapter implementation.
-//
-// This could be addressed by the InventoryCommandHandler in Application,
-// by moving InvokeIfNew / InvokeIfExists guards from the Aggregate
-// to the InventoryCommandHandler, and removing state instance from the
-// Aggregate methods signature that handle such commands.
+// Technically a persisted event stream could be empty (possible in some event stores),
+// and as far as this application is concerned the end result is the same - there are
+// no events to apply to the projection, so the aggregate receives `None`. This is
+// semantically almost the same as having no stream at all, and can only happen as a
+// result of an internal error in an EventStream adapter implementation.
 
 public sealed class InventoryAggregateTests
 {
@@ -32,7 +21,7 @@ public sealed class InventoryAggregateTests
     {
         InventoryAggregate
             .CreateInventory(
-                TestInventoryState_New,
+                TestInventoryState_None,
                 new CreateInventory(TestInventoryId, TestInventoryName)
             )
             .ShouldProduceEvents([new InventoryCreated(TestInventoryId, TestInventoryName, true)]);
@@ -82,7 +71,7 @@ public sealed class InventoryAggregateTests
     {
         InventoryAggregate
             .RenameInventory(
-                TestInventoryState_New,
+                TestInventoryState_None,
                 new RenameInventory(TestInventoryId, TestInventoryName_Updated)
             )
             .ShouldProduceFailure(
@@ -146,7 +135,7 @@ public sealed class InventoryAggregateTests
     {
         InventoryAggregate
             .AddItemsToInventory(
-                TestInventoryState_New,
+                TestInventoryState_None,
                 new AddItemsToInventory(TestInventoryId, CreateTestStockQuantity(2))
             )
             .ShouldProduceFailure(
@@ -227,7 +216,7 @@ public sealed class InventoryAggregateTests
     {
         InventoryAggregate
             .RemoveItemsFromInventory(
-                TestInventoryState_New,
+                TestInventoryState_None,
                 new RemoveItemsFromInventory(TestInventoryId, CreateTestStockQuantity(2))
             )
             .ShouldProduceFailure(
@@ -331,7 +320,7 @@ public sealed class InventoryAggregateTests
     {
         InventoryAggregate
             .DeactivateInventory(
-                TestInventoryState_New,
+                TestInventoryState_None,
                 new DeactivateInventory(TestInventoryId),
                 MoonPhase.NewMoon
             )

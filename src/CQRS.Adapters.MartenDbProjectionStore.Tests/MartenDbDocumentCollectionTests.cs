@@ -61,7 +61,15 @@ public sealed class MartenDbDocumentCollectionTests(PostgreSqlContainerFixture f
         var collection = CreateCollection();
         var id = DocumentId.NewId();
 
-        await collection.Update(id, vm => { vm.Name = "FromFunc"; vm.Count = 10; return vm; });
+        await collection.Update(
+            id,
+            vm =>
+            {
+                vm.Name = "FromFunc";
+                vm.Count = 10;
+                return vm;
+            }
+        );
 
         var result = await collection.GetById(id);
         result.ShouldNotBeNull();
@@ -76,7 +84,14 @@ public sealed class MartenDbDocumentCollectionTests(PostgreSqlContainerFixture f
         var id = DocumentId.NewId();
         await collection.Update(id, new TestViewModel { Name = "Original", Count = 5 });
 
-        await collection.Update(id, vm => { vm.Count += 3; return vm; });
+        await collection.Update(
+            id,
+            vm =>
+            {
+                vm.Count += 3;
+                return vm;
+            }
+        );
 
         var result = await collection.GetById(id);
         result.ShouldNotBeNull();
@@ -90,9 +105,30 @@ public sealed class MartenDbDocumentCollectionTests(PostgreSqlContainerFixture f
         var collection = CreateCollection();
         var id = DocumentId.NewId();
 
-        await collection.Update(id, vm => { vm.Count = 1; return vm; });
-        await collection.Update(id, vm => { vm.Count += 2; return vm; });
-        await collection.Update(id, vm => { vm.Count += 3; return vm; });
+        await collection.Update(
+            id,
+            vm =>
+            {
+                vm.Count = 1;
+                return vm;
+            }
+        );
+        await collection.Update(
+            id,
+            vm =>
+            {
+                vm.Count += 2;
+                return vm;
+            }
+        );
+        await collection.Update(
+            id,
+            vm =>
+            {
+                vm.Count += 3;
+                return vm;
+            }
+        );
 
         var result = await collection.GetById(id);
         result.ShouldNotBeNull();
@@ -109,7 +145,10 @@ public sealed class MartenDbDocumentCollectionTests(PostgreSqlContainerFixture f
         await collection.Update(id, new TestViewModel { Name = "v2" });
 
         using var session = fixture.DocumentStore.LightweightSession();
-        var envelope = await session.LoadAsync<DocumentEnvelope<TestViewModel>>(id, token: TestContext.Current.CancellationToken);
+        var envelope = await session.LoadAsync<DocumentEnvelope<TestViewModel>>(
+            id,
+            token: TestContext.Current.CancellationToken
+        );
         envelope.ShouldNotBeNull();
         ((long)envelope.Version).ShouldBe(2);
     }
@@ -123,7 +162,10 @@ public sealed class MartenDbDocumentCollectionTests(PostgreSqlContainerFixture f
         await collection.Update(id, new TestViewModel { Name = "first" });
 
         using var session = fixture.DocumentStore.LightweightSession();
-        var envelope = await session.LoadAsync<DocumentEnvelope<TestViewModel>>(id, token: TestContext.Current.CancellationToken);
+        var envelope = await session.LoadAsync<DocumentEnvelope<TestViewModel>>(
+            id,
+            token: TestContext.Current.CancellationToken
+        );
         envelope.ShouldNotBeNull();
         ((long)envelope.Version).ShouldBe(1);
     }

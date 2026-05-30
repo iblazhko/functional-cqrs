@@ -1,14 +1,15 @@
 using CQRS.Domain.Inventory;
 using CQRS.Ports.EventStore;
+using LanguageExt;
 
 namespace CQRS.Application.Inventory;
 
 public sealed class InventoryEventStreamStateProjection
-    : IEventStreamProjection<InventoryState, IInventoryEvent>
+    : IEventStreamProjection<Option<InventoryState>, IInventoryEvent>
 {
-    public InventoryState GetInitialState(EventStreamId streamId) =>
-        InventoryStateProjection.GetInitialState(InventoryEventStreamId.GetInventoryId(streamId));
+    public Option<InventoryState> GetInitialState(EventStreamId streamId) =>
+        InventoryStateProjection.GetInitialState();
 
-    public InventoryState Apply(InventoryState state, IInventoryEvent evt) =>
+    public Option<InventoryState> Apply(Option<InventoryState> state, IInventoryEvent evt) =>
         InventoryStateProjection.Apply(state, evt);
 }

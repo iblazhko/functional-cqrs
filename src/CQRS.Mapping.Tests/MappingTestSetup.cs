@@ -14,14 +14,17 @@ internal static class MappingTestSetup
     public const string ValidInventoryName = "Test Inventory";
     public const string ValidUpdatedName = "Updated Name";
 
-    public static readonly InventoryId TestInventoryId =
-        InventoryId.Create(EntityId.CreateUnsafe(ValidInventoryIdString));
+    public static readonly InventoryId TestInventoryId = InventoryId.Create(
+        EntityId.CreateUnsafe(ValidInventoryIdString)
+    );
 
-    public static readonly InventoryName TestInventoryName =
-        InventoryName.CreateUnsafe(ValidInventoryName);
+    public static readonly InventoryName TestInventoryName = InventoryName.CreateUnsafe(
+        ValidInventoryName
+    );
 
-    public static readonly InventoryName TestInventoryName_Updated =
-        InventoryName.CreateUnsafe(ValidUpdatedName);
+    public static readonly InventoryName TestInventoryName_Updated = InventoryName.CreateUnsafe(
+        ValidUpdatedName
+    );
 
     public static PositiveInteger Stock(int count) => PositiveInteger.CreateUnsafe(count);
 

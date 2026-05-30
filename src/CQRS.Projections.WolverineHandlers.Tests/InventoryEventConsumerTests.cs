@@ -23,7 +23,14 @@ public sealed class InventoryEventConsumerTests
     private static string ValidId() => (string)EntityId.NewId();
 
     private Task SeedCreated(string id, string name = "Widget") =>
-        _consumer.Consume(new InventoryCreatedEvent { InventoryId = id, Name = name, IsActive = true });
+        _consumer.Consume(
+            new InventoryCreatedEvent
+            {
+                InventoryId = id,
+                Name = name,
+                IsActive = true,
+            }
+        );
 
     private async Task<InventoryViewModel?> GetViewModel(string id)
     {
@@ -37,7 +44,14 @@ public sealed class InventoryEventConsumerTests
     public async Task Consume_InventoryCreatedEvent_StoresViewModelInProjectionStore()
     {
         var id = ValidId();
-        await _consumer.Consume(new InventoryCreatedEvent { InventoryId = id, Name = "Widget", IsActive = true });
+        await _consumer.Consume(
+            new InventoryCreatedEvent
+            {
+                InventoryId = id,
+                Name = "Widget",
+                IsActive = true,
+            }
+        );
         (await GetViewModel(id)).ShouldNotBeNull();
     }
 
@@ -45,7 +59,14 @@ public sealed class InventoryEventConsumerTests
     public async Task Consume_InventoryCreatedEvent_ViewModelReflectsEventFields()
     {
         var id = ValidId();
-        await _consumer.Consume(new InventoryCreatedEvent { InventoryId = id, Name = "Widget", IsActive = true });
+        await _consumer.Consume(
+            new InventoryCreatedEvent
+            {
+                InventoryId = id,
+                Name = "Widget",
+                IsActive = true,
+            }
+        );
 
         var vm = await GetViewModel(id);
         vm!.Name.ShouldBe("Widget");
@@ -61,7 +82,14 @@ public sealed class InventoryEventConsumerTests
         var id = ValidId();
         await SeedCreated(id, "Widget");
 
-        await _consumer.Consume(new InventoryRenamedEvent { InventoryId = id, OldName = "Widget", NewName = "Gadget" });
+        await _consumer.Consume(
+            new InventoryRenamedEvent
+            {
+                InventoryId = id,
+                OldName = "Widget",
+                NewName = "Gadget",
+            }
+        );
 
         (await GetViewModel(id))!.Name.ShouldBe("Gadget");
     }
@@ -74,11 +102,16 @@ public sealed class InventoryEventConsumerTests
         var id = ValidId();
         await SeedCreated(id);
 
-        await _consumer.Consume(new ItemsAddedToInventoryEvent
-        {
-            InventoryId = id, Name = "Widget",
-            AddedCount = 10, OldStockQuantity = 0, NewStockQuantity = 10,
-        });
+        await _consumer.Consume(
+            new ItemsAddedToInventoryEvent
+            {
+                InventoryId = id,
+                Name = "Widget",
+                AddedCount = 10,
+                OldStockQuantity = 0,
+                NewStockQuantity = 10,
+            }
+        );
 
         (await GetViewModel(id))!.StockQuantity.ShouldBe(10);
     }
@@ -90,17 +123,27 @@ public sealed class InventoryEventConsumerTests
     {
         var id = ValidId();
         await SeedCreated(id);
-        await _consumer.Consume(new ItemsAddedToInventoryEvent
-        {
-            InventoryId = id, Name = "Widget",
-            AddedCount = 10, OldStockQuantity = 0, NewStockQuantity = 10,
-        });
+        await _consumer.Consume(
+            new ItemsAddedToInventoryEvent
+            {
+                InventoryId = id,
+                Name = "Widget",
+                AddedCount = 10,
+                OldStockQuantity = 0,
+                NewStockQuantity = 10,
+            }
+        );
 
-        await _consumer.Consume(new ItemsRemovedFromInventoryEvent
-        {
-            InventoryId = id, Name = "Widget",
-            RemovedCount = 3, OldStockQuantity = 10, NewStockQuantity = 7,
-        });
+        await _consumer.Consume(
+            new ItemsRemovedFromInventoryEvent
+            {
+                InventoryId = id,
+                Name = "Widget",
+                RemovedCount = 3,
+                OldStockQuantity = 10,
+                NewStockQuantity = 7,
+            }
+        );
 
         (await GetViewModel(id))!.StockQuantity.ShouldBe(7);
     }
@@ -113,7 +156,9 @@ public sealed class InventoryEventConsumerTests
         var id = ValidId();
         await SeedCreated(id);
 
-        await _consumer.Consume(new InventoryDeactivatedEvent { InventoryId = id, Name = "Widget" });
+        await _consumer.Consume(
+            new InventoryDeactivatedEvent { InventoryId = id, Name = "Widget" }
+        );
 
         (await GetViewModel(id))!.IsActive.ShouldBeFalse();
     }
@@ -128,8 +173,15 @@ public sealed class InventoryEventConsumerTests
         var id = ValidId();
         await SeedCreated(id);
 
-        await Should.NotThrowAsync(
-            () => _consumer.Consume(new ItemWentInStockEvent { InventoryId = id, Name = "Widget", StockQuantity = 1 })
+        await Should.NotThrowAsync(() =>
+            _consumer.Consume(
+                new ItemWentInStockEvent
+                {
+                    InventoryId = id,
+                    Name = "Widget",
+                    StockQuantity = 1,
+                }
+            )
         );
     }
 
@@ -139,8 +191,8 @@ public sealed class InventoryEventConsumerTests
         var id = ValidId();
         await SeedCreated(id);
 
-        await Should.NotThrowAsync(
-            () => _consumer.Consume(new ItemWentOutOfStockEvent { InventoryId = id, Name = "Widget" })
+        await Should.NotThrowAsync(() =>
+            _consumer.Consume(new ItemWentOutOfStockEvent { InventoryId = id, Name = "Widget" })
         );
     }
 
@@ -150,24 +202,45 @@ public sealed class InventoryEventConsumerTests
     public async Task Consume_WithInvalidInventoryId_ThrowsMappingException()
     {
         // "bad-id" fails EntityId.Create validation → Left<MappingFault> → MappingException
-        await Should.ThrowAsync<MappingException>(
-            () => _consumer.Consume(new InventoryCreatedEvent { InventoryId = "bad-id", Name = "Widget", IsActive = true })
+        await Should.ThrowAsync<MappingException>(() =>
+            _consumer.Consume(
+                new InventoryCreatedEvent
+                {
+                    InventoryId = "bad-id",
+                    Name = "Widget",
+                    IsActive = true,
+                }
+            )
         );
     }
 
     [Fact]
     public async Task Consume_WithEmptyName_ThrowsMappingException()
     {
-        await Should.ThrowAsync<MappingException>(
-            () => _consumer.Consume(new InventoryCreatedEvent { InventoryId = ValidId(), Name = string.Empty, IsActive = true })
+        await Should.ThrowAsync<MappingException>(() =>
+            _consumer.Consume(
+                new InventoryCreatedEvent
+                {
+                    InventoryId = ValidId(),
+                    Name = string.Empty,
+                    IsActive = true,
+                }
+            )
         );
     }
 
     [Fact]
     public async Task Consume_WithInvalidInventoryId_DoesNotUpdateProjectionStore()
     {
-        await Should.ThrowAsync<MappingException>(
-            () => _consumer.Consume(new InventoryCreatedEvent { InventoryId = "bad-id", Name = "Widget", IsActive = true })
+        await Should.ThrowAsync<MappingException>(() =>
+            _consumer.Consume(
+                new InventoryCreatedEvent
+                {
+                    InventoryId = "bad-id",
+                    Name = "Widget",
+                    IsActive = true,
+                }
+            )
         );
 
         var collection = await _store.OpenDocumentCollection(InventoryCollection.CollectionId);

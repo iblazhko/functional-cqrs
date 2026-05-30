@@ -1,8 +1,8 @@
 using CQRS.Ports.EventStore;
 using LanguageExt;
-using static LanguageExt.Prelude;
 using Marten;
 using Microsoft.Extensions.Logging;
+using static LanguageExt.Prelude;
 
 namespace CQRS.Adapters.MartenDbEventStore;
 
@@ -32,29 +32,36 @@ internal sealed class MartenDbEventStreamSession<TDomainState, TDomainEvent, TEv
 
     private bool _isLocked;
 
-    private Either<EventDeserializationError, IReadOnlyList<EventWithMetadata<TDomainEvent>>>
-        MapFromMartenEvents(IReadOnlyList<JasperFx.Events.IEvent> mtEvents) =>
+    private Either<
+        EventDeserializationError,
+        IReadOnlyList<EventWithMetadata<TDomainEvent>>
+    > MapFromMartenEvents(IReadOnlyList<JasperFx.Events.IEvent> mtEvents) =>
         mtEvents
             .Aggregate(
                 Right<EventDeserializationError, List<EventWithMetadata<TDomainEvent>>>(
                     new List<EventWithMetadata<TDomainEvent>>()
                 ),
-                (acc, e) => acc.Bind(list =>
-                    EventMapper.ToDomainEvent((TEventDto)e.Data).Map(evt =>
-                    {
-                        list.Add(new EventWithMetadata<TDomainEvent>(
-                            evt,
-                            EventMetadata.NewEventMetadata(
-                                e.EventType.FullName
-                                    ?? throw new InvalidOperationException(
-                                        "Could not get event type full name"
-                                    ),
-                                EventTimeProvider.GetUtcNow().UtcDateTime
-                            )
-                        ));
-                        return list;
-                    })
-                )
+                (acc, e) =>
+                    acc.Bind(list =>
+                        EventMapper
+                            .ToDomainEvent((TEventDto)e.Data)
+                            .Map(evt =>
+                            {
+                                list.Add(
+                                    new EventWithMetadata<TDomainEvent>(
+                                        evt,
+                                        EventMetadata.NewEventMetadata(
+                                            e.EventType.FullName
+                                                ?? throw new InvalidOperationException(
+                                                    "Could not get event type full name"
+                                                ),
+                                            EventTimeProvider.GetUtcNow().UtcDateTime
+                                        )
+                                    )
+                                );
+                                return list;
+                            })
+                    )
             )
             .Map(list => (IReadOnlyList<EventWithMetadata<TDomainEvent>>)list);
 
@@ -73,14 +80,15 @@ internal sealed class MartenDbEventStreamSession<TDomainState, TDomainEvent, TEv
         // ReSharper disable once ConstantConditionalAccessQualifier
         if (mtEvents.Count > 0)
         {
-            MapFromMartenEvents(mtEvents).Match(
-                Left: err => _deserializationError = err,
-                Right: events =>
-                {
-                    _storedEvents.AddRange(events);
-                    _storedRevision = (EventStreamVersion)mtEvents[^1].Version;
-                }
-            );
+            MapFromMartenEvents(mtEvents)
+                .Match(
+                    Left: err => _deserializationError = err,
+                    Right: events =>
+                    {
+                        _storedEvents.AddRange(events);
+                        _storedRevision = (EventStreamVersion)mtEvents[^1].Version;
+                    }
+                );
         }
     }
 
@@ -136,9 +144,7 @@ internal sealed class MartenDbEventStreamSession<TDomainState, TDomainEvent, TEv
     public void AppendEvents(IEnumerable<EventWithMetadata<TDomainEvent>> events)
     {
         AssertSessionIsNotLocked();
-        _newEvents.AddRange(
-            events.Where(e => e is { Event: not null })
-        );
+        _newEvents.AddRange(events.Where(e => e is { Event: not null }));
     }
 
     public async Task Save(

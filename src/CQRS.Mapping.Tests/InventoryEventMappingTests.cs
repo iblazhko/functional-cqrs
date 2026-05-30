@@ -28,7 +28,11 @@ public sealed class InventoryEventV1Mapper_ToEventDto_Tests
     [Fact]
     public void InventoryRenamed_MapsToDto()
     {
-        var domain = new InventoryRenamed(TestInventoryId, TestInventoryName, TestInventoryName_Updated);
+        var domain = new InventoryRenamed(
+            TestInventoryId,
+            TestInventoryName,
+            TestInventoryName_Updated
+        );
 
         var dto = (InventoryRenamedEvent)_mapper.ToEventDto(domain);
 
@@ -41,7 +45,11 @@ public sealed class InventoryEventV1Mapper_ToEventDto_Tests
     public void ItemsAddedToInventory_WithOldStock_MapsToDto()
     {
         var domain = new ItemsAddedToInventory(
-            TestInventoryId, TestInventoryName, Stock(5), Some(Stock(3)), Stock(8)
+            TestInventoryId,
+            TestInventoryName,
+            Stock(5),
+            Some(Stock(3)),
+            Stock(8)
         );
 
         var dto = (ItemsAddedToInventoryEvent)_mapper.ToEventDto(domain);
@@ -56,7 +64,11 @@ public sealed class InventoryEventV1Mapper_ToEventDto_Tests
     public void ItemsAddedToInventory_WhenOldStockIsNone_DtoHasZero()
     {
         var domain = new ItemsAddedToInventory(
-            TestInventoryId, TestInventoryName, Stock(5), None, Stock(5)
+            TestInventoryId,
+            TestInventoryName,
+            Stock(5),
+            None,
+            Stock(5)
         );
 
         var dto = (ItemsAddedToInventoryEvent)_mapper.ToEventDto(domain);
@@ -69,7 +81,11 @@ public sealed class InventoryEventV1Mapper_ToEventDto_Tests
     public void ItemsRemovedFromInventory_WithRemainingStock_MapsToDto()
     {
         var domain = new ItemsRemovedFromInventory(
-            TestInventoryId, TestInventoryName, Stock(2), Stock(7), Some(Stock(5))
+            TestInventoryId,
+            TestInventoryName,
+            Stock(2),
+            Stock(7),
+            Some(Stock(5))
         );
 
         var dto = (ItemsRemovedFromInventoryEvent)_mapper.ToEventDto(domain);
@@ -84,7 +100,11 @@ public sealed class InventoryEventV1Mapper_ToEventDto_Tests
     public void ItemsRemovedFromInventory_WhenNewStockIsNone_DtoHasZero()
     {
         var domain = new ItemsRemovedFromInventory(
-            TestInventoryId, TestInventoryName, Stock(5), Stock(5), None
+            TestInventoryId,
+            TestInventoryName,
+            Stock(5),
+            Stock(5),
+            None
         );
 
         var dto = (ItemsRemovedFromInventoryEvent)_mapper.ToEventDto(domain);
@@ -356,9 +376,7 @@ public sealed class InventoryEventV1Mapper_ToDomainEvent_Tests
     [Fact]
     public void UnknownDtoType_ThrowsInvalidOperationException()
     {
-        Should.Throw<InvalidOperationException>(() =>
-            _mapper.ToDomainEvent(new UnknownEventDto())
-        );
+        Should.Throw<InvalidOperationException>(() => _mapper.ToDomainEvent(new UnknownEventDto()));
     }
 
     private sealed record UnknownEventDto : IInventoryEventDto;

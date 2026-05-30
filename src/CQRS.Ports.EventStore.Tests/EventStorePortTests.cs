@@ -10,19 +10,28 @@ public sealed class EventStreamIdTests
     [Fact]
     public void Create_FromEmptyString_ThrowsArgumentException()
     {
-        Should.Throw<ArgumentException>(() => { var _ = (EventStreamId)""; });
+        Should.Throw<ArgumentException>(() =>
+        {
+            var _ = (EventStreamId)"";
+        });
     }
 
     [Fact]
     public void Create_FromWhitespace_ThrowsArgumentException()
     {
-        Should.Throw<ArgumentException>(() => { var _ = (EventStreamId)"   "; });
+        Should.Throw<ArgumentException>(() =>
+        {
+            var _ = (EventStreamId)"   ";
+        });
     }
 
     [Fact]
     public void Create_FromValidString_Succeeds()
     {
-        Should.NotThrow(() => { var _ = (EventStreamId)"inventory-stream-1"; });
+        Should.NotThrow(() =>
+        {
+            var _ = (EventStreamId)"inventory-stream-1";
+        });
     }
 
     [Fact]
@@ -124,7 +133,12 @@ public sealed class EventWithMetadataTests
     public void FromEvent_WrapsEventCorrectly()
     {
         var evt = new TestEvent("created");
-        var wrapped = EventWithMetadata<TestEvent>.FromEvent(evt, Guid.NewGuid(), Guid.NewGuid(), DateTime.UtcNow);
+        var wrapped = EventWithMetadata<TestEvent>.FromEvent(
+            evt,
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            DateTime.UtcNow
+        );
         wrapped.Event.ShouldBe(evt);
     }
 
@@ -132,7 +146,12 @@ public sealed class EventWithMetadataTests
     public void FromEvent_SetsCorrelationIdInMetadata()
     {
         var corrId = Guid.NewGuid();
-        var wrapped = EventWithMetadata<TestEvent>.FromEvent(new TestEvent("x"), corrId, Guid.NewGuid(), DateTime.UtcNow);
+        var wrapped = EventWithMetadata<TestEvent>.FromEvent(
+            new TestEvent("x"),
+            corrId,
+            Guid.NewGuid(),
+            DateTime.UtcNow
+        );
         wrapped.Metadata.CorrelationId.ShouldBe(corrId);
     }
 
@@ -140,7 +159,12 @@ public sealed class EventWithMetadataTests
     public void FromEvent_SetsCausationIdInMetadata()
     {
         var causId = Guid.NewGuid();
-        var wrapped = EventWithMetadata<TestEvent>.FromEvent(new TestEvent("x"), Guid.NewGuid(), causId, DateTime.UtcNow);
+        var wrapped = EventWithMetadata<TestEvent>.FromEvent(
+            new TestEvent("x"),
+            Guid.NewGuid(),
+            causId,
+            DateTime.UtcNow
+        );
         wrapped.Metadata.CausationId.ShouldBe(causId);
     }
 
@@ -148,7 +172,12 @@ public sealed class EventWithMetadataTests
     public void FromEvent_SetsTimestampInMetadata()
     {
         var timestamp = new DateTime(2026, 6, 1, 0, 0, 0, DateTimeKind.Utc);
-        var wrapped = EventWithMetadata<TestEvent>.FromEvent(new TestEvent("x"), Guid.NewGuid(), Guid.NewGuid(), timestamp);
+        var wrapped = EventWithMetadata<TestEvent>.FromEvent(
+            new TestEvent("x"),
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            timestamp
+        );
         wrapped.Metadata.Timestamp.ShouldBe(timestamp);
     }
 
@@ -156,7 +185,12 @@ public sealed class EventWithMetadataTests
     public void FromEvent_SetsEventTypeFullNameInMetadata()
     {
         var evt = new TestEvent("x");
-        var wrapped = EventWithMetadata<TestEvent>.FromEvent(evt, Guid.NewGuid(), Guid.NewGuid(), DateTime.UtcNow);
+        var wrapped = EventWithMetadata<TestEvent>.FromEvent(
+            evt,
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            DateTime.UtcNow
+        );
         wrapped.Metadata.EventTypeFullName.ShouldBe(typeof(TestEvent).FullName);
     }
 }
@@ -179,7 +213,9 @@ public sealed class EventTypeResolverTests
     [Fact]
     public void GetEventType_UnknownTypeName_ThrowsInvalidOperationException()
     {
-        Should.Throw<InvalidOperationException>(() => _resolver.GetEventType("CQRS.Ports.EventStore.Tests.NonExistentType"));
+        Should.Throw<InvalidOperationException>(() =>
+            _resolver.GetEventType("CQRS.Ports.EventStore.Tests.NonExistentType")
+        );
     }
 
     [Fact]
@@ -203,7 +239,8 @@ public sealed class EventJsonSerializerTests
     {
         var original = new SerializablePayload("widget", 42);
         var bytes = EventJsonSerializer.Instance.Serialize(original);
-        var restored = (SerializablePayload)EventJsonSerializer.Instance.Deserialize(bytes, typeof(SerializablePayload));
+        var restored = (SerializablePayload)
+            EventJsonSerializer.Instance.Deserialize(bytes, typeof(SerializablePayload));
         restored.ShouldBe(original);
     }
 
@@ -211,8 +248,8 @@ public sealed class EventJsonSerializerTests
     public void Deserialize_NullJson_ThrowsInvalidOperationException()
     {
         var nullJsonBytes = "null"u8.ToArray();
-        Should.Throw<InvalidOperationException>(
-            () => EventJsonSerializer.Instance.Deserialize(nullJsonBytes, typeof(SerializablePayload))
+        Should.Throw<InvalidOperationException>(() =>
+            EventJsonSerializer.Instance.Deserialize(nullJsonBytes, typeof(SerializablePayload))
         );
     }
 
@@ -237,7 +274,12 @@ public sealed class NoOpEventPublisherTests
         var publisher = new NoOpEventPublisher<TestEvent>();
         var events = new[]
         {
-            EventWithMetadata<TestEvent>.FromEvent(new TestEvent("e"), Guid.NewGuid(), Guid.NewGuid(), DateTime.UtcNow),
+            EventWithMetadata<TestEvent>.FromEvent(
+                new TestEvent("e"),
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                DateTime.UtcNow
+            ),
         };
 
         await Should.NotThrowAsync(() => publisher.Publish(events));

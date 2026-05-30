@@ -38,13 +38,13 @@ public class EventStoreEventsPublisher<T>(IMessageBus bus) : IEventPublisher<T>
     ) =>
         @event switch
         {
-            InventoryCreated x          => bus.Publish(x.ToDto(), context, ct),
-            InventoryRenamed x          => bus.Publish(x.ToDto(), context, ct),
-            ItemsAddedToInventory x     => bus.Publish(x.ToDto(), context, ct),
+            InventoryCreated x => bus.Publish(x.ToDto(), context, ct),
+            InventoryRenamed x => bus.Publish(x.ToDto(), context, ct),
+            ItemsAddedToInventory x => bus.Publish(x.ToDto(), context, ct),
             ItemsRemovedFromInventory x => bus.Publish(x.ToDto(), context, ct),
-            ItemWentInStock x           => bus.Publish(x.ToDto(), context, ct),
-            ItemWentOutOfStock x        => bus.Publish(x.ToDto(), context, ct),
-            InventoryDeactivated x      => bus.Publish(x.ToDto(), context, ct),
+            ItemWentInStock x => bus.Publish(x.ToDto(), context, ct),
+            ItemWentOutOfStock x => bus.Publish(x.ToDto(), context, ct),
+            InventoryDeactivated x => bus.Publish(x.ToDto(), context, ct),
             _ => throw new InvalidOperationException(
                 $"Unknown domain event type: {@event.GetType().FullName ?? @event.GetType().Name}"
             ),

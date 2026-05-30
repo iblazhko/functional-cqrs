@@ -131,7 +131,15 @@ public sealed class ContextTests
 
 public sealed class MessageContextBuilderExtensionsTests
 {
-    private static readonly DateTimeOffset FixedTimestamp = new(2026, 4, 25, 10, 0, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset FixedTimestamp = new(
+        2026,
+        4,
+        25,
+        10,
+        0,
+        0,
+        TimeSpan.Zero
+    );
 
     private static Context MakeContext() => Context.GetNew(DateTimeOffset.UtcNow);
 

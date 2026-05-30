@@ -29,7 +29,8 @@ public static class CommandProcessingStatusConfigurator
 }
 
 internal sealed class MartenDbCommandProcessingStatusService(IDocumentStore documentStore)
-    : ICommandProcessingStatusRecordingService, ICommandProcessingStatusQueryService
+    : ICommandProcessingStatusRecordingService,
+        ICommandProcessingStatusQueryService
 {
     public async Task RecordCommandProcessingStarted(CommandProcessingRequest request)
     {
@@ -55,36 +56,48 @@ internal sealed class MartenDbCommandProcessingStatusService(IDocumentStore docu
         DateTimeOffset completedAt,
         string response = ""
     ) =>
-        await UpdateStatus(commandId, vm => vm with
-        {
-            Status = "Completed",
-            Response = response,
-            UpdatedAt = completedAt.ToString("O"),
-        });
+        await UpdateStatus(
+            commandId,
+            vm =>
+                vm with
+                {
+                    Status = "Completed",
+                    Response = response,
+                    UpdatedAt = completedAt.ToString("O"),
+                }
+        );
 
     public async Task RecordCommandProcessingRejected(
         Guid commandId,
         DateTimeOffset rejectedAt,
         string reason
     ) =>
-        await UpdateStatus(commandId, vm => vm with
-        {
-            Status = "Rejected",
-            Response = reason,
-            UpdatedAt = rejectedAt.ToString("O"),
-        });
+        await UpdateStatus(
+            commandId,
+            vm =>
+                vm with
+                {
+                    Status = "Rejected",
+                    Response = reason,
+                    UpdatedAt = rejectedAt.ToString("O"),
+                }
+        );
 
     public async Task RecordCommandProcessingFailed(
         Guid commandId,
         DateTimeOffset failedAt,
         string failure
     ) =>
-        await UpdateStatus(commandId, vm => vm with
-        {
-            Status = "Failed",
-            Response = failure,
-            UpdatedAt = failedAt.ToString("O"),
-        });
+        await UpdateStatus(
+            commandId,
+            vm =>
+                vm with
+                {
+                    Status = "Failed",
+                    Response = failure,
+                    UpdatedAt = failedAt.ToString("O"),
+                }
+        );
 
     public async Task<Option<CommandProcessingStatusViewModel>> GetCommandProcessingStatus(
         Guid commandId

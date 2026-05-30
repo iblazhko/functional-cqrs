@@ -5,7 +5,10 @@ using CliFx.Infrastructure;
 namespace CQRS.CLI.Commands.Inventory;
 
 [Command("inventory rename", Description = "Rename an inventory item")]
-public sealed partial class RenameInventoryCommand(InventoryApiClient client, CqrsCommandStatusApiClient commandStatusClient) : ICommand
+public sealed partial class RenameInventoryCommand(
+    InventoryApiClient client,
+    CqrsCommandStatusApiClient commandStatusClient
+) : ICommand
 {
     [CommandParameter(0, Name = "id", Description = "Inventory ID")]
     public string Id { get; set; } = string.Empty;

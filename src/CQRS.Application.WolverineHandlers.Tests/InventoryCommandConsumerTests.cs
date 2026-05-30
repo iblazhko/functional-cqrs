@@ -10,6 +10,7 @@ using CQRS.EntityIds;
 using CQRS.Mapping.Inventory.V1;
 using CQRS.Ports.EventStore;
 using CQRS.Ports.MessageBus;
+using LanguageExt;
 using Microsoft.Extensions.Logging.Abstractions;
 using Shouldly;
 using Wolverine;
@@ -39,19 +40,31 @@ public sealed class InventoryCommandConsumerTests
             return Task.CompletedTask;
         }
 
-        public Task RecordCommandProcessingCompleted(Guid commandId, DateTimeOffset completedAt, string response = "")
+        public Task RecordCommandProcessingCompleted(
+            Guid commandId,
+            DateTimeOffset completedAt,
+            string response = ""
+        )
         {
             CompletedCommandId = commandId;
             return Task.CompletedTask;
         }
 
-        public Task RecordCommandProcessingRejected(Guid commandId, DateTimeOffset rejectedAt, string reason)
+        public Task RecordCommandProcessingRejected(
+            Guid commandId,
+            DateTimeOffset rejectedAt,
+            string reason
+        )
         {
             RejectedCommandId = commandId;
             return Task.CompletedTask;
         }
 
-        public Task RecordCommandProcessingFailed(Guid commandId, DateTimeOffset failedAt, string failure)
+        public Task RecordCommandProcessingFailed(
+            Guid commandId,
+            DateTimeOffset failedAt,
+            string failure
+        )
         {
             FailedCommandId = commandId;
             return Task.CompletedTask;
@@ -59,7 +72,11 @@ public sealed class InventoryCommandConsumerTests
     }
 
     private readonly SpyStatusRecorder _recorder = new();
-    private readonly InMemoryEventStoreAdapter<InventoryState, IInventoryEvent, IInventoryEventDto> _eventStore = new();
+    private readonly InMemoryEventStoreAdapter<
+        Option<InventoryState>,
+        IInventoryEvent,
+        IInventoryEventDto
+    > _eventStore = new();
     private readonly InventoryCommandConsumer _consumer;
 
     public InventoryCommandConsumerTests()
@@ -68,19 +85,20 @@ public sealed class InventoryCommandConsumerTests
     }
 
     private InventoryCommandConsumer MakeConsumer(
-        IEventStore<InventoryState, IInventoryEvent, IInventoryEventDto> store
-    ) => new(
-        new TimeProviderStub(),
-        new MoonPhaseServiceStub(MoonPhase.NewMoon),
-        _recorder,
-        new InventoryCommandDtoHandler(
-            store,
-            new InventoryCommandV1Mapper(),
-            new InventoryEventStreamStateProjection(),
-            new EventStoreInventoryEventMapper()
-        ),
-        NullLogger<InventoryCommandConsumer>.Instance
-    );
+        IEventStore<Option<InventoryState>, IInventoryEvent, IInventoryEventDto> store
+    ) =>
+        new(
+            new TimeProviderStub(),
+            new MoonPhaseServiceStub(MoonPhase.NewMoon),
+            _recorder,
+            new InventoryCommandDtoHandler(
+                store,
+                new InventoryCommandV1Mapper(),
+                new InventoryEventStreamStateProjection(),
+                new EventStoreInventoryEventMapper()
+            ),
+            NullLogger<InventoryCommandConsumer>.Instance
+        );
 
     private static string ValidId() => (string)EntityId.NewId();
 
@@ -88,7 +106,13 @@ public sealed class InventoryCommandConsumerTests
         Guid? id = null,
         string? correlationId = null,
         string? parentId = null
-    ) => new() { Id = id ?? Guid.NewGuid(), CorrelationId = correlationId, ParentId = parentId };
+    ) =>
+        new()
+        {
+            Id = id ?? Guid.NewGuid(),
+            CorrelationId = correlationId,
+            ParentId = parentId,
+        };
 
     // --- Context building ---
 
@@ -96,7 +120,10 @@ public sealed class InventoryCommandConsumerTests
     public async Task Consume_SetsCommandIdFromEnvelopeId()
     {
         var envelopeId = Guid.NewGuid();
-        await _consumer.Consume(new CreateInventoryCommand { InventoryId = ValidId(), Name = "Widget" }, MakeEnvelope(id: envelopeId));
+        await _consumer.Consume(
+            new CreateInventoryCommand { InventoryId = ValidId(), Name = "Widget" },
+            MakeEnvelope(id: envelopeId)
+        );
         _recorder.StartedRequest!.CommandId.ShouldBe(envelopeId);
     }
 
@@ -220,8 +247,8 @@ public sealed class InventoryCommandConsumerTests
         var consumer = MakeConsumer(new ThrowingEventStore());
         var envelopeId = Guid.NewGuid();
 
-        await Should.ThrowAsync<PermanentProcessingFailureException>(
-            () => consumer.Consume(
+        await Should.ThrowAsync<PermanentProcessingFailureException>(() =>
+            consumer.Consume(
                 new CreateInventoryCommand { InventoryId = ValidId(), Name = "Widget" },
                 MakeEnvelope(id: envelopeId)
             )
@@ -288,7 +315,9 @@ public sealed class InventoryCommandConsumerTests
 file sealed class TimeProviderStub : ITimeProvider
 {
     private static readonly DateTimeOffset Timestamp = new(2026, 1, 15, 12, 0, 0, TimeSpan.Zero);
+
     public DateTimeOffset GetUtcNow() => Timestamp;
+
     public Domain.TimeZone TimeZone { get; } = Domain.TimeZone.CreateUnsafe("Europe/London");
 }
 
@@ -298,17 +327,21 @@ file sealed class MoonPhaseServiceStub(MoonPhase phase) : IMoonPhaseService
         Task.FromResult(phase);
 }
 
-file sealed class ThrowingEventStore : IEventStore<InventoryState, IInventoryEvent, IInventoryEventDto>
+file sealed class ThrowingEventStore
+    : IEventStore<Option<InventoryState>, IInventoryEvent, IInventoryEventDto>
 {
-    public IEventStreamSession<InventoryState, IInventoryEvent> Open(
+    public IEventStreamSession<Option<InventoryState>, IInventoryEvent> Open(
         EventStreamId streamId,
         IEventMapper<IInventoryEvent, IInventoryEventDto> eventMapper,
         IEventSerializer? eventSerializer = null
     ) => throw new InvalidOperationException("Simulated event store failure");
 
-    public Task<bool> Contains(EventStreamId streamId, CancellationToken cancellationToken = default) =>
-        Task.FromResult(false);
+    public Task<bool> Contains(
+        EventStreamId streamId,
+        CancellationToken cancellationToken = default
+    ) => Task.FromResult(false);
 
     public void Dispose() { }
+
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }

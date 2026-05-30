@@ -12,7 +12,9 @@ public sealed class BenchmarkRunner(InventoryBenchmarkClient client, BenchmarkSe
         var allRecords = new List<BenchmarkRecord>();
         foreach (var concurrencyLevel in settings.ConcurrencyLevels)
         {
-            AnsiConsole.MarkupLine($"Running [bold]{concurrencyLevel}[/] concurrent scenario(s)...");
+            AnsiConsole.MarkupLine(
+                $"Running [bold]{concurrencyLevel}[/] concurrent scenario(s)..."
+            );
             var tasks = Enumerable
                 .Range(0, concurrencyLevel)
                 .Select(_ => new InventoryScenario(client, settings).RunAsync(concurrencyLevel));

@@ -81,10 +81,7 @@ public sealed class MapValidationFaultExtensionTests
         var result = validationResult.MapValidationFault<int, string>();
 
         result.IsRight.ShouldBeTrue();
-        result.Match(
-            Left: _ => Assert.Fail("Expected Right"),
-            Right: v => v.ShouldBe("success")
-        );
+        result.Match(Left: _ => Assert.Fail("Expected Right"), Right: v => v.ShouldBe("success"));
     }
 
     [Fact]

@@ -71,11 +71,15 @@ public sealed class InMemoryEventStoreDBTests
     [Fact]
     public void AppendEvents_MultipleEvents_IncrementsVersionByCount()
     {
-        _db.AppendEvents("stream", [
-            new SerializedEvent("Type1", []),
-            new SerializedEvent("Type2", []),
-            new SerializedEvent("Type3", [])
-        ], 0);
+        _db.AppendEvents(
+            "stream",
+            [
+                new SerializedEvent("Type1", []),
+                new SerializedEvent("Type2", []),
+                new SerializedEvent("Type3", []),
+            ],
+            0
+        );
 
         var stream = _db.Open("stream");
 

@@ -1,7 +1,6 @@
 using System.Reflection;
 using CQRS.Application;
 using CQRS.Application.CommandProcessingStatusRecording;
-using Microsoft.AspNetCore.Mvc;
 using CQRS.Application.WolverineHandlers;
 using CQRS.Configuration;
 using CQRS.DTO;
@@ -9,6 +8,7 @@ using CQRS.Infrastructure;
 using CQRS.Mapping;
 using CQRS.Projections.WolverineHandlers;
 using LanguageExt;
+using Microsoft.AspNetCore.Mvc;
 
 var settings = SettingsResolver.GetSettings("CqrsApp");
 Console.WriteLine(settings.ToString()); // Proper logger in not available at this point
@@ -44,8 +44,10 @@ app.UseHealthChecks("/health");
 app.MapGet(
     "/commands/{commandId:guid}/status",
     async (Guid commandId, [FromServices] ICommandProcessingStatusQueryService queryService) =>
-        (await queryService.GetCommandProcessingStatus(commandId))
-            .Match<IResult>(vm => Results.Ok(vm), () => Results.NotFound())
+        (await queryService.GetCommandProcessingStatus(commandId)).Match<IResult>(
+            vm => Results.Ok(vm),
+            () => Results.NotFound()
+        )
 );
 
 app.Run();

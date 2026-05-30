@@ -12,10 +12,10 @@ public sealed class InventoryStateProjectionTests
     {
         InventoryStateProjection
             .Apply(
-                TestInventoryState_New,
+                TestInventoryState_None,
                 new InventoryCreated(TestInventoryId, TestInventoryName, true)
             )
-            .ShouldBe(new InventoryState(TestInventoryId, TestInventoryName, None, false, true));
+            .ShouldBe(Some(new InventoryState(TestInventoryId, TestInventoryName, None, true)));
     }
 
     [Fact(DisplayName = $"Apply {nameof(InventoryDeactivated)} event")]
@@ -26,7 +26,7 @@ public sealed class InventoryStateProjectionTests
                 TestInventoryState_NoStock,
                 new InventoryDeactivated(TestInventoryId, TestInventoryName)
             )
-            .ShouldBe(new InventoryState(TestInventoryId, TestInventoryName, None, false, false));
+            .ShouldBe(Some(new InventoryState(TestInventoryId, TestInventoryName, None, false)));
     }
 
     [Fact(DisplayName = $"Apply {nameof(InventoryRenamed)} event")]
@@ -38,12 +38,13 @@ public sealed class InventoryStateProjectionTests
                 new InventoryRenamed(TestInventoryId, TestInventoryName, TestInventoryName_Updated)
             )
             .ShouldBe(
-                new InventoryState(
-                    TestInventoryId,
-                    TestInventoryName_Updated,
-                    TestInventoryState_Current.Quantity,
-                    false,
-                    true
+                Some(
+                    new InventoryState(
+                        TestInventoryId,
+                        TestInventoryName_Updated,
+                        TestInventoryState_Current.Quantity,
+                        true
+                    )
                 )
             );
     }
@@ -68,9 +69,7 @@ public sealed class InventoryStateProjectionTests
                     newStock
                 )
             )
-            .ShouldBe(
-                new InventoryState(TestInventoryId, TestInventoryName, newStock, false, true)
-            );
+            .ShouldBe(Some(new InventoryState(TestInventoryId, TestInventoryName, newStock, true)));
     }
 
     [Fact(DisplayName = $"Apply {nameof(ItemsRemovedFromInventory)} event")]
@@ -93,9 +92,7 @@ public sealed class InventoryStateProjectionTests
                     newStock
                 )
             )
-            .ShouldBe(
-                new InventoryState(TestInventoryId, TestInventoryName, newStock, false, true)
-            );
+            .ShouldBe(Some(new InventoryState(TestInventoryId, TestInventoryName, newStock, true)));
     }
 
     [Fact(DisplayName = $"Apply {nameof(ItemWentInStock)} event (NO-OP)")]
@@ -106,7 +103,7 @@ public sealed class InventoryStateProjectionTests
                 TestInventoryState_Current,
                 new ItemWentInStock(TestInventoryId, TestInventoryName, CreateTestStockQuantity(3))
             )
-            .ShouldBe(TestInventoryState_Current);
+            .ShouldBe(Some(TestInventoryState_Current));
     }
 
     [Fact(DisplayName = $"Apply {nameof(ItemWentOutOfStock)} event (NO-OP)")]
@@ -117,24 +114,34 @@ public sealed class InventoryStateProjectionTests
                 TestInventoryState_Current,
                 new ItemWentOutOfStock(TestInventoryId, TestInventoryName)
             )
-            .ShouldBe(TestInventoryState_Current);
+            .ShouldBe(Some(TestInventoryState_Current));
     }
 
-    [Fact(DisplayName = "GetInitialState returns new state with correct id")]
-    public void GetInitialState_ReturnsNewStateWithGivenId()
+    [Fact(DisplayName = "GetInitialState returns None (non-existent inventory)")]
+    public void GetInitialState_ReturnsNone()
     {
-        var state = InventoryStateProjection.GetInitialState(TestInventoryId);
-
-        state.Id.ShouldBe(TestInventoryId);
-        state.IsNew.ShouldBeTrue();
-        state.Quantity.IsNone.ShouldBeTrue();
+        InventoryStateProjection.GetInitialState().IsNone.ShouldBeTrue();
     }
 
     [Fact(DisplayName = "Apply unsupported event type throws NotSupportedException")]
     public void ApplyUnsupportedEvent_ThrowsNotSupportedException()
     {
         Should.Throw<NotSupportedException>(() =>
-            InventoryStateProjection.Apply(TestInventoryState_Current, new UnsupportedTestEvent(TestInventoryId))
+            InventoryStateProjection.Apply(
+                TestInventoryState_Current,
+                new UnsupportedTestEvent(TestInventoryId)
+            )
+        );
+    }
+
+    [Fact(DisplayName = "Apply non-creation event to None throws NotSupportedException")]
+    public void ApplyEventBeforeCreated_ThrowsNotSupportedException()
+    {
+        Should.Throw<NotSupportedException>(() =>
+            InventoryStateProjection.Apply(
+                TestInventoryState_None,
+                new InventoryRenamed(TestInventoryId, TestInventoryName, TestInventoryName_Updated)
+            )
         );
     }
 
