@@ -11,7 +11,7 @@ public static class Module
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton<ITimeProvider, ApplicationTimeProvider>();
 
-        services.AddSingleton<Random>();
+        services.AddSingleton(Random.Shared);
         services.AddSingleton<IMoonPhaseService, MoonPhaseService>();
 
         services.AddSingleton<InventoryEventStreamStateProjection>();
