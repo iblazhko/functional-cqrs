@@ -19,19 +19,19 @@ System_Ext(ext_client, "<&cog> Component that uses inventory", "Adds items to or
 
 System_Boundary(boundary_system, "Inventory Management") {
     frame "API Host" as api_host {
-        Container(api, "API", ".net/f#", "Command and Query API that the client system interacts with")
-        Container(query, "<&cog> Projections Query", ".net/f#", "Retrieves view models", $tags="microservice-component")
+        Container(api, "API", ".net/c#", "Command and Query API that the client system interacts with")
+        Container(query, "<&cog> Projections Query", ".net/c#", "Retrieves view models", $tags="microservice-component")
     }
 
     frame "Application Host" as app_host {
-        Container(domain, "Domain", ".net/f#", "Domain model and services")
-        Container(app, "<&cog> Application", ".net/f#", "Processes commands, adds events to event streams", $tags="microservice-component")
-        Container(projections, "<&cog> Projections", ".net/f#", "Subscribed to events, updates view model projectsions", $tags="microservice-component")
+        Container(domain, "Domain", ".net/c#", "Domain model and services")
+        Container(app, "<&cog> Application", ".net/c#", "Processes commands, adds events to event streams", $tags="microservice-component")
+        Container(projections, "<&cog> Projections", ".net/c#", "Subscribed to events, updates view model projectsions", $tags="microservice-component")
     }
 
-    ContainerQueue(messagebus, "Message Bus", "RabbitMQ", "Inventory message queues")
-    ContainerDb(eventstore, "Event Store", "MartenDB", "Inventory event streams")
-    ContainerDb(projectionstore, "Projection Store", "MartenDB", "Inventory view models documents")
+    ContainerQueue(messagebus, "Message Bus", "Wolverine/RabbitMQ", "Inventory message queues")
+    ContainerDb(eventstore, "Event Store", "MartenDB/PostgreSQL", "Inventory event streams")
+    ContainerDb(projectionstore, "Projection Store", "MartenDB/PostgreSQL", "Inventory view models documents")
 
     Rel(client, api, "Uses")
     Rel(query, api, "Retreive view model DTO")

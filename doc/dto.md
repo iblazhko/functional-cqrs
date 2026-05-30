@@ -19,14 +19,6 @@ primitive CLR types, and mappers that use industry standard formats for
 representing domain model values, e.g. strings in ISO 8601 format to represent
 date or time values.
 
-I am calling this *representation* of domain commands and events
-***Domain Transfer Object*** (DTO).
-
-Not to be confused with *Data Transfer Object* (also DTO) which may serve
-slightly different purpose. In the true spirit of DDD, *Domain Transfer Object*
-shares abbreviation with *Data Transfer Object*, and somewhat similar to it,
-but means something different.
-
 ## References
 
 1. Abraham, Isaac. “F# In Action”. Manning Publications, 2023,

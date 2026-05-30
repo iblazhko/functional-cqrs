@@ -41,12 +41,12 @@ Solution uses .NET 10 / C# and has following major parts:
         for _EventStore_ port
     -   `CQRS.Adapters.MartenDbProjectionStore`: [MartenDB](https://martendb.io/)
         adapter for _ProjectionStore_ port
-    -   `CQRS.Adapters.MassTransitMessageBus`:
-        [MassTransit](https://masstransit.io/) /
+    -   `CQRS.Adapters.WolverineMessageBus`:
+        [Wolverine](https://wolverinefx.net/) /
         [RabbitMQ](https://www.rabbitmq.com/) adapter for _MessageBus_ port
--   Client (`CQRS.Client`): example of an external client that interacts with
+-   Client (`CQRS.CLI`): example of an external client that interacts with
     the system via API
--   Benchmark tests (`benchmark`). (WIP)
+-   Benchmark tests (`CQRS.Benchmarks`). (WIP)
 
 For educational purposes _API_ and _Application_ have separate hosts
 (`CQRS.API.Host` and `CQRS.Application.Host` respectively). In a real life

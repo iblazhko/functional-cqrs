@@ -31,10 +31,10 @@ Application implements generic Command DTO handler that is using
 Non-pure imperative shell consists of two main parts:
 
 * Host executable projects. These depend on Microsoft Hosting and Microsoft
-  Dependency Injection components, and while implemented in F#, code there
+  Dependency Injection components, and while implemented in C#, code there
   can be considered rather imperative. Here we prepare environment - read
   configuration from `appsettings.json` / environment variables, register
-  adapters in MS DI, register MassTransit consumers etc. Finally, we start
+  adapters in MS DI, register Wolverine message handlers etc. Finally, we start
   the host by using methods provided in Microsoft Hosting.
 
 * Input triggers. Here we take inputs from either API calls or incoming
@@ -45,9 +45,9 @@ Non-pure imperative shell consists of two main parts:
     * API calls are handled by ASP.NET Core Minimal API.
       API can send commands using *MessageBus Port*, or query view models
       using *ProjectionStore Port*.
-    * Messages are handled using MassTransit, and we define MassTransit-specific
-      message consumers that unwrap MassTransit consume context and pass on DTO
-      into a generic Application of Projection DTO handler.
+    * Messages are handled using Wolverine, and we define Wolverine-specific
+      message handlers that unwrap the incoming message and pass on the DTO
+      into a generic Application or Projection DTO handler.
 
 ## References
 

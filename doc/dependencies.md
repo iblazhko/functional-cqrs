@@ -3,9 +3,8 @@
 1. **`Core`**. Projects in this group (`Domain`, `DTO`, `Mapping`) MUST NOT
    depend on any project from `Server` (i.e. there should be no dependencies on
    Ports, Application, or Projections). The only external libraries used there
-   are `FPrimitive` (for declaring value objects constraints),
-   `FSToolkit.ErrorHandling` (for generic `ErrorsByTag` type and errors
-   handling), and `Nanoid` (for short ids generation).
+   are `LanguageExt.Core` (for value objects, `Either`/`Option` and functional
+   error handling) and `Nanoid` (for short ids generation).
 2. **`Server`**
     1. `Application`
         1. MUST NOT depend on any project from `Adapters`, only on `Ports`
@@ -37,8 +36,8 @@
         1. MUST NOT depend on any project from `Core`
         2. MUST NOT depend on any project from `Application` or `Projections`
         3. An `Adapter` MUST ONLY implement one corresponding `Port`
-    6. Code in `*.MassTransitConsumers` projects MUST ONLY unwrap MassTransit
-       consume context and pass DTO to `Application` or `Projections`
+    6. Code in `*.WolverineHandlers` projects MUST ONLY unwrap the incoming
+       Wolverine message and pass the DTO to `Application` or `Projections`
        DTO handler, there should be no application logic there as such
     7. `Hosts`
         1. `Application.Host` MUST NOT depend on `API`
@@ -46,4 +45,4 @@
 3. **`Client`** MUST ONLY depend on `CQRS.DTO` (command DTOs) and
    `CQRS.Projections.ViewModels`
 
-These rules are checked in [Architecture Tests](../src/CQRS.Architecture.Tests/DependenciesTests.fs).
+These rules are checked in [Architecture Tests](../src/CQRS.System.Architecture.Tests/DependenciesTest.cs).
