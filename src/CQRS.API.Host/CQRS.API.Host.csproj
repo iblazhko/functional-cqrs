@@ -23,5 +23,6 @@
 
   <ItemGroup>
     <PackageReference Include="LanguageExt.Core" />
+    <PackageReference Include="WolverineFx.RuntimeCompilation" />
   </ItemGroup>
 </Project>

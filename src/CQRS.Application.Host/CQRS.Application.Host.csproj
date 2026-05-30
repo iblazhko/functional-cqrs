@@ -17,4 +17,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WolverineFx.RuntimeCompilation" />
+  </ItemGroup>
 </Project>
