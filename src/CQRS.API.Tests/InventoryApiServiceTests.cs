@@ -2,6 +2,7 @@ using CQRS.Adapters.InMemoryProjectionStore;
 using CQRS.API.Inventory;
 using CQRS.EntityIds;
 using CQRS.Mapping;
+using CQRS.Mapping.Inventory.V1;
 using CQRS.Ports.ProjectionStore;
 using CQRS.Projections.Repositories.Inventory.V1;
 using CQRS.Projections.ViewModels.Inventory.V1;
@@ -22,6 +23,7 @@ public sealed class InventoryApiServiceTests
         _queryRepository = new InventoryViewModelQueryRepository(_store);
         _service = new InventoryApiService(
             _bus,
+            new InventoryCommandV1Mapper(),
             _queryRepository,
             TimeProvider.System
         );

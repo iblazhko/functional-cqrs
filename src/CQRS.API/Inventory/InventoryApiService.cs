@@ -2,7 +2,7 @@ using CQRS.DTO;
 using CQRS.DTO.Inventory.V1;
 using CQRS.EntityIds;
 using CQRS.Mapping;
-using CQRS.Mapping.Inventory.V1;
+using CQRS.Mapping.Inventory;
 using CQRS.Ports.MessageBus;
 using CQRS.Ports.ProjectionStore;
 using CQRS.Projections.Repositories.Inventory.V1;
@@ -35,6 +35,7 @@ public interface IInventoriesApiService
 
 public class InventoryApiService(
     IMessageBus messageBus,
+    IInventoryCommandMapper commandMapper,
     InventoryViewModelQueryRepository queryRepository,
     TimeProvider timeProvider
 ) : IInventoriesApiService
@@ -51,96 +52,58 @@ public class InventoryApiService(
         });
     }
 
-    public async Task<Either<MappingFault, AcceptedResponse>> CreateInventory(
+    public Task<Either<MappingFault, AcceptedResponse>> CreateInventory(
         CreateInventoryRequest request
     )
     {
         if (string.IsNullOrWhiteSpace(request.InventoryId))
             request = request with { InventoryId = EntityId.NewId() };
 
-        var commandDto = new CreateInventoryCommand
-        {
-            InventoryId = request.InventoryId,
-            Name = request.Name,
-        };
-
-        var commandMetadata = ExtractRequestMetadata().GetResponseMetadata(timeProvider.GetUtcNow());
-        var validationResult = commandDto.ToDomain();
-        return await validationResult.Match(
-            Left: fault => Task.FromResult<Either<MappingFault, AcceptedResponse>>(fault),
-            Right: async command => (Either<MappingFault, AcceptedResponse>)await SendCommandDto(commandDto, command.Id, commandMetadata)
+        return ValidateAndSend(
+            new CreateInventoryCommand { InventoryId = request.InventoryId, Name = request.Name }
         );
     }
 
-    public async Task<Either<MappingFault, AcceptedResponse>> RenameInventory(
+    public Task<Either<MappingFault, AcceptedResponse>> RenameInventory(
         string inventoryId,
         RenameInventoryRequest request
-    )
-    {
-        var commandDto = new RenameInventoryCommand
-        {
-            InventoryId = inventoryId,
-            NewName = request.Name,
-        };
-
-        var commandMetadata = ExtractRequestMetadata().GetResponseMetadata(timeProvider.GetUtcNow());
-        var validationResult = commandDto.ToDomain();
-        return await validationResult.Match(
-            Left: fault => Task.FromResult<Either<MappingFault, AcceptedResponse>>(fault),
-            Right: async command => (Either<MappingFault, AcceptedResponse>)await SendCommandDto(commandDto, command.Id, commandMetadata)
+    ) =>
+        ValidateAndSend(
+            new RenameInventoryCommand { InventoryId = inventoryId, NewName = request.Name }
         );
-    }
 
-    public async Task<Either<MappingFault, AcceptedResponse>> AddItemsToInventory(
+    public Task<Either<MappingFault, AcceptedResponse>> AddItemsToInventory(
         string inventoryId,
         AddItemsToInventoryRequest request
-    )
-    {
-        var commandDto = new AddItemsToInventoryCommand
-        {
-            InventoryId = inventoryId,
-            Count = request.Count,
-        };
-
-        var commandMetadata = ExtractRequestMetadata().GetResponseMetadata(timeProvider.GetUtcNow());
-        var validationResult = commandDto.ToDomain();
-        return await validationResult.Match(
-            Left: fault => Task.FromResult<Either<MappingFault, AcceptedResponse>>(fault),
-            Right: async command => (Either<MappingFault, AcceptedResponse>)await SendCommandDto(commandDto, command.Id, commandMetadata)
+    ) =>
+        ValidateAndSend(
+            new AddItemsToInventoryCommand { InventoryId = inventoryId, Count = request.Count }
         );
-    }
 
-    public async Task<Either<MappingFault, AcceptedResponse>> RemoveItemsFromInventory(
+    public Task<Either<MappingFault, AcceptedResponse>> RemoveItemsFromInventory(
         string inventoryId,
         RemoveItemsFromInventoryRequest request
-    )
-    {
-        var commandDto = new RemoveItemsFromInventoryCommand
-        {
-            InventoryId = inventoryId,
-            Count = request.Count,
-        };
-
-        var commandMetadata = ExtractRequestMetadata().GetResponseMetadata(timeProvider.GetUtcNow());
-        var validationResult = commandDto.ToDomain();
-        return await validationResult.Match(
-            Left: fault => Task.FromResult<Either<MappingFault, AcceptedResponse>>(fault),
-            Right: async command => (Either<MappingFault, AcceptedResponse>)await SendCommandDto(commandDto, command.Id, commandMetadata)
+    ) =>
+        ValidateAndSend(
+            new RemoveItemsFromInventoryCommand { InventoryId = inventoryId, Count = request.Count }
         );
-    }
 
-    public async Task<Either<MappingFault, AcceptedResponse>> DeactivateInventory(
+    public Task<Either<MappingFault, AcceptedResponse>> DeactivateInventory(
         string inventoryId,
         DeactivateInventoryRequest request
-    )
+    ) => ValidateAndSend(new DeactivateInventoryCommand { InventoryId = inventoryId });
+
+    Task<Either<MappingFault, AcceptedResponse>> ValidateAndSend<TDto>(TDto commandDto)
+        where TDto : IInventoryCommandDto
     {
-        var commandDto = new DeactivateInventoryCommand { InventoryId = inventoryId };
         var commandMetadata = ExtractRequestMetadata().GetResponseMetadata(timeProvider.GetUtcNow());
-        var validationResult = commandDto.ToDomain();
-        return await validationResult.Match(
-            Left: fault => Task.FromResult<Either<MappingFault, AcceptedResponse>>(fault),
-            Right: async command => (Either<MappingFault, AcceptedResponse>)await SendCommandDto(commandDto, command.Id, commandMetadata)
-        );
+        return commandMapper
+            .ToDomainCommand(commandDto)
+            .Match(
+                Left: fault => Task.FromResult<Either<MappingFault, AcceptedResponse>>(fault),
+                Right: async command => (Either<MappingFault, AcceptedResponse>)
+                    await SendCommandDto(commandDto, command.Id, commandMetadata)
+            );
     }
 
     async Task<AcceptedResponse> SendCommandDto<TDto>(
