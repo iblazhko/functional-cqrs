@@ -1,5 +1,6 @@
 namespace CQRS.Infrastructure;
 
+using System.Globalization;
 using CQRS.Application.CommandProcessingStatusRecording;
 using CQRS.Configuration;
 using LanguageExt;
@@ -42,7 +43,7 @@ internal sealed class MartenDbCommandProcessingStatusService(IDocumentStore docu
             CausationId = request.CausationId,
             CommandType = request.CommandType,
             CommandBody = request.CommandBody,
-            RequestedAt = request.RequestedAt.ToString("O"),
+            RequestedAt = request.RequestedAt.ToString("O", CultureInfo.InvariantCulture),
             Status = "Processing",
             Response = string.Empty,
             UpdatedAt = string.Empty,
@@ -63,7 +64,7 @@ internal sealed class MartenDbCommandProcessingStatusService(IDocumentStore docu
                 {
                     Status = "Completed",
                     Response = response,
-                    UpdatedAt = completedAt.ToString("O"),
+                    UpdatedAt = completedAt.ToString("O", CultureInfo.InvariantCulture),
                 }
         );
 
@@ -79,7 +80,7 @@ internal sealed class MartenDbCommandProcessingStatusService(IDocumentStore docu
                 {
                     Status = "Rejected",
                     Response = reason,
-                    UpdatedAt = rejectedAt.ToString("O"),
+                    UpdatedAt = rejectedAt.ToString("O", CultureInfo.InvariantCulture),
                 }
         );
 
@@ -95,7 +96,7 @@ internal sealed class MartenDbCommandProcessingStatusService(IDocumentStore docu
                 {
                     Status = "Failed",
                     Response = failure,
-                    UpdatedAt = failedAt.ToString("O"),
+                    UpdatedAt = failedAt.ToString("O", CultureInfo.InvariantCulture),
                 }
         );
 

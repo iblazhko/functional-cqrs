@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Globalization;
 using LanguageExt;
 using static LanguageExt.Prelude;
 
@@ -66,8 +67,8 @@ public class CommandProcessingStatusRecordingService
             CausationId = request.CausationId,
             CommandType = request.CommandType,
             CommandBody = request.CommandBody,
-            RequestedAt = request.RequestedAt.ToString("O"),
-            Status = "Processing",
+            RequestedAt = request.RequestedAt.ToString("O", CultureInfo.InvariantCulture),
+            Status = nameof(Status.Processing),
             Response = string.Empty,
             UpdatedAt = string.Empty,
         };
@@ -82,16 +83,7 @@ public class CommandProcessingStatusRecordingService
         string response = ""
     )
     {
-        Update(
-            commandId,
-            vm =>
-                vm with
-                {
-                    Status = "Completed",
-                    Response = response,
-                    UpdatedAt = completedAt.ToString("O"),
-                }
-        );
+        Update(commandId, vm => UpdateStatusVM(vm, Status.Completed, response, completedAt));
         return Task.CompletedTask;
     }
 
@@ -101,16 +93,7 @@ public class CommandProcessingStatusRecordingService
         string reason
     )
     {
-        Update(
-            commandId,
-            vm =>
-                vm with
-                {
-                    Status = "Rejected",
-                    Response = reason,
-                    UpdatedAt = rejectedAt.ToString("O"),
-                }
-        );
+        Update(commandId, vm => UpdateStatusVM(vm, Status.Rejected, reason, rejectedAt));
         return Task.CompletedTask;
     }
 
@@ -120,16 +103,7 @@ public class CommandProcessingStatusRecordingService
         string failure
     )
     {
-        Update(
-            commandId,
-            vm =>
-                vm with
-                {
-                    Status = "Failed",
-                    Response = failure,
-                    UpdatedAt = failedAt.ToString("O"),
-                }
-        );
+        Update(commandId, vm => UpdateStatusVM(vm, Status.Failed, failure, failedAt));
         return Task.CompletedTask;
     }
 
@@ -153,4 +127,17 @@ public class CommandProcessingStatusRecordingService
         if (_byCommandId.TryGetValue(commandId, out var existing))
             _byCommandId[commandId] = transform(existing);
     }
+
+    private static CommandProcessingStatusViewModel UpdateStatusVM(
+        CommandProcessingStatusViewModel vm,
+        Status status,
+        string response,
+        DateTimeOffset updatedAt
+    ) =>
+        vm with
+        {
+            Status = status.ToString(),
+            Response = response,
+            UpdatedAt = updatedAt.ToString("O", CultureInfo.InvariantCulture),
+        };
 }

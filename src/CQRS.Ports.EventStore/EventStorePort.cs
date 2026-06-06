@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Globalization;
 using System.Text.Json;
 using LanguageExt;
 
@@ -40,7 +41,7 @@ public readonly record struct EventStreamVersion
 
     public static explicit operator EventStreamVersion(long id) => new(id);
 
-    public override string ToString() => Value.ToString();
+    public override string ToString() => Value.ToString(CultureInfo.InvariantCulture);
 }
 
 public sealed record EventMetadata(
