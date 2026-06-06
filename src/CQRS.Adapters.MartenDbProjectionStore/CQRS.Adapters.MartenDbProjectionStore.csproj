@@ -6,4 +6,7 @@
     <PackageReference Include="Marten" />
     <PackageReference Include="Serilog" />
   </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="CQRS.Adapters.MartenDbProjectionStore.Tests" />
+  </ItemGroup>
 </Project>

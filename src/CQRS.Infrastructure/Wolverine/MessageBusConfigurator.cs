@@ -49,6 +49,13 @@ public static class MessageBusConfigurator
                     TimeSpan.FromMilliseconds(500),
                 ]);
 
+            opts.OnException<Ports.ProjectionStore.ConcurrencyException>()
+                .RetryWithCooldown([
+                    TimeSpan.FromMilliseconds(50),
+                    TimeSpan.FromMilliseconds(150),
+                    TimeSpan.FromMilliseconds(500),
+                ]);
+
             opts.OnException<Ports.MessageBus.PermanentProcessingFailureException>()
                 .MoveToErrorQueue();
         });

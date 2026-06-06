@@ -74,16 +74,6 @@ public class InvalidDocumentCollectionIdException : Exception;
 
 public class InvalidDocumentIdException : Exception;
 
-public sealed record DocumentEnvelope<TViewModel>
-    where TViewModel : class
-{
-    public string Id { get; init; } = DocumentId.Empty;
-    public long Version { get; init; } = DocumentVersion.New;
-
-    // ReSharper disable once InconsistentNaming
-    public TViewModel? VM { get; init; }
-}
-
 public interface IProjectionDocumentCollection<TViewModel> : IDisposable, IAsyncDisposable
     where TViewModel : class
 {

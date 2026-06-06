@@ -1,3 +1,4 @@
+using CQRS.Adapters.MartenDbProjectionStore;
 using CQRS.Ports.ProjectionStore;
 using Microsoft.Extensions.Logging.Abstractions;
 using Shouldly;
@@ -145,7 +146,7 @@ public sealed class MartenDbDocumentCollectionTests(PostgreSqlContainerFixture f
         await collection.Update(id, new TestViewModel { Name = "v2" });
 
         using var session = fixture.DocumentStore.LightweightSession();
-        var envelope = await session.LoadAsync<DocumentEnvelope<TestViewModel>>(
+        var envelope = await session.LoadAsync<ViewModelEnvelope<TestViewModel>>(
             id,
             token: TestContext.Current.CancellationToken
         );
@@ -162,11 +163,70 @@ public sealed class MartenDbDocumentCollectionTests(PostgreSqlContainerFixture f
         await collection.Update(id, new TestViewModel { Name = "first" });
 
         using var session = fixture.DocumentStore.LightweightSession();
-        var envelope = await session.LoadAsync<DocumentEnvelope<TestViewModel>>(
+        var envelope = await session.LoadAsync<ViewModelEnvelope<TestViewModel>>(
             id,
             token: TestContext.Current.CancellationToken
         );
         envelope.ShouldNotBeNull();
         ((long)envelope.Version).ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task Update_WithFunc_ConcurrentUpdates_BothUpdatesAreApplied()
+    {
+        var id = DocumentId.NewId();
+        await CreateCollection()
+            .Update(
+                id,
+                vm =>
+                {
+                    vm.Count = 0;
+                    return vm;
+                }
+            );
+
+        var barrier = new Barrier(2);
+
+        var ct = TestContext.Current.CancellationToken;
+
+        var task1 = Task.Run(
+            async () =>
+            {
+                var collection = CreateCollection();
+                barrier.SignalAndWait();
+                await collection.Update(
+                    id,
+                    vm =>
+                    {
+                        vm.Count += 10;
+                        return vm;
+                    }
+                );
+            },
+            ct
+        );
+
+        var task2 = Task.Run(
+            async () =>
+            {
+                var collection = CreateCollection();
+                barrier.SignalAndWait();
+                await collection.Update(
+                    id,
+                    vm =>
+                    {
+                        vm.Count += 5;
+                        return vm;
+                    }
+                );
+            },
+            ct
+        );
+
+        await Task.WhenAll(task1, task2);
+
+        var result = await CreateCollection().GetById(id);
+        result.ShouldNotBeNull();
+        result.Count.ShouldBe(15);
     }
 }
