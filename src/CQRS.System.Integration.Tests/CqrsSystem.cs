@@ -64,7 +64,7 @@ public class CqrsSystem(Uri apiBaseAddress, Uri applicationBaseAddress)
         public string Response { get; init; } = string.Empty;
     }
 
-    public async Task WaitForCommandProcessed(Guid commandId, int timeoutSeconds = 15)
+    public async Task WaitForCommandProcessed(Guid commandId, int timeoutSeconds = 5)
     {
         const int delayMilliseconds = 200;
         var retryCount = timeoutSeconds * 1000 / delayMilliseconds;
@@ -213,8 +213,8 @@ public class CqrsSystem(Uri apiBaseAddress, Uri applicationBaseAddress)
             )
             .WaitAndRetryAsync(
                 Backoff.LinearBackoff(
-                    TimeSpan.FromMilliseconds(500),
-                    retryCount: 60,
+                    TimeSpan.FromMilliseconds(250),
+                    retryCount: 20,
                     factor: 0.1,
                     fastFirst: true
                 )

@@ -24,9 +24,9 @@ public sealed class InventoryEventConsumer(
 
     public Task Consume(InventoryDeactivatedEvent message) => HandleEventDto(message);
 
-    public Task Consume(ItemWentInStockEvent message) => HandleEventDto(message);
+    public Task Consume(ItemWentInStockEvent message) => Task.CompletedTask;
 
-    public Task Consume(ItemWentOutOfStockEvent message) => HandleEventDto(message);
+    public Task Consume(ItemWentOutOfStockEvent message) => Task.CompletedTask;
 
     private async Task HandleEventDto<TEventDto>(TEventDto eventDto)
         where TEventDto : class, IInventoryEventDto
