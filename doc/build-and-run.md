@@ -34,19 +34,25 @@ To build the solution and run tests:
 
 ### Cleanup
 
-To completely remove all the intermediate build files:
+To remove all intermediate build artifacts (bin, obj, publish, test results):
 
 ```bash
-./build.ps1 Prune
+./build.ps1 Prune.Build
 ```
 
-To clean up Docker containers and images, first make sure that the system
-is stopped (see `DockerCompose.Stop` target below).
+To clean up Docker containers, images, and volumes, first make sure that the
+system is stopped (see `DockerCompose.Stop` target below).
 
-Then run command
+Then run:
 
 ```bash
 ./build.ps1 Prune.Docker
+```
+
+To do both at once:
+
+```bash
+./build.ps1 Prune
 ```
 
 ## Run
