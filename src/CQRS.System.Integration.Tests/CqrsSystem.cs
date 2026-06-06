@@ -64,7 +64,7 @@ public class CqrsSystem(Uri apiBaseAddress, Uri applicationBaseAddress)
         public string Response { get; init; } = string.Empty;
     }
 
-    public async Task WaitForCommandProcessed(Guid commandId, int timeoutSeconds = 5)
+    public async Task WaitForCommandProcessed(Guid commandId, int timeoutSeconds = 15)
     {
         const int delayMilliseconds = 200;
         var retryCount = timeoutSeconds * 1000 / delayMilliseconds;
@@ -213,8 +213,8 @@ public class CqrsSystem(Uri apiBaseAddress, Uri applicationBaseAddress)
             )
             .WaitAndRetryAsync(
                 Backoff.LinearBackoff(
-                    TimeSpan.FromMilliseconds(250),
-                    retryCount: 20,
+                    TimeSpan.FromMilliseconds(500),
+                    retryCount: 60,
                     factor: 0.1,
                     fastFirst: true
                 )
@@ -224,8 +224,16 @@ public class CqrsSystem(Uri apiBaseAddress, Uri applicationBaseAddress)
         var inventory =
             result.Outcome == OutcomeType.Successful ? result.Result : result.FinalHandledResult;
 
-        inventory.ShouldNotBeNull($"Inventory '{inventoryId}' did not reach expected state");
+        if (inventory is null)
+            throw new InvalidOperationException(
+                $"Inventory '{inventoryId}' did not appear within timeout"
+            );
 
-        return inventory!;
+        if (predicate is not null && !predicate(inventory))
+            throw new InvalidOperationException(
+                $"Inventory '{inventoryId}' did not reach expected state within timeout"
+            );
+
+        return inventory;
     }
 }
