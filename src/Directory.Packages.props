@@ -2,17 +2,12 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
-  <!-- App Packages -->
+  <!-- System Packages -->
   <ItemGroup>
-    <PackageVersion Include="CliFx" Version="3.0.0" />
+    <PackageVersion Include="System.Data.SqlClient" Version="4.8.6" />
+    <PackageVersion Include="System.Text.Json" Version="8.0.4" />
     <PackageVersion Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />
     <PackageVersion Include="AspNetCore.HealthChecks.Rabbitmq" Version="9.0.0" />
-    <PackageVersion Include="Flurl" Version="4.0.0" />
-    <PackageVersion Include="Flurl.Http" Version="4.0.2" />
-    <PackageVersion Include="LanguageExt.Core" Version="5.0.0-beta-77" />
-    <PackageVersion Include="Marten" Version="9.6.0" />
-    <PackageVersion Include="WolverineFx" Version="6.5.1" />
-    <PackageVersion Include="WolverineFx.RabbitMQ" Version="6.5.1" />
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.8" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.8" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.8" />
@@ -28,37 +23,45 @@
     <PackageVersion Include="Microsoft.Extensions.Logging.Configuration" Version="10.0.8" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="10.0.8" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="10.0.8" />
-    <PackageVersion Include="Nanoid" Version="3.1.0" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.3" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.15.3" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.15.2" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.15.1" />
-    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.3" />
-    <PackageVersion Include="Serilog.Enrichers.OpenTelemetry" Version="1.0.1" />
+  </ItemGroup>
+  <!-- App Packages -->
+  <ItemGroup>
+    <PackageVersion Include="CliFx" Version="3.0.0" />
+    <PackageVersion Include="Flurl" Version="4.0.0" />
+    <PackageVersion Include="Flurl.Http" Version="4.0.2" />
+    <PackageVersion Include="LanguageExt.Core" Version="5.0.0-beta-77" />
+    <PackageVersion Include="Marten" Version="9.6.0" />
+    <PackageVersion Include="Nanoid" Version="3.1.0" />
     <PackageVersion Include="Npgsql" Version="8.0.3" />
     <PackageVersion Include="OneOf" Version="3.0.271" />
     <PackageVersion Include="Polly" Version="8.6.6" />
     <PackageVersion Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
     <PackageVersion Include="Serilog" Version="4.3.1" />
     <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageVersion Include="Serilog.Enrichers.OpenTelemetry" Version="1.0.1" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageVersion Include="Spectre.Console" Version="0.56.0" />
-    <PackageVersion Include="Shouldly" Version="4.3.0" />
-    <PackageVersion Include="System.Data.SqlClient" Version="4.8.6" />
-    <PackageVersion Include="System.Text.Json" Version="8.0.4" />
+    <PackageVersion Include="WolverineFx" Version="6.5.1" />
+    <PackageVersion Include="WolverineFx.RabbitMQ" Version="6.5.1" />
     <PackageVersion Include="WolverineFx.RuntimeCompilation" Version="6.5.1" />
   </ItemGroup>
   <!-- Test Packages -->
   <ItemGroup>
-    <PackageVersion Include="Bogus" Version="35.6.1" />
-    <PackageVersion Include="Testcontainers" Version="4.12.0" />
-    <PackageVersion Include="Testcontainers.PostgreSql" Version="4.12.0" />
-    <PackageVersion Include="Testcontainers.RabbitMq" Version="4.12.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
+    <PackageVersion Include="xunit.v3" Version="3.2.2" />
     <PackageVersion Include="coverlet.collector" Version="10.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
+    <PackageVersion Include="Bogus" Version="35.6.1" />
+    <PackageVersion Include="Shouldly" Version="4.3.0" />
+    <PackageVersion Include="Testcontainers" Version="4.12.0" />
+    <PackageVersion Include="Testcontainers.PostgreSql" Version="4.12.0" />
+    <PackageVersion Include="Testcontainers.RabbitMq" Version="4.12.0" />
     <PackageVersion Include="TngTech.ArchUnitNET.xUnitV3" Version="0.13.3" />
-    <PackageVersion Include="xunit.v3" Version="3.2.2" />
   </ItemGroup>
 </Project>
