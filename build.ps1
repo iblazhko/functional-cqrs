@@ -48,22 +48,26 @@ $dockerComposeProject = "cqrs"
 #######################################################################
 # LOGGING
 
-function LogInfo {
+function LogInfo
+{
     param([ValidateNotNullOrEmpty()] [string]$Message)
     Write-Host -ForegroundColor Green $Message
 }
 
-function LogWarning {
+function LogWarning
+{
     param([ValidateNotNullOrEmpty()] [string]$Message)
     Write-Host -ForegroundColor Yellow "*** $Message"
 }
 
-function LogError {
+function LogError
+{
     param([ValidateNotNullOrEmpty()] [string]$Message)
     Write-Host -ForegroundColor Red "*** $Message"
 }
 
-function LogStep {
+function LogStep
+{
     param(
         [ValidateNotNullOrEmpty()] [string]$Message,
         [ValidateNotNullOrEmpty()] [string]$Title = "STEP"
@@ -71,13 +75,15 @@ function LogStep {
     Write-Host -ForegroundColor Yellow "--- ${Title}: $Message"
 }
 
-function LogTarget {
+function LogTarget
+{
     param([ValidateNotNullOrEmpty()] [string]$Message)
     Write-Host ""
     Write-Host -ForegroundColor Green "--- TARGET: $Message"
 }
 
-function LogCmd {
+function LogCmd
+{
     param([ValidateNotNullOrEmpty()] [string]$Message)
     Write-Host -ForegroundColor Yellow "--- $Message"
 }
@@ -85,25 +91,30 @@ function LogCmd {
 #######################################################################
 # STEPS
 
-function PreludeStep_ValidateDotnetCli {
+function PreludeStep_ValidateDotnetCli
+{
     LogStep "Check .NET CLI" -Title "PRELUDE"
     $dotnetCmd = Get-Command dotnet -ErrorAction Ignore
-    if (-not $dotnetCmd) {
+    if (-not $dotnetCmd)
+    {
         LogError ".NET SDK CLI (dotnet) is not available. Refer to https://dotnet.microsoft.com/download for more information."
         Exit 1
     }
 }
 
-function PreludeStep_ValidateDockerCli {
+function PreludeStep_ValidateDockerCli
+{
     LogStep "Check Docker CLI" -Title "PRELUDE"
     $dockerCmd = Get-Command docker -ErrorAction Ignore
-    if (-not $dockerCmd) {
+    if (-not $dockerCmd)
+    {
         LogError "Docker CLI (docker) is not available. Refer to https://docs.docker.com/get-docker/ for more information."
         Exit 1
     }
 }
 
-function Step_PruneBuild {
+function Step_PruneBuild
+{
     LogStep "PruneBuild"
 
     $pruneDir = $repositoryDir
@@ -129,7 +140,8 @@ function Step_PruneBuild {
     # }
 }
 
-function Step_PruneDocker {
+function Step_PruneDocker
+{
     LogStep "PruneDocker"
 
     $pruneDir = $repositoryDir
@@ -141,60 +153,85 @@ function Step_PruneDocker {
     }
 
     $(docker image ls --format "{{.Repository}}:{{.Tag}}") | ForEach-Object {
-        if ($_.StartsWith("${dockerComposeProject}-")) {
+        if ($_.StartsWith("${dockerComposeProject}-"))
+        {
             LogCmd "docker image rm $_"
             & docker image rm $_ | Out-Null
         }
     }
 
     $(docker volume ls --format "{{.Name}}") | ForEach-Object {
-        if ($_.StartsWith("${dockerComposeProject}_")) {
+        if ($_.StartsWith("${dockerComposeProject}_"))
+        {
             LogCmd "docker volume rm $_"
             & docker volume rm $_ | Out-Null
         }
     }
 }
 
-function Step_DotnetClean {
+function Step_DotnetClean
+{
     LogStep "dotnet clean $dotnetSolutionFile --verbosity $DotnetVerbosity -nologo"
     & dotnet clean "$dotnetSolutionFile" --verbosity $DotnetVerbosity -nologo
-    if (-not $?) { exit $LastExitCode }
+    if (-not $?)
+    { exit $LastExitCode
+    }
 }
 
-function Step_DotnetRestore {
+function Step_DotnetRestore
+{
     LogStep "dotnet restore $dotnetSolutionFile --verbosity $DotnetVerbosity -nologo"
     & dotnet restore "$dotnetSolutionFile" --verbosity $DotnetVerbosity -nologo
-    if (-not $?) { exit $LastExitCode }
+    if (-not $?)
+    { exit $LastExitCode
+    }
 }
 
-function Step_DotnetBuild {
+function Step_DotnetBuild
+{
     LogStep "dotnet build $dotnetSolutionFile --no-restore --configuration $Configuration --verbosity $DotnetVerbosity -nologo /p:Version=$buildVersion"
     $currentLocation = Get-Location
-    try {
+    try
+    {
         Set-Location $srcDir
         & dotnet build "$dotnetSolutionFile" --no-restore --configuration $Configuration --verbosity $DotnetVerbosity -nologo /p:Version=$buildVersion
-        if (-not $?) { exit $LastExitCode }
-    }
-    finally {
+        if (-not $?)
+        { exit $LastExitCode
+        }
+    } finally
+    {
         Set-Location $currentLocation
     }
 }
 
-function Step_DotnetPublish {
+function Step_DotnetPublish
+{
     param([ValidateNotNullOrEmpty()] [string]$ProjectFile, [ValidateNotNullOrEmpty()] [string]$PublishOutput)
     LogStep "dotnet publish $ProjectFile --output $PublishOutput --configuration $Configuration --verbosity $DotnetVerbosity -nologo /p:Version=$buildVersion"
     & dotnet publish "$ProjectFile" --output "$PublishOutput" --configuration $Configuration --verbosity $DotnetVerbosity -nologo /p:Version=$buildVersion
-    if (-not $?) { exit $LastExitCode }
+    if (-not $?)
+    { exit $LastExitCode
+    }
 }
 
-function Step_DotnetTest {
+function Step_DotnetTest
+{
     param([ValidateNotNullOrEmpty()] [string]$ProjectFile)
-    LogStep "dotnet test $ProjectFile --no-build --configuration $Configuration --logger:trx -nologo"
-    & dotnet test "$ProjectFile" --no-build --configuration $Configuration --logger:trx --logger:"console;verbosity=normal" -nologo
-    if (-not $?) { exit $LastExitCode }
+    $projectItem = Get-Item $ProjectFile
+    $projectDir = $projectItem.Directory.FullName
+    $projectName = $projectItem.BaseName
+    $testResultsDir = Join-Path $projectDir "TestResults"
+    $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+    $trxFile = Join-Path $testResultsDir "$projectName-$timestamp.trx"
+    LogStep "dotnet run --project $ProjectFile -- -trx $trxFile"
+    & dotnet run --project "$ProjectFile" -- -trx "$trxFile"
+    if (-not $?)
+    { exit $LastExitCode
+    }
 }
 
-function Step_DockerBuild {
+function Step_DockerBuild
+{
     param([ValidateNotNullOrEmpty()] [string]$DockerFilePath)
     $file = Get-Item $DockerFilePath
     $imageName = $file.BaseName
@@ -204,20 +241,25 @@ function Step_DockerBuild {
 
     LogStep "docker build -t $imageTag -f $dockerfile ."
     $currentLocation = Get-Location
-    try {
+    try
+    {
         Set-Location $dir
         & docker build -t $imageTag -f $dockerfile .
-        if (-not $?) { exit $LastExitCode }
-    }
-    finally {
+        if (-not $?)
+        { exit $LastExitCode
+        }
+    } finally
+    {
         Set-Location $currentLocation
     }
 }
 
-function Step_DockerComposeStart {
+function Step_DockerComposeStart
+{
     LogStep "docker compose -p $dockerComposeProject up --build --abort-on-container-exit"
 
-    if (-not $(Test-Path ".env")) {
+    if (-not $(Test-Path ".env"))
+    {
         Set-Content -Path ".env" @"
 POSTGRES_USER=cqrs_admin
 POSTGRES_PASSWORD=changeit
@@ -229,29 +271,42 @@ RABBITMQ_VHOST=cqrs
     }
 
     & docker compose -p $dockerComposeProject up --build --abort-on-container-exit
-    if (-not $?) { exit $LastExitCode }
+    if (-not $?)
+    { exit $LastExitCode
+    }
 }
 
-function Step_DockerComposeStartDetached {
+function Step_DockerComposeStartDetached
+{
     LogStep "docker compose -p $dockerComposeProject up --build --detach"
     & docker compose -p $dockerComposeProject up --build --detach
-    if (-not $?) { exit $LastExitCode }
+    if (-not $?)
+    { exit $LastExitCode
+    }
 }
 
-function Step_DockerComposeStop {
+function Step_DockerComposeStop
+{
     LogStep "docker compose -p $dockerComposeProject -f ./docker-compose.yaml -f ./benchmark/docker-compose.yaml down"
     & docker compose -p $dockerComposeProject -f ./docker-compose.yaml -f ./benchmark/docker-compose.yaml down
-    if (-not $?) { exit $LastExitCode }
+    if (-not $?)
+    { exit $LastExitCode
+    }
 }
 
-function Step_DockerComposeBenchmark {
+function Step_DockerComposeBenchmark
+{
     LogStep "docker-compose -p $dockerComposeProject -f ./docker-compose.yaml -f ./benchmark/docker-compose-yaml up --build --exit-code-from benchmark-test-runner --abort-on-container-exit"
     & docker compose -p $dockerComposeProject -f ./docker-compose.yaml -f ./benchmark/docker-compose-yaml up --build --exit-code-from benchmark-test-runner --abort-on-container-exit
-    if (-not $?) { exit $LastExitCode }
+    if (-not $?)
+    { exit $LastExitCode
+    }
 }
 
-function Step_DockerExtractBenchmarkReport {
-    if (-not $(Test-Path $benchmarkReportsDir)) {
+function Step_DockerExtractBenchmarkReport
+{
+    if (-not $(Test-Path $benchmarkReportsDir))
+    {
         New-Item -Path $benchmarkReportsDir -Type Directory | Out-Null
     }
 
@@ -264,8 +319,10 @@ function Step_DockerExtractBenchmarkReport {
     & docker rm $containerName | Out-Null
 
     $tempVolumeDir = Join-Path $benchmarkReportsDir "$tempDir"
-    foreach ($resultsDir in $(Get-ChildItem -Path $tempVolumeDir)) {
-        if (-not $(Test-Path $(Join-Path $benchmarkReportsDir $resultsDir.BaseName))) {
+    foreach ($resultsDir in $(Get-ChildItem -Path $tempVolumeDir))
+    {
+        if (-not $(Test-Path $(Join-Path $benchmarkReportsDir $resultsDir.BaseName)))
+        {
             Move-Item -Path $resultsDir -Destination $benchmarkReportsDir
         }
     }
@@ -277,15 +334,18 @@ function Step_DockerExtractBenchmarkReport {
 #######################################################################
 # PRELUDE TARGETS
 
-function Target_Prelude_DotnetCli {
+function Target_Prelude_DotnetCli
+{
     PreludeStep_ValidateDotnetCli
 }
 
-function Target_Prelude_DockerCli {
+function Target_Prelude_DockerCli
+{
     PreludeStep_ValidateDockerCli
 }
 
-function Target_Prelude {
+function Target_Prelude
+{
     DependsOn "Prelude.DotnetCli"
     DependsOn "Prelude.DockerCli"
 }
@@ -294,21 +354,24 @@ function Target_Prelude {
 #######################################################################
 # TARGETS
 
-function Target_Dotnet_Clean {
+function Target_Dotnet_Clean
+{
     DependsOn "Prelude.DotnetCli"
 
     LogTarget "Dotnet.Clean"
     Step_DotnetClean
 }
 
-function Target_Dotnet_Restore {
+function Target_Dotnet_Restore
+{
     DependsOn "Prelude.DotnetCli"
 
     LogTarget "Dotnet.Restore"
     Step_DotnetRestore
 }
 
-function Target_Dotnet_Build {
+function Target_Dotnet_Build
+{
     DependsOn "Prelude.DotnetCli"
     DependsOn "Dotnet.Restore"
 
@@ -316,24 +379,28 @@ function Target_Dotnet_Build {
     Step_DotnetBuild
 }
 
-function Target_Dotnet_Test {
+function Target_Dotnet_Test
+{
     DependsOn "Prelude.DotnetCli"
     DependsOn "Dotnet.Build"
 
     LogTarget "Dotnet.Test"
     $projects = Get-ChildItem -Path $srcDir -Filter "*.Tests.?sproj" -Recurse -File
-    foreach ($projectFile in $projects) {
+    foreach ($projectFile in $projects)
+    {
         Step_DotnetTest $projectFile
     }
 }
 
-function Target_Dotnet_Publish {
+function Target_Dotnet_Publish
+{
     DependsOn "Prelude.DotnetCli"
     DependsOn "Dotnet.Build"
 
     LogTarget "Dotnet.Publish"
     $dockerfiles = Get-ChildItem -Path $srcDir -Filter "*.Dockerfile" -Recurse -File
-    foreach ($dockerFile in $dockerfiles) {
+    foreach ($dockerFile in $dockerfiles)
+    {
         LogInfo "Dockerfile found: $dockerFile"
         $projectDirectory = $dockerFile.Directory
         $projectFile = Get-ChildItem -Path $projectDirectory -Filter "*.?sproj" | Select-Object -First 1
@@ -342,33 +409,38 @@ function Target_Dotnet_Publish {
     }
 }
 
-function Target_Docker_Build {
+function Target_Docker_Build
+{
     DependsOn "Prelude"
     DependsOn "Dotnet.Publish"
 
     LogTarget "Docker.Build"
     $dockerFiles = Get-ChildItem -Path $srcDir -Filter "*.Dockerfile" -Recurse -File
-    foreach ($dockerFile in $dockerFiles) {
+    foreach ($dockerFile in $dockerFiles)
+    {
         LogInfo "Dockerfile found: $dockerFile"
         Step_DockerBuild $dockerFile
     }
 }
 
-function Target_DockerCompose_Start {
+function Target_DockerCompose_Start
+{
     DependsOn "Prelude"
     DependsOn "Dotnet.Publish"
 
     LogTarget "DockerCompose.Start"
-    try {
+    try
+    {
         Step_DockerComposeStart
-    }
-    finally {
+    } finally
+    {
         # ensure proper cleanup
         Step_DockerComposeStop
     }
 }
 
-function Target_DockerCompose_StartDetached {
+function Target_DockerCompose_StartDetached
+{
     DependsOn "Prelude"
     DependsOn "Dotnet.Publish"
 
@@ -376,47 +448,54 @@ function Target_DockerCompose_StartDetached {
     Step_DockerComposeStartDetached
 }
 
-function Target_DockerCompose_Stop {
+function Target_DockerCompose_Stop
+{
     DependsOn "Prelude.DockerCli"
 
     LogTarget "DockerCompose.Stop"
     Step_DockerComposeStop
 }
 
-function Target_DockerCompose_Benchmark {
+function Target_DockerCompose_Benchmark
+{
     DependsOn "Prelude.DockerCli"
     DependsOn "Dotnet.Publish"
 
     LogTarget "DockerCompose.Benchmark"
-    try {
+    try
+    {
         Step_DockerComposeBenchmark
         Step_DockerExtractBenchmarkReport
-    }
-    finally {
+    } finally
+    {
         # ensure proper cleanup
         Step_DockerComposeStop
     }
 }
 
-function Target_Prune_Build {
+function Target_Prune_Build
+{
     DependsOn "Prelude.DotNetCli"
     LogTarget "Prune.Build"
     Step_PruneBuild
 }
 
-function Target_Prune_Docker {
+function Target_Prune_Docker
+{
     DependsOn "Prelude.DockerCli"
     LogTarget "Prune.Docker"
     Step_PruneDocker
 }
 
-function Target_Prune {
+function Target_Prune
+{
     DependsOn "Prelude"
     DependsOn "Prune.Build"
     DependsOn "Prune.Docker"
 }
 
-function Target_FullBuild {
+function Target_FullBuild
+{
     DependsOn "Prelude"
     DependsOn "Dotnet.Build"
     DependsOn "Dotnet.Test"
@@ -428,15 +507,18 @@ function Target_FullBuild {
 # DEPENDENCIES TRACKING
 
 $targetCalls = @{ }
-function DependsOn {
+function DependsOn
+{
     param([ValidateNotNullOrEmpty()] [string]$Target)
-    if (-not $targetCalls.ContainsKey($Target)) {
+    if (-not $targetCalls.ContainsKey($Target))
+    {
         Invoke_BuildTarget $Target
         $targetCalls.Add($Target, $(Get-Date))
     }
 }
 
-function Invoke_BuildTarget {
+function Invoke_BuildTarget
+{
     param([ValidateNotNullOrEmpty()] [string]$Target)
     $normalizedTarget = $Target.Replace(".", "_")
     Invoke-Expression "Target_$normalizedTarget"
@@ -449,7 +531,8 @@ function Invoke_BuildTarget {
 $exitResult = 0
 
 $currentLocation = Get-Location
-try {
+try
+{
     LogInfo "*** BUILD: $Target ($buildVersion $Configuration) in $repositoryDir"
     Set-Location $repositoryDir
 
@@ -457,19 +540,20 @@ try {
 
     Write-Host ""
     LogInfo "DONE"
-}
-catch [System.Exception] {
+} catch [System.Exception]
+{
     $errorMessage = "$_"
     if ($errorMessage.StartsWith("The term 'Target_$Target' is not recognized") -or
-        $errorMessage.StartsWith("The term 'Target_$normalizedTarget' is not recognized")) {
+        $errorMessage.StartsWith("The term 'Target_$normalizedTarget' is not recognized"))
+    {
         LogError("Target $Target is not recognized")
-    }
-    else {
+    } else
+    {
         LogError($errorMessage)
     }
     $exitResult = 1
-}
-finally {
+} finally
+{
     $stopwatch.Stop()
     LogInfo "*** Completed in: $($stopwatch.Elapsed)"
     Set-Location $currentLocation
