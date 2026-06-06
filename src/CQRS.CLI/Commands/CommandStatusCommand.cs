@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using CliFx;
 using CliFx.Binding;
@@ -21,16 +22,28 @@ public sealed partial class CommandStatusCommand(CqrsCommandStatusApiClient clie
         }
 
         var statusSummary = new StringBuilder();
-        statusSummary.AppendLine($"Status:      {status.Status}");
+        statusSummary.AppendLine(CultureInfo.InvariantCulture, $"Status:      {status.Status}");
         if (!string.IsNullOrEmpty(status.Response))
-            statusSummary.AppendLine($"Response:    {status.Response}");
+            statusSummary.AppendLine(
+                CultureInfo.InvariantCulture,
+                $"Response:    {status.Response}"
+            );
 
         statusSummary.AppendLine();
-        statusSummary.AppendLine($"CommandId:   {status.CommandId}");
-        statusSummary.AppendLine($"CommandType: {status.CommandType}");
-        statusSummary.AppendLine($"CommandBody: {status.CommandBody}");
-        statusSummary.AppendLine($"RequestedAt: {status.RequestedAt}");
-        statusSummary.AppendLine($"UpdatedAt:   {status.UpdatedAt}");
+        statusSummary.AppendLine(CultureInfo.InvariantCulture, $"CommandId:   {status.CommandId}");
+        statusSummary.AppendLine(
+            CultureInfo.InvariantCulture,
+            $"CommandType: {status.CommandType}"
+        );
+        statusSummary.AppendLine(
+            CultureInfo.InvariantCulture,
+            $"CommandBody: {status.CommandBody}"
+        );
+        statusSummary.AppendLine(
+            CultureInfo.InvariantCulture,
+            $"RequestedAt: {status.RequestedAt}"
+        );
+        statusSummary.AppendLine(CultureInfo.InvariantCulture, $"UpdatedAt:   {status.UpdatedAt}");
 
         await console.Output.WriteLineAsync(statusSummary.ToString());
     }

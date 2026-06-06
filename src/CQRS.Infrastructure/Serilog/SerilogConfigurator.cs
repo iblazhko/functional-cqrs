@@ -1,11 +1,11 @@
+using System.Globalization;
 using CQRS.Configuration;
-
-namespace CQRS.Infrastructure;
-
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Enrichers.OpenTelemetry;
 using Serilog.Events;
+
+namespace CQRS.Infrastructure;
 
 public static class SerilogConfigurator
 {
@@ -21,7 +21,7 @@ public static class SerilogConfigurator
             .Enrich.FromLogContext()
             .Enrich.WithOpenTelemetryTraceId()
             .Enrich.WithOpenTelemetrySpanId()
-            .WriteTo.Console()
+            .WriteTo.Console(formatProvider: CultureInfo.InvariantCulture)
             .CreateLogger();
 
         services.AddSerilog();

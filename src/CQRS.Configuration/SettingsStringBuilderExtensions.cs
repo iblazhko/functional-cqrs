@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Text;
 
@@ -47,14 +48,17 @@ public static class SettingsStringBuilderExtensions
 
         if (isPrimitiveProperty)
         {
-            stringBuilder.AppendLine($"{Indent}{memberName}: {formattedValue}");
+            stringBuilder.AppendLine(
+                CultureInfo.InvariantCulture,
+                $"{Indent}{memberName}: {formattedValue}"
+            );
         }
         else
         {
             stringBuilder.AppendSettingSectionTitle(memberName);
             foreach (var line in formattedValue.Split(Environment.NewLine))
             {
-                stringBuilder.AppendLine($"{Indent}{Indent}{line}");
+                stringBuilder.AppendLine(CultureInfo.InvariantCulture, $"{Indent}{Indent}{line}");
             }
         }
 
@@ -66,7 +70,7 @@ public static class SettingsStringBuilderExtensions
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Name must be specified", nameof(name));
 
-        stringBuilder.AppendLine($"{Indent}{name}");
-        stringBuilder.AppendLine($"{Indent}---");
+        stringBuilder.AppendLine(CultureInfo.InvariantCulture, $"{Indent}{name}");
+        stringBuilder.AppendLine(CultureInfo.InvariantCulture, $"{Indent}---");
     }
 }
