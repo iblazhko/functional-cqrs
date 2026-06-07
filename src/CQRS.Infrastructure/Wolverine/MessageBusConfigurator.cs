@@ -42,6 +42,16 @@ public static class MessageBusConfigurator
                 () => { }
             );
 
+            endpointsRegistration.IntegrationEvents.Match(
+                some =>
+                    WolverineConventions.RegisterIntegrationEventPublishing(
+                        opts,
+                        some.QueuePrefix,
+                        some.Assemblies
+                    ),
+                () => { }
+            );
+
             opts.OnException<Ports.EventStore.ConcurrencyException>()
                 .RetryWithCooldown([
                     TimeSpan.FromMilliseconds(50),

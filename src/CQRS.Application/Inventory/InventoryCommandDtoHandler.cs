@@ -1,9 +1,11 @@
 using CQRS.Domain;
 using CQRS.Domain.Inventory;
 using CQRS.DTO;
+using CQRS.IntegrationEvents.Inventory.V1;
 using CQRS.Mapping;
 using CQRS.Mapping.Inventory;
 using CQRS.Ports.EventStore;
+using CQRS.Ports.MessageBus;
 using LanguageExt;
 using OneOf;
 
@@ -13,7 +15,9 @@ public class InventoryCommandDtoHandler(
     IEventStore<Option<InventoryState>, IInventoryEvent, IInventoryEventDto> eventStore,
     IInventoryCommandMapper commandMapper,
     InventoryEventStreamStateProjection stateProjection,
-    EventStoreInventoryEventMapper eventMapper
+    EventStoreInventoryEventMapper eventMapper,
+    IMessageBus bus,
+    ITimeProvider timeProvider
 )
 {
     public Task<CommandProcessingResult> Handle(
@@ -54,15 +58,51 @@ public class InventoryCommandDtoHandler(
                     error => Task.FromResult(CommandProcessingResult.Failed(error)),
                     SaveNewEvents
                 );
+
+                async Task<CommandProcessingResult> SaveNewEvents(Seq<IInventoryEvent> newEvents)
+                {
+                    session.AppendEvents(newEvents, correlationId, causationId);
+                    await session.Save();
+                    await PublishIntegrationEvent(
+                        newEvents,
+                        currentState,
+                        correlationId,
+                        causationId
+                    );
+                    return CommandProcessingResult.Completed(newEvents);
+                }
             }
         );
+    }
 
-        async Task<CommandProcessingResult> SaveNewEvents(Seq<IInventoryEvent> newEvents)
-        {
-            session.AppendEvents(newEvents, correlationId, causationId);
-            await session.Save();
-            return CommandProcessingResult.Completed(newEvents);
-        }
+    private async Task PublishIntegrationEvent(
+        Seq<IInventoryEvent> newEvents,
+        Option<InventoryState> stateBefore,
+        Guid correlationId,
+        Guid causationId
+    )
+    {
+        var newState = newEvents.Fold(stateBefore, InventoryStateProjection.Apply);
+        await newState.Match(
+            Some: state =>
+                bus.Publish(
+                    new InventoryUpdated
+                    {
+                        InventoryId = state.Id,
+                        Name = state.Name,
+                        StockQuantity = state.Quantity.Match(q => (int)q, () => 0),
+                        IsActive = state.IsActive,
+                    },
+                    new Context
+                    {
+                        MessageId = MessagingId.NewId(),
+                        CorrelationId = (MessagingId)correlationId,
+                        CausationId = (MessagingId)causationId,
+                        Timestamp = timeProvider.GetUtcNow(),
+                    }
+                ),
+            None: () => Task.CompletedTask
+        );
     }
 }
 

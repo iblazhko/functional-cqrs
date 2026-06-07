@@ -10,6 +10,5 @@ public static class InventoryEventStreamId
     public static EventStreamId GetStreamId(InventoryId inventoryId) =>
         (EventStreamId)$"{EventStreamPrefix}{inventoryId}";
 
-    public static string GetDocumentId(string streamKey) =>
-        streamKey[EventStreamPrefix.Length..];
+    public static string GetDocumentId(string streamKey) => streamKey[EventStreamPrefix.Length..];
 }

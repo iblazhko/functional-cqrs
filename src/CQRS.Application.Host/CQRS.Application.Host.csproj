@@ -9,7 +9,6 @@
     <ProjectReference Include="..\CQRS.Application\CQRS.Application.csproj" />
     <ProjectReference Include="..\CQRS.Configuration\CQRS.Configuration.csproj" />
     <ProjectReference Include="..\CQRS.Infrastructure\CQRS.Infrastructure.csproj" />
-
   </ItemGroup>
 
   <ItemGroup>

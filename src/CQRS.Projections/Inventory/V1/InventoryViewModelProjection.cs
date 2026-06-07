@@ -4,7 +4,8 @@ using CQRS.Projections.ViewModels.Inventory.V1;
 
 namespace CQRS.Projections.Inventory.V1;
 
-public class InventoryViewModelProjection : IEventStoreProjection<InventoryViewModel, IInventoryEvent>
+public class InventoryViewModelProjection
+    : IEventStoreProjection<InventoryViewModel, IInventoryEvent>
 {
     public static InventoryViewModel Apply(InventoryViewModel vm, IInventoryEvent @event) =>
         @event switch

@@ -23,5 +23,6 @@
     <ProjectReference Include="..\CQRS.EntityIds\CQRS.EntityIds.csproj" />
     <ProjectReference Include="..\CQRS.Mapping\CQRS.Mapping.csproj" />
     <ProjectReference Include="..\CQRS.Ports.EventStore\CQRS.Ports.EventStore.csproj" />
+    <ProjectReference Include="..\CQRS.Ports.MessageBus\CQRS.Ports.MessageBus.csproj" />
   </ItemGroup>
 </Project>

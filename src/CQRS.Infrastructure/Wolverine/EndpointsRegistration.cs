@@ -7,5 +7,6 @@ public sealed record EndpointsRegistration(Seq<Assembly> Assemblies, string Queu
 
 public sealed record HostEndpointsRegistration(
     Option<EndpointsRegistration> SendConventions,
-    Option<EndpointsRegistration> Consumers
+    Option<EndpointsRegistration> Consumers,
+    Option<EndpointsRegistration> IntegrationEvents = default
 );

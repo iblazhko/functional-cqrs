@@ -7,6 +7,5 @@ public class InventoryViewModelQueryRepository(
     IEventStoreProjectionReader<InventoryViewModel> reader
 )
 {
-    public Task<InventoryViewModel?> GetById(string inventoryId) =>
-        reader.GetById(inventoryId);
+    public Task<InventoryViewModel?> GetById(string inventoryId) => reader.GetById(inventoryId);
 }

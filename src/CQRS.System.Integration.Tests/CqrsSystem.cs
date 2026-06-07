@@ -1,6 +1,5 @@
 using CQRS.API.Inventory;
 using CQRS.Application.CommandProcessingStatusRecording;
-
 using Flurl;
 using Flurl.Http;
 using Polly;
@@ -73,9 +72,7 @@ public class CqrsSystem(Uri apiBaseAddress, Uri applicationBaseAddress)
         const int delayMilliseconds = 200;
         var retryCount = timeoutSeconds * 1000 / delayMilliseconds;
         var result = await Policy
-            .HandleResult<string?>(s =>
-                s is null or nameof(Status.Processing)
-            )
+            .HandleResult<string?>(s => s is null or nameof(Status.Processing))
             .WaitAndRetryAsync(
                 Backoff.LinearBackoff(
                     TimeSpan.FromMilliseconds(delayMilliseconds),
@@ -102,7 +99,9 @@ public class CqrsSystem(Uri apiBaseAddress, Uri applicationBaseAddress)
 
                 if (status?.Status is nameof(Status.Rejected) or nameof(Status.Failed))
                 {
-                    Console.WriteLine($"Command {commandId} finished processing with status {status?.Status}: {status?.Response}");
+                    Console.WriteLine(
+                        $"Command {commandId} finished processing with status {status?.Status}: {status?.Response}"
+                    );
                 }
 
                 return status?.Status;

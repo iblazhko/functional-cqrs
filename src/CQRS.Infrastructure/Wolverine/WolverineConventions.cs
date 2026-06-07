@@ -69,6 +69,27 @@ internal static class WolverineConventions
             .Select(p => p.ParameterType)
             .Distinct();
 
+    internal static void RegisterIntegrationEventPublishing(
+        WolverineOptions opts,
+        string queuePrefix,
+        IEnumerable<Assembly> assemblies
+    )
+    {
+        var exchangePrefix = $"{queuePrefix}.integration";
+        foreach (var asm in assemblies)
+        foreach (var eventType in IntegrationEventTypesFromAssembly(asm))
+        {
+            var exchangeName = $"{exchangePrefix}:{ToSnakeCase(eventType.Name)}";
+            opts.PublishMessage(eventType).ToRabbitExchange(exchangeName);
+        }
+    }
+
+    private static IEnumerable<Type> IntegrationEventTypesFromAssembly(Assembly asm) =>
+        asm.GetTypes()
+            .Where(t =>
+                !t.IsAbstract && t.IsPublic && !t.IsInterface && !t.IsGenericType && !t.IsNested
+            );
+
     private static IEnumerable<Type> CommandTypesFromAssembly(Assembly asm) =>
         asm.GetTypes().Where(t => !t.IsAbstract && CommandDtoType.IsAssignableFrom(t));
 

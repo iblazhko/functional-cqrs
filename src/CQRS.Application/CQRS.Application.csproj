@@ -3,8 +3,10 @@
     <ProjectReference Include="..\CQRS.Application.CommandProcessingStatusRecording\CQRS.Application.CommandProcessingStatusRecording.csproj" />
     <ProjectReference Include="..\CQRS.Domain\CQRS.Domain.csproj" />
     <ProjectReference Include="..\CQRS.DTO\CQRS.DTO.csproj" />
+    <ProjectReference Include="..\CQRS.IntegrationEvents\CQRS.IntegrationEvents.csproj" />
     <ProjectReference Include="..\CQRS.Mapping\CQRS.Mapping.csproj" />
     <ProjectReference Include="..\CQRS.Ports.EventStore\CQRS.Ports.EventStore.csproj" />
+    <ProjectReference Include="..\CQRS.Ports.MessageBus\CQRS.Ports.MessageBus.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />

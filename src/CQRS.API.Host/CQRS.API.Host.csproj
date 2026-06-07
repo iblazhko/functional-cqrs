@@ -12,7 +12,6 @@
     <ProjectReference Include="..\CQRS.Infrastructure\CQRS.Infrastructure.csproj" />
     <ProjectReference Include="..\CQRS.Ports.EventStore\CQRS.Ports.EventStore.csproj" />
     <ProjectReference Include="..\CQRS.Ports.MessageBus\CQRS.Ports.MessageBus.csproj" />
-
   </ItemGroup>
 
   <ItemGroup>

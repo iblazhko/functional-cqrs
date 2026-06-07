@@ -25,7 +25,9 @@ public sealed class MartenDbProjectionAdapter<TViewModel, TDomainEvent, TEventDt
             var vm = await operations.LoadAsync<TViewModel>(id, cancellation) ?? new TViewModel();
             foreach (var e in group)
                 if (e.Data is TEventDto dto)
-                    vm = mapper.ToDomainEvent(dto).Match(Left: _ => vm, Right: de => projection.Apply(vm, de));
+                    vm = mapper
+                        .ToDomainEvent(dto)
+                        .Match(Left: _ => vm, Right: de => projection.Apply(vm, de));
             operations.Store(vm);
         }
     }

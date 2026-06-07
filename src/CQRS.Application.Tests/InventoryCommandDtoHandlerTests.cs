@@ -8,10 +8,33 @@ using CQRS.DTO.Inventory.V1;
 using CQRS.EntityIds;
 using CQRS.Mapping.Inventory.V1;
 using CQRS.Ports.EventStore;
+using CQRS.Ports.MessageBus;
 using LanguageExt;
 using Shouldly;
 
 namespace CQRS.Application.Tests;
+
+file sealed class NoOpMessageBus : IMessageBus
+{
+    public Task Publish<T>(
+        T message,
+        Context context,
+        CancellationToken cancellationToken = default
+    ) => Task.CompletedTask;
+
+    public Task Send<T>(
+        T message,
+        Context context,
+        CancellationToken cancellationToken = default
+    ) => Task.CompletedTask;
+}
+
+file sealed class FixedTimeProvider : ITimeProvider
+{
+    public DateTimeOffset GetUtcNow() => DateTimeOffset.UtcNow;
+
+    public Domain.TimeZone TimeZone => Domain.TimeZone.Create("UTC").IfLeft(_ => throw new());
+}
 
 public sealed class InventoryCommandDtoHandlerTests
 {
@@ -34,7 +57,9 @@ public sealed class InventoryCommandDtoHandlerTests
             _eventStore,
             new InventoryCommandV1Mapper(),
             new InventoryEventStreamStateProjection(),
-            new EventStoreInventoryEventMapper()
+            new EventStoreInventoryEventMapper(),
+            new NoOpMessageBus(),
+            new FixedTimeProvider()
         );
     }
 

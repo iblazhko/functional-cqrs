@@ -24,6 +24,7 @@
     <ProjectReference Include="..\CQRS.Domain\CQRS.Domain.csproj" />
     <ProjectReference Include="..\CQRS.DTO\CQRS.DTO.csproj" />
     <ProjectReference Include="..\CQRS.EntityIds\CQRS.EntityIds.csproj" />
+    <ProjectReference Include="..\CQRS.IntegrationEvents\CQRS.IntegrationEvents.csproj" />
     <ProjectReference Include="..\CQRS.Infrastructure\CQRS.Infrastructure.csproj" />
     <ProjectReference Include="..\CQRS.Mapping\CQRS.Mapping.csproj" />
     <ProjectReference Include="..\CQRS.Ports.EventStore\CQRS.Ports.EventStore.csproj" />

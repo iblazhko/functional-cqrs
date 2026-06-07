@@ -7,8 +7,8 @@ using CQRS.Configuration;
 using CQRS.Domain;
 using CQRS.DTO;
 using CQRS.Infrastructure;
+using CQRS.IntegrationEvents.Inventory.V1;
 using CQRS.Mapping;
-
 using DotNet.Testcontainers.Configurations;
 using LanguageExt;
 using Microsoft.AspNetCore.Builder;
@@ -52,6 +52,7 @@ public class CqrsTestContainersFixture : IAsyncLifetime
 
     // ReSharper disable once InconsistentNaming
     public CqrsSystem SUT { get; private set; } = null!;
+    public RabbitMqSettings RabbitMqSettings { get; private set; } = null!;
 
     public async ValueTask InitializeAsync()
     {
@@ -63,6 +64,7 @@ public class CqrsTestContainersFixture : IAsyncLifetime
 
         var martenDbSettings = BuildMartenDbSettings(MartenDbSettingsTemplate, _postgres);
         var messageBusSettings = BuildMessageBusSettings(RabbitMqSettingsTemplate, _rabbitmq);
+        RabbitMqSettings = BuildRabbitMqSettings(RabbitMqSettingsTemplate, _rabbitmq);
 
         _appHost = BuildApplicationHost(martenDbSettings, messageBusSettings);
         _apiHost = BuildApiHost(martenDbSettings, messageBusSettings);
@@ -162,6 +164,7 @@ public class CqrsTestContainersFixture : IAsyncLifetime
 
         var commandsAssembly = typeof(IInventoryCommandDto).Assembly;
         var commandConsumersAssembly = typeof(InventoryCommandConsumer).Assembly;
+        var integrationEventsAssembly = typeof(InventoryUpdated).Assembly;
         // csharpier-ignore
         builder.Services
             .AddApplicationServices()
@@ -170,7 +173,8 @@ public class CqrsTestContainersFixture : IAsyncLifetime
             .AddCqrsMessageBus(
                 new HostEndpointsRegistration(
                     new EndpointsRegistration(new Seq<Assembly>([commandsAssembly])),
-                    new EndpointsRegistration(new Seq<Assembly>([commandConsumersAssembly]))),
+                    new EndpointsRegistration(new Seq<Assembly>([commandConsumersAssembly])),
+                    new EndpointsRegistration(new Seq<Assembly>([integrationEventsAssembly]))),
                 messageBus)
             .AddCqrsEventStore(martenDb)
             .AddMartenDbCommandProcessingStatus(martenDb)

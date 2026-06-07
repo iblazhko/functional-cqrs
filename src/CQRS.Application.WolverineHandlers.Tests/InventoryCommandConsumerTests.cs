@@ -95,7 +95,9 @@ public sealed class InventoryCommandConsumerTests
                 store,
                 new InventoryCommandV1Mapper(),
                 new InventoryEventStreamStateProjection(),
-                new EventStoreInventoryEventMapper()
+                new EventStoreInventoryEventMapper(),
+                new NoOpMessageBus(),
+                new TimeProviderStub()
             ),
             NullLogger<InventoryCommandConsumer>.Instance
         );
@@ -310,6 +312,21 @@ public sealed class InventoryCommandConsumerTests
         );
         _recorder.StartedRequest.ShouldNotBeNull();
     }
+}
+
+file sealed class NoOpMessageBus : CQRS.Ports.MessageBus.IMessageBus
+{
+    public Task Publish<T>(
+        T message,
+        CQRS.Ports.MessageBus.Context context,
+        CancellationToken cancellationToken = default
+    ) => Task.CompletedTask;
+
+    public Task Send<T>(
+        T message,
+        CQRS.Ports.MessageBus.Context context,
+        CancellationToken cancellationToken = default
+    ) => Task.CompletedTask;
 }
 
 file sealed class TimeProviderStub : ITimeProvider

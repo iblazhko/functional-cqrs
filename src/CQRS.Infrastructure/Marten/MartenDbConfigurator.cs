@@ -1,5 +1,6 @@
 namespace CQRS.Infrastructure;
 
+using CQRS.Adapters.MartenDbEventStore;
 using CQRS.Application.CommandProcessingStatusRecording;
 using CQRS.Application.Inventory;
 using CQRS.Configuration;
@@ -7,7 +8,6 @@ using CQRS.Domain.Inventory;
 using CQRS.DTO;
 using CQRS.Projections.Inventory.V1;
 using CQRS.Projections.ViewModels.Inventory.V1;
-using CQRS.Adapters.MartenDbEventStore;
 using JasperFx.Events;
 using JasperFx.Events.Projections;
 using Marten;
@@ -38,7 +38,11 @@ public static class MartenDbConfigurator
 
                 options.Schema.For<InventoryViewModel>().Identity(x => x.Id);
                 options.Projections.Add(
-                    new MartenDbProjectionAdapter<InventoryViewModel, IInventoryEvent, IInventoryEventDto>(
+                    new MartenDbProjectionAdapter<
+                        InventoryViewModel,
+                        IInventoryEvent,
+                        IInventoryEventDto
+                    >(
                         new InventoryViewModelProjection(),
                         new EventStoreInventoryEventMapper(),
                         InventoryEventStreamId.GetDocumentId

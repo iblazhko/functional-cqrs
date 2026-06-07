@@ -5,6 +5,7 @@ using CQRS.Application.WolverineHandlers;
 using CQRS.Configuration;
 using CQRS.DTO;
 using CQRS.Infrastructure;
+using CQRS.IntegrationEvents.Inventory.V1;
 using CQRS.Mapping;
 using LanguageExt;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +19,7 @@ builder.WebHost.UseUrls(settings.ServiceUrl);
 
 var commandsAssembly = typeof(IInventoryCommandDto).Assembly;
 var commandConsumersAssembly = typeof(InventoryCommandConsumer).Assembly;
+var integrationEventsAssembly = typeof(InventoryUpdated).Assembly;
 
 // csharpier-ignore
 builder.Services
@@ -26,7 +28,8 @@ builder.Services
     .AddCqrsMessageBus(
          new HostEndpointsRegistration(
              new EndpointsRegistration(new Seq<Assembly>([commandsAssembly])),
-             new EndpointsRegistration(new Seq<Assembly>([commandConsumersAssembly]))),
+             new EndpointsRegistration(new Seq<Assembly>([commandConsumersAssembly])),
+             new EndpointsRegistration(new Seq<Assembly>([integrationEventsAssembly]))),
          settings.MessageBus)
     .AddCqrsEventStore(settings.MartenDb)
     .AddMartenDbCommandProcessingStatus(settings.MartenDb)

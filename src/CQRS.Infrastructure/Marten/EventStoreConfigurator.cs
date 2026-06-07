@@ -12,7 +12,7 @@ public static class EventStoreConfigurator
     {
         services.AddScoped(
             typeof(Ports.EventStore.IEventPublisher<>),
-            typeof(EventStoreEventsPublisher<>)
+            typeof(Ports.EventStore.NoOpEventPublisher<>)
         );
         services.AddScoped(
             typeof(Ports.EventStore.IEventStore<,,>),

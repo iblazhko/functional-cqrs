@@ -30,7 +30,14 @@ public sealed class InventoryViewModelQueryRepositoryTests
     public async Task GetById_DocumentExists_ReturnsViewModel()
     {
         var inventoryId = InventoryId.NewId();
-        SeedViewModel(new InventoryViewModel { Id = inventoryId, Name = "Widget", IsActive = true });
+        SeedViewModel(
+            new InventoryViewModel
+            {
+                Id = inventoryId,
+                Name = "Widget",
+                IsActive = true,
+            }
+        );
 
         var result = await MakeRepository().GetById(inventoryId);
 
@@ -41,7 +48,14 @@ public sealed class InventoryViewModelQueryRepositoryTests
     public async Task GetById_DocumentExists_ReturnsViewModelWithCorrectId()
     {
         var inventoryId = InventoryId.NewId();
-        SeedViewModel(new InventoryViewModel { Id = inventoryId, Name = "Widget", IsActive = true });
+        SeedViewModel(
+            new InventoryViewModel
+            {
+                Id = inventoryId,
+                Name = "Widget",
+                IsActive = true,
+            }
+        );
 
         var result = await MakeRepository().GetById(inventoryId);
 
@@ -52,13 +66,15 @@ public sealed class InventoryViewModelQueryRepositoryTests
     public async Task GetById_DocumentExists_ReturnsViewModelWithCorrectData()
     {
         var inventoryId = InventoryId.NewId();
-        SeedViewModel(new InventoryViewModel
-        {
-            Id = inventoryId,
-            Name = "Gadget",
-            StockQuantity = 42,
-            IsActive = false,
-        });
+        SeedViewModel(
+            new InventoryViewModel
+            {
+                Id = inventoryId,
+                Name = "Gadget",
+                StockQuantity = 42,
+                IsActive = false,
+            }
+        );
 
         var result = await MakeRepository().GetById(inventoryId);
 

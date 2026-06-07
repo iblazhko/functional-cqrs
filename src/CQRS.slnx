@@ -6,6 +6,7 @@
         <Project Path="CQRS.DTO\CQRS.DTO.csproj" Type="Classic C#" />
         <Project Path="CQRS.EntityIds\CQRS.EntityIds.csproj" Type="Classic C#" />
         <Project Path="CQRS.EntityIds.Tests\CQRS.EntityIds.Tests.csproj" Type="Classic C#" />
+        <Project Path="CQRS.IntegrationEvents\CQRS.IntegrationEvents.csproj" Type="Classic C#" />
         <Project Path="CQRS.Mapping\CQRS.Mapping.csproj" Type="Classic C#" />
         <Project Path="CQRS.Mapping.Tests\CQRS.Mapping.Tests.csproj" Type="Classic C#" />
     </Folder>

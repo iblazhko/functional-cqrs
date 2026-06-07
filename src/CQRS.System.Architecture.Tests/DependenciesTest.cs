@@ -26,6 +26,7 @@ public sealed class DependenciesTest
                 "CQRS.Domain",
                 "CQRS.DTO",
                 "CQRS.EntityIds",
+                "CQRS.IntegrationEvents",
                 "CQRS.Infrastructure",
                 "CQRS.Mapping",
                 "CQRS.Ports.EventStore",
@@ -49,6 +50,8 @@ public sealed class DependenciesTest
     private readonly IObjectProvider<IType> DtoLayer = Types()
         .That()
         .ResideInAssembly("CQRS.DTO")
+        .Or()
+        .ResideInAssembly("CQRS.IntegrationEvents")
         .As("DTO Layer");
 
     private readonly IObjectProvider<IType> CoreLayer = Types()
