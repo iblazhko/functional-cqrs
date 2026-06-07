@@ -1,9 +1,8 @@
-using CQRS.Adapters.InMemoryProjectionStore;
 using CQRS.API.Inventory;
 using CQRS.EntityIds;
 using CQRS.Mapping;
 using CQRS.Mapping.Inventory.V1;
-using CQRS.Ports.ProjectionStore;
+using CQRS.Ports.EventStore;
 using CQRS.Projections.Repositories.Inventory.V1;
 using CQRS.Projections.ViewModels.Inventory.V1;
 using LanguageExt;
@@ -11,16 +10,26 @@ using Shouldly;
 
 namespace CQRS.API.Tests;
 
+internal sealed class InMemoryInventoryReader : IEventStoreProjectionReader<InventoryViewModel>
+{
+    private readonly Dictionary<string, InventoryViewModel> _store = new();
+
+    public void Seed(InventoryViewModel vm) => _store[vm.Id] = vm;
+
+    public Task<InventoryViewModel?> GetById(string id) =>
+        Task.FromResult(_store.GetValueOrDefault(id));
+}
+
 public sealed class InventoryApiServiceTests
 {
     private readonly FakeMessageBus _bus = new();
-    private readonly InMemoryProjectionStoreAdapter<InventoryViewModel> _store = new();
+    private readonly InMemoryInventoryReader _reader = new();
     private readonly InventoryViewModelQueryRepository _queryRepository;
     private readonly InventoryApiService _service;
 
     public InventoryApiServiceTests()
     {
-        _queryRepository = new InventoryViewModelQueryRepository(_store);
+        _queryRepository = new InventoryViewModelQueryRepository(_reader);
         _service = new InventoryApiService(
             _bus,
             new InventoryCommandV1Mapper(),
@@ -33,16 +42,13 @@ public sealed class InventoryApiServiceTests
 
     private static string InvalidId() => "bad-id";
 
-    private async Task SeedInventory(
+    private void SeedInventory(
         string inventoryId,
         string name,
         int stock = 0,
         bool isActive = true
-    )
-    {
-        var collection = await _store.OpenDocumentCollection(InventoryCollection.CollectionId);
-        await collection.Update(
-            (DocumentId)inventoryId,
+    ) =>
+        _reader.Seed(
             new InventoryViewModel
             {
                 Id = inventoryId,
@@ -51,7 +57,6 @@ public sealed class InventoryApiServiceTests
                 IsActive = isActive,
             }
         );
-    }
 
     // --- GetInventory ---
 
@@ -59,13 +64,13 @@ public sealed class InventoryApiServiceTests
     public async Task GetInventory_ExistingId_ReturnsSomeWithCorrectFields()
     {
         var id = ValidId();
-        await SeedInventory(id, "Widget", 10, true);
+        SeedInventory(id, "Widget", 10, true);
 
         var result = await _service.GetInventory(id);
 
         var response = result.Match(r => r, () => null!);
         response.ShouldNotBeNull();
-        response.InventoryId.ShouldBe(id.ToUpperInvariant());
+        response.InventoryId.ShouldBe(id);
         response.Name.ShouldBe("Widget");
         response.StockQuantity.ShouldBe(10);
         response.IsActive.ShouldBeTrue();
@@ -113,7 +118,7 @@ public sealed class InventoryApiServiceTests
 
         var response = result.IfLeft((AcceptedResponse)null!);
         response.ShouldNotBeNull();
-        response.InventoryId.ShouldBe(id.ToUpperInvariant());
+        response.InventoryId.ShouldBe(id);
     }
 
     [Fact]

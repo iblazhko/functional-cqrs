@@ -6,7 +6,6 @@ using CQRS.Configuration;
 using CQRS.DTO;
 using CQRS.Infrastructure;
 using CQRS.Mapping;
-using CQRS.Projections.WolverineHandlers;
 using LanguageExt;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,7 +18,6 @@ builder.WebHost.UseUrls(settings.ServiceUrl);
 
 var commandsAssembly = typeof(IInventoryCommandDto).Assembly;
 var commandConsumersAssembly = typeof(InventoryCommandConsumer).Assembly;
-var projectionConsumersAssembly = typeof(InventoryEventConsumer).Assembly;
 
 // csharpier-ignore
 builder.Services
@@ -28,10 +26,9 @@ builder.Services
     .AddCqrsMessageBus(
          new HostEndpointsRegistration(
              new EndpointsRegistration(new Seq<Assembly>([commandsAssembly])),
-             new EndpointsRegistration(new Seq<Assembly>([commandConsumersAssembly, projectionConsumersAssembly]))),
+             new EndpointsRegistration(new Seq<Assembly>([commandConsumersAssembly]))),
          settings.MessageBus)
     .AddCqrsEventStore(settings.MartenDb)
-    .AddCqrsProjectionStore(settings.MartenDb)
     .AddMartenDbCommandProcessingStatus(settings.MartenDb)
     .AddApplicationSerilog(settings.Logging)
     .AddApplicationHealthChecks(settings)

@@ -186,6 +186,18 @@ public interface IEventStore<TDomainState, TDomainEvent, TEventDto> : IDisposabl
     Task<bool> Contains(EventStreamId streamId, CancellationToken cancellationToken = default);
 }
 
+public interface IEventStoreProjection<TViewModel, TDomainEvent>
+    where TViewModel : class, new()
+{
+    TViewModel Apply(TViewModel current, TDomainEvent @event);
+}
+
+public interface IEventStoreProjectionReader<TViewModel>
+    where TViewModel : class
+{
+    Task<TViewModel?> GetById(string id);
+}
+
 public sealed class UnknownEventTypeException(string typeName)
     : Exception($"Unknown event type {typeName}");
 

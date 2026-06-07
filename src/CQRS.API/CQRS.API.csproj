@@ -12,7 +12,6 @@
     <ProjectReference Include="..\CQRS.EntityIds\CQRS.EntityIds.csproj" />
     <ProjectReference Include="..\CQRS.Mapping\CQRS.Mapping.csproj" />
     <ProjectReference Include="..\CQRS.Ports.MessageBus\CQRS.Ports.MessageBus.csproj" />
-    <ProjectReference Include="..\CQRS.Ports.ProjectionStore\CQRS.Ports.ProjectionStore.csproj" />
     <ProjectReference Include="..\CQRS.Projections.Repositories\CQRS.Projections.Repositories.csproj" />
   </ItemGroup>
 </Project>

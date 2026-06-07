@@ -4,7 +4,6 @@ using CQRS.EntityIds;
 using CQRS.Mapping;
 using CQRS.Mapping.Inventory;
 using CQRS.Ports.MessageBus;
-using CQRS.Ports.ProjectionStore;
 using CQRS.Projections.Repositories.Inventory.V1;
 using CQRS.Projections.ViewModels.Inventory.V1;
 using LanguageExt;
@@ -42,7 +41,7 @@ public class InventoryApiService(
 {
     public async Task<Option<InventoryResponse>> GetInventory(string inventoryId)
     {
-        var vm = await queryRepository.GetById((DocumentId)inventoryId);
+        var vm = await queryRepository.GetById(inventoryId);
         return ((Option<InventoryViewModel>)vm).Map(x => new InventoryResponse
         {
             InventoryId = x.Id,

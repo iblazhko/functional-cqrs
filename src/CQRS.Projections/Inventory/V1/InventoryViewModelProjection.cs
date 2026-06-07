@@ -1,9 +1,10 @@
 using CQRS.Domain.Inventory;
+using CQRS.Ports.EventStore;
 using CQRS.Projections.ViewModels.Inventory.V1;
 
 namespace CQRS.Projections.Inventory.V1;
 
-public static class InventoryViewModelProjection
+public class InventoryViewModelProjection : IEventStoreProjection<InventoryViewModel, IInventoryEvent>
 {
     public static InventoryViewModel Apply(InventoryViewModel vm, IInventoryEvent @event) =>
         @event switch
@@ -26,4 +27,9 @@ public static class InventoryViewModelProjection
             ItemWentOutOfStock => vm,
             _ => vm,
         };
+
+    InventoryViewModel IEventStoreProjection<InventoryViewModel, IInventoryEvent>.Apply(
+        InventoryViewModel current,
+        IInventoryEvent @event
+    ) => Apply(current, @event);
 }

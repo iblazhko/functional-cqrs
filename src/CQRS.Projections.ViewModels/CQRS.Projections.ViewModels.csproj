@@ -1,5 +1,2 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <ProjectReference Include="..\CQRS.Ports.ProjectionStore\CQRS.Ports.ProjectionStore.csproj" />
-  </ItemGroup>
+<Project Sdk="Microsoft.NET.Sdk">
 </Project>

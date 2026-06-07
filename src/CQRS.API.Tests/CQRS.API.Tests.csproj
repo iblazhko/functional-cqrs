@@ -20,7 +20,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CQRS.API\CQRS.API.csproj" />
-    <ProjectReference Include="..\CQRS.Adapters.InMemoryProjectionStore\CQRS.Adapters.InMemoryProjectionStore.csproj" />
     <ProjectReference Include="..\CQRS.Mapping\CQRS.Mapping.csproj" />
+    <ProjectReference Include="..\CQRS.Ports.EventStore\CQRS.Ports.EventStore.csproj" />
+    <ProjectReference Include="..\CQRS.Projections.Repositories\CQRS.Projections.Repositories.csproj" />
+    <ProjectReference Include="..\CQRS.Projections.ViewModels\CQRS.Projections.ViewModels.csproj" />
   </ItemGroup>
 </Project>

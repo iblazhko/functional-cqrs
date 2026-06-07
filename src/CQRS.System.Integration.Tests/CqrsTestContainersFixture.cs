@@ -8,7 +8,7 @@ using CQRS.Domain;
 using CQRS.DTO;
 using CQRS.Infrastructure;
 using CQRS.Mapping;
-using CQRS.Projections.WolverineHandlers;
+
 using DotNet.Testcontainers.Configurations;
 using LanguageExt;
 using Microsoft.AspNetCore.Builder;
@@ -162,7 +162,6 @@ public class CqrsTestContainersFixture : IAsyncLifetime
 
         var commandsAssembly = typeof(IInventoryCommandDto).Assembly;
         var commandConsumersAssembly = typeof(InventoryCommandConsumer).Assembly;
-        var projectionConsumersAssembly = typeof(InventoryEventConsumer).Assembly;
         // csharpier-ignore
         builder.Services
             .AddApplicationServices()
@@ -171,10 +170,9 @@ public class CqrsTestContainersFixture : IAsyncLifetime
             .AddCqrsMessageBus(
                 new HostEndpointsRegistration(
                     new EndpointsRegistration(new Seq<Assembly>([commandsAssembly])),
-                    new EndpointsRegistration(new Seq<Assembly>([commandConsumersAssembly, projectionConsumersAssembly]))),
+                    new EndpointsRegistration(new Seq<Assembly>([commandConsumersAssembly]))),
                 messageBus)
             .AddCqrsEventStore(martenDb)
-            .AddCqrsProjectionStore(martenDb)
             .AddMartenDbCommandProcessingStatus(martenDb)
             .AddApplicationSerilog(new LoggingSettings { Level = "ERROR" })
             .AddApplicationHealthChecks(BuildSettings(martenDb, messageBus));
@@ -211,7 +209,7 @@ public class CqrsTestContainersFixture : IAsyncLifetime
                     new EndpointsRegistration(new Seq<Assembly>([typeof(IInventoryCommandDto).Assembly])),
                     None),
                 messageBus)
-            .AddCqrsProjectionStore(martenDb)
+            .AddCqrsProjectionReader(martenDb)
             .AddApplicationHealthChecks(BuildSettings(martenDb, messageBus));
 
         var app = builder.Build();

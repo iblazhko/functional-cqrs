@@ -1,9 +1,13 @@
 using CQRS.API.Inventory;
+using CQRS.Application.CommandProcessingStatusRecording;
+
 using Flurl;
 using Flurl.Http;
 using Polly;
 using Polly.Contrib.WaitAndRetry;
 using Shouldly;
+
+[assembly: CaptureConsole]
 
 namespace CQRS.System.Integration.Tests;
 
@@ -70,7 +74,7 @@ public class CqrsSystem(Uri apiBaseAddress, Uri applicationBaseAddress)
         var retryCount = timeoutSeconds * 1000 / delayMilliseconds;
         var result = await Policy
             .HandleResult<string?>(s =>
-                s is null || (s != "Completed" && s != "Rejected" && s != "Failed")
+                s is null or nameof(Status.Processing)
             )
             .WaitAndRetryAsync(
                 Backoff.LinearBackoff(
@@ -90,9 +94,17 @@ public class CqrsSystem(Uri apiBaseAddress, Uri applicationBaseAddress)
                     .GetAsync();
 
                 if (flurlResponse.StatusCode == 404)
+                {
                     return null;
+                }
 
                 var status = await flurlResponse.GetJsonAsync<CommandStatusResponse>();
+
+                if (status?.Status is nameof(Status.Rejected) or nameof(Status.Failed))
+                {
+                    Console.WriteLine($"Command {commandId} finished processing with status {status?.Status}: {status?.Response}");
+                }
+
                 return status?.Status;
             });
 

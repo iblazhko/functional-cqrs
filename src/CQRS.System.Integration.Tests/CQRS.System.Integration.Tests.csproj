@@ -36,6 +36,5 @@
     <ProjectReference Include="..\CQRS.EntityIds\CQRS.EntityIds.csproj" />
     <ProjectReference Include="..\CQRS.Infrastructure\CQRS.Infrastructure.csproj" />
     <ProjectReference Include="..\CQRS.Mapping\CQRS.Mapping.csproj" />
-    <ProjectReference Include="..\CQRS.Projections.WolverineHandlers\CQRS.Projections.WolverineHandlers.csproj" />
   </ItemGroup>
 </Project>

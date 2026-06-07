@@ -13,9 +13,7 @@ public sealed class DependenciesTest
             .. new[]
             {
                 "CQRS.Adapters.InMemoryEventStore",
-                "CQRS.Adapters.InMemoryProjectionStore",
                 "CQRS.Adapters.MartenDbEventStore",
-                "CQRS.Adapters.MartenDbProjectionStore",
                 "CQRS.Adapters.WolverineMessageBus",
                 "CQRS.API",
                 "CQRS.API.Host",
@@ -32,9 +30,7 @@ public sealed class DependenciesTest
                 "CQRS.Mapping",
                 "CQRS.Ports.EventStore",
                 "CQRS.Ports.MessageBus",
-                "CQRS.Ports.ProjectionStore",
                 "CQRS.Projections",
-                "CQRS.Projections.WolverineHandlers",
                 "CQRS.Projections.Repositories",
                 "CQRS.Projections.ViewModels",
             }.Select(global::System.Reflection.Assembly.Load),
@@ -84,8 +80,6 @@ public sealed class DependenciesTest
     private readonly IObjectProvider<IType> ProjectionsLayer = Types()
         .That()
         .ResideInAssembly("CQRS.Projections")
-        .Or()
-        .ResideInAssembly("CQRS.Projections.WolverineHandlers")
         .As("Projections Layer");
 
     private readonly IObjectProvider<IType> ProjectionsRepositoriesLayer = Types()
@@ -108,19 +102,13 @@ public sealed class DependenciesTest
         .ResideInAssembly("CQRS.Ports.EventStore")
         .Or()
         .ResideInAssembly("CQRS.Ports.MessageBus")
-        .Or()
-        .ResideInAssembly("CQRS.Ports.ProjectionStore")
         .As("Ports Layer");
 
     private readonly IObjectProvider<IType> AdaptersLayer = Types()
         .That()
         .ResideInAssembly("CQRS.Adapters.InMemoryEventStore")
         .Or()
-        .ResideInAssembly("CQRS.Adapters.InMemoryProjectionStore")
-        .Or()
         .ResideInAssembly("CQRS.Adapters.MartenDbEventStore")
-        .Or()
-        .ResideInAssembly("CQRS.Adapters.MartenDbProjectionStore")
         .Or()
         .ResideInAssembly("CQRS.Adapters.WolverineMessageBus")
         .As("Adapters Layer");
@@ -377,18 +365,12 @@ public sealed class DependenciesTest
             .That()
             .ResideInAssembly("CQRS.Ports.MessageBus")
             .As("MessageBus Port");
-        var projectionStorePort = Types()
-            .That()
-            .ResideInAssembly("CQRS.Ports.ProjectionStore")
-            .As("ProjectionStore Port");
 
         Types()
             .That()
             .Are(eventStorePort)
             .Should()
             .NotDependOnAny(messageBusPort)
-            .AndShould()
-            .NotDependOnAny(projectionStorePort)
             .Because(RulePortsShouldNotDependOnEachOther)
             .WithoutRequiringPositiveResults()
             .Check(Architecture);
@@ -398,19 +380,6 @@ public sealed class DependenciesTest
             .Are(messageBusPort)
             .Should()
             .NotDependOnAny(eventStorePort)
-            .AndShould()
-            .NotDependOnAny(projectionStorePort)
-            .Because(RulePortsShouldNotDependOnEachOther)
-            .WithoutRequiringPositiveResults()
-            .Check(Architecture);
-
-        Types()
-            .That()
-            .Are(projectionStorePort)
-            .Should()
-            .NotDependOnAny(eventStorePort)
-            .AndShould()
-            .NotDependOnAny(messageBusPort)
             .Because(RulePortsShouldNotDependOnEachOther)
             .WithoutRequiringPositiveResults()
             .Check(Architecture);

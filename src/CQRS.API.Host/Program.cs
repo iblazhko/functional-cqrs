@@ -21,7 +21,7 @@ builder.Services
              new EndpointsRegistration([typeof(IInventoryCommandDto).Assembly]),
              None),
          settings.MessageBus)
-    .AddCqrsProjectionStore(settings.MartenDb)
+    .AddCqrsProjectionReader(settings.MartenDb)
     .AddApplicationSerilog(settings.Logging)
     .AddApplicationHealthChecks(settings)
     .AddApplicationOpenTelemetry("cqrs-api");
